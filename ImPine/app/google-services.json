@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "714222331085",
+    "project_id": "bubby-78235",
+    "storage_bucket": "bubby-78235.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:714222331085:android:caff2bfcb66cdc34363584",
+        "android_client_info": {
+          "package_name": "com.example.imPine"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDC_LZq829a3modHlWRXTtz4GBE6oJyhoQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
