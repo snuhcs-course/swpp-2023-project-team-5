@@ -23,6 +23,11 @@
 
         <activity android:name=".HomePageActivity" />
         <activity android:name=".DiaryPageActivity" />
+        <activity android:name=".PredictionPageActivity" />
+        <activity android:name=".FriendsPageActivity" />
+        <activity android:name=".SettingsPageActivity" />
+        <activity android:name=".UserPageActivity" />
+        <activity android:name=".NotificationsPageActivity" />
     </application>
 
 </manifest>

@@ -1,18 +1,18 @@
 package com.example.imPine;
 
-import android.os.Bundle;
 import android.content.Intent;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class HomePageActivity extends AppCompatActivity {
+public class NotificationsPageActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.home_page);
+        setContentView(R.layout.notifications_page);
 
         // Diary button click
         ImageButton diaryButton = findViewById(R.id.diary);
@@ -20,7 +20,7 @@ public class HomePageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Start the DiaryPageActivity
-                Intent intent = new Intent(HomePageActivity.this, DiaryPageActivity.class);
+                Intent intent = new Intent(NotificationsPageActivity.this, DiaryPageActivity.class);
                 startActivity(intent);
             }
         });
@@ -28,13 +28,10 @@ public class HomePageActivity extends AppCompatActivity {
         // Home button click
         ImageButton homeButton = findViewById(R.id.home);
         homeButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(HomePageActivity.this, "Already Home!", Toast.LENGTH_SHORT).show();
-//            }
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(HomePageActivity.this, HomePageActivity.class);
+                // Start the DiaryPageActivity
+                Intent intent = new Intent(NotificationsPageActivity.this, HomePageActivity.class);
                 startActivity(intent);
             }
         });
@@ -44,7 +41,7 @@ public class HomePageActivity extends AppCompatActivity {
         predictionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(HomePageActivity.this, PredictionPageActivity.class);
+                Intent intent = new Intent(NotificationsPageActivity.this, PredictionPageActivity.class);
                 startActivity(intent);
             }
         });
@@ -54,7 +51,7 @@ public class HomePageActivity extends AppCompatActivity {
         friendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(HomePageActivity.this, FriendsPageActivity.class);
+                Intent intent = new Intent(NotificationsPageActivity.this, FriendsPageActivity.class);
                 startActivity(intent);
             }
         });
@@ -64,7 +61,7 @@ public class HomePageActivity extends AppCompatActivity {
         setButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(HomePageActivity.this, SettingsPageActivity.class);
+                Intent intent = new Intent(NotificationsPageActivity.this, SettingsPageActivity.class);
                 startActivity(intent);
             }
         });
@@ -74,7 +71,7 @@ public class HomePageActivity extends AppCompatActivity {
         userButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(HomePageActivity.this, UserPageActivity.class);
+                Intent intent = new Intent(NotificationsPageActivity.this, UserPageActivity.class);
                 startActivity(intent);
             }
         });
@@ -84,7 +81,7 @@ public class HomePageActivity extends AppCompatActivity {
         noteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(HomePageActivity.this, NotificationsPageActivity.class);
+                Intent intent = new Intent(NotificationsPageActivity.this, NotificationsPageActivity.class);
                 startActivity(intent);
             }
         });

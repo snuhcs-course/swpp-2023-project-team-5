@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".DiaryPageActivity">
+    android:background="@android:color/white">
+
     <!-- Header Bar -->
     <LinearLayout
         android:id="@+id/headerBar"
@@ -100,26 +101,16 @@
             android:src="@drawable/set" />
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+    <TextView
+        android:layout_width="219dp"
+        android:layout_height="251dp"
+        android:text="friends page"
+        android:textSize="50dp"
+
         app:layout_constraintBottom_toTopOf="@+id/footerBar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/headerBar"
-        tools:listitem="@layout/diary_item" />
+        app:layout_constraintTop_toBottomOf="@+id/headerBar" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_add_item"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="@dimen/fab_margin"
-        android:backgroundTint="@color/yellow"
-        android:src="@android:drawable/ic_input_add"
-        app:layout_constraintBottom_toTopOf="@+id/footerBar"
-        app:layout_constraintEnd_toEndOf="@+id/recyclerView"
-        app:layout_constraintRight_toRightOf="@id/recyclerView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
