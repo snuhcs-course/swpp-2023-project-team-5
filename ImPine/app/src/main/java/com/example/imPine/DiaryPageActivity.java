@@ -10,11 +10,11 @@ import java.util.Arrays;
 import java.util.List;
 
 // Define the HomePageActivity class extending AppCompatActivity
-public class HomePageActivity extends AppCompatActivity {
+public class DiaryPageActivity extends AppCompatActivity {
 
     // Define a RecyclerView and Adapter as instance variables
     private RecyclerView recyclerView;
-    private pineDiariesAdapter adapter;
+    private PineDiariesAdapter adapter;
 
     // Define the onCreate method that runs when the activity is created
     @Override
@@ -44,7 +44,7 @@ public class HomePageActivity extends AppCompatActivity {
         );
 
         // Create a new adapter with the sample list of BucketListItem objects
-        adapter = new pineDiariesAdapter(pineDiaries);
+        adapter = new PineDiariesAdapter(pineDiaries);
 
         // Set the adapter to the RecyclerView to display the items
         recyclerView.setAdapter(adapter);

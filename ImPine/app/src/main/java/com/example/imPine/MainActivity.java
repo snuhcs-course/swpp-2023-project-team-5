@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, "Login Successful.", Toast.LENGTH_SHORT).show();
 
                         // Start the home page activity
-                        Intent intent = new Intent(MainActivity.this, HomePageActivity.class);
+                        Intent intent = new Intent(MainActivity.this, DiaryPageActivity.class);
                         startActivity(intent);
                         finish();  // This will finish the current activity and the user won't be able to go back to it
                     } else {

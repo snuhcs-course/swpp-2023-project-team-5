@@ -1,4 +1,4 @@
-package com.example.imPine;
+package com.example.bubby;
 
 import android.view.LayoutInflater;
 import android.view.View;
