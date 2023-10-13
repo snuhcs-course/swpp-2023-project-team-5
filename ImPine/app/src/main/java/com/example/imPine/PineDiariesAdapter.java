@@ -20,7 +20,7 @@ public class PineDiariesAdapter extends RecyclerView.Adapter<PineDiariesAdapter.
     @NonNull
     @Override
     public BucketListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.bucket_list_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.diary_list_item, parent, false);
         return new BucketListViewHolder(view);
     }
 

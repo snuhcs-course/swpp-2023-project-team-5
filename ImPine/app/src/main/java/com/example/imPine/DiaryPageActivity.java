@@ -20,7 +20,7 @@ public class DiaryPageActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home_page);
+        setContentView(R.layout.diary_page);
 
         recyclerView = findViewById(R.id.recyclerView);
 

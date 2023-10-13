@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 
-public class MainActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private EditText editTextEmail;
     private EditText editTextPassword;
@@ -52,10 +52,10 @@ public class MainActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         // Sign up success
-                        Toast.makeText(MainActivity.this, "Sign-Up Successful.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Sign-Up Successful.", Toast.LENGTH_SHORT).show();
                     } else {
                         // If sign up fails, display a message to the user.
-                        Toast.makeText(MainActivity.this, "Authentication Failed.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Authentication Failed.", Toast.LENGTH_SHORT).show();
                         Log.e("FirebaseAuth", "Sign-Up Error", task.getException()); // Log the error
                     }
                 });
@@ -81,15 +81,15 @@ public class MainActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         // Login success
-                        Toast.makeText(MainActivity.this, "Login Successful.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Login Successful.", Toast.LENGTH_SHORT).show();
 
                         // Start the home page activity
-                        Intent intent = new Intent(MainActivity.this, DiaryPageActivity.class);
+                        Intent intent = new Intent(LoginActivity.this, HomePageActivity.class);
                         startActivity(intent);
                         finish();  // This will finish the current activity and the user won't be able to go back to it
                     } else {
                         // If login fails, display a message to the user.
-                        Toast.makeText(MainActivity.this, "Authentication Failed.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "Authentication Failed.", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
