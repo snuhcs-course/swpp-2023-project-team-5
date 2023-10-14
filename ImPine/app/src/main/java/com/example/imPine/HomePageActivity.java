@@ -3,7 +3,10 @@ package com.example.imPine;
 import android.os.Bundle;
 import android.content.Intent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -74,5 +77,42 @@ public class HomePageActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        ImageView pineappleAvatar = findViewById(R.id.pineappleAvatar);
+
+        // Load the animations
+        final Animation swayRight = AnimationUtils.loadAnimation(this, R.anim.sway_right);
+        final Animation swayLeft = AnimationUtils.loadAnimation(this, R.anim.sway_left);
+
+        // Set animation listeners to create an infinite swaying effect
+        swayRight.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {}
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                pineappleAvatar.startAnimation(swayLeft);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+
+        swayLeft.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {}
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                pineappleAvatar.startAnimation(swayRight);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+
+        // Start the animation
+        pineappleAvatar.startAnimation(swayRight);
+
     }
 }
