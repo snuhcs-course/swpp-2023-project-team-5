@@ -53,17 +53,6 @@ public class DiaryPageActivity extends AppCompatActivity {
         // Set the adapter to the RecyclerView to display the items
         recyclerView.setAdapter(adapter);
 
-        // Diary button click
-        ImageButton diaryButton = findViewById(R.id.diary);
-        diaryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Start the DiaryPageActivity
-                Intent intent = new Intent(DiaryPageActivity.this, DiaryPageActivity.class);
-                startActivity(intent);
-            }
-        });
-
         // Home button click
         ImageButton homeButton = findViewById(R.id.home);
         homeButton.setOnClickListener(new View.OnClickListener() {

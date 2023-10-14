@@ -35,16 +35,6 @@ public class PredictionPageActivity extends AppCompatActivity {
             }
         });
 
-        // Prediction button click
-        ImageButton predictionButton = findViewById(R.id.prediction);
-        predictionButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(PredictionPageActivity.this, PredictionPageActivity.class);
-                startActivity(intent);
-            }
-        });
-
         // Friends button click
         ImageButton friendButton = findViewById(R.id.friend);
         friendButton.setOnClickListener(new View.OnClickListener() {

@@ -76,14 +76,5 @@ public class NotificationsPageActivity extends AppCompatActivity {
             }
         });
 
-        // Note button click
-        ImageButton noteButton = findViewById(R.id.note);
-        noteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(NotificationsPageActivity.this, NotificationsPageActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 }

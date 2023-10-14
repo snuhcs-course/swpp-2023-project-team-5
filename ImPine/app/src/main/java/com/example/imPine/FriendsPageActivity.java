@@ -46,16 +46,6 @@ public class FriendsPageActivity extends AppCompatActivity {
             }
         });
 
-        // Friends button click
-        ImageButton friendButton = findViewById(R.id.friend);
-        friendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(FriendsPageActivity.this, FriendsPageActivity.class);
-                startActivity(intent);
-            }
-        });
-
         // Settings button click
         ImageButton setButton = findViewById(R.id.set);
         setButton.setOnClickListener(new View.OnClickListener() {

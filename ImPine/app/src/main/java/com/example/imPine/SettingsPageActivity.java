@@ -55,16 +55,6 @@ public class SettingsPageActivity extends AppCompatActivity {
             }
         });
 
-        // Settings button click
-        ImageButton setButton = findViewById(R.id.set);
-        setButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(SettingsPageActivity.this, SettingsPageActivity.class);
-                startActivity(intent);
-            }
-        });
-
         // User button click
         ImageButton userButton = findViewById(R.id.user);
         userButton.setOnClickListener(new View.OnClickListener() {

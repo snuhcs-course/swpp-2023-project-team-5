@@ -25,20 +25,6 @@ public class HomePageActivity extends AppCompatActivity {
             }
         });
 
-        // Home button click
-        ImageButton homeButton = findViewById(R.id.home);
-        homeButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Toast.makeText(HomePageActivity.this, "Already Home!", Toast.LENGTH_SHORT).show();
-//            }
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(HomePageActivity.this, HomePageActivity.class);
-                startActivity(intent);
-            }
-        });
-
         // Prediction button click
         ImageButton predictionButton = findViewById(R.id.prediction);
         predictionButton.setOnClickListener(new View.OnClickListener() {

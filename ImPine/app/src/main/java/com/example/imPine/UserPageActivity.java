@@ -65,15 +65,6 @@ public class UserPageActivity extends AppCompatActivity {
             }
         });
 
-        // User button click
-        ImageButton userButton = findViewById(R.id.user);
-        userButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(UserPageActivity.this, UserPageActivity.class);
-                startActivity(intent);
-            }
-        });
 
         // Note button click
         ImageButton noteButton = findViewById(R.id.note);
