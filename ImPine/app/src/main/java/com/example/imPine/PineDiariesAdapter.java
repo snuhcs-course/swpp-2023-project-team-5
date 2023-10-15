@@ -9,18 +9,18 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 // Define the adapter class and extend it from RecyclerView.Adapter
-public class pineDiariesAdapter extends RecyclerView.Adapter<pineDiariesAdapter.BucketListViewHolder> {
+public class PineDiariesAdapter extends RecyclerView.Adapter<PineDiariesAdapter.BucketListViewHolder> {
 
     private List<PineDiary> pineDiaries;
 
-    public pineDiariesAdapter(List<PineDiary> pineDiaries) {
+    public PineDiariesAdapter(List<PineDiary> pineDiaries) {
         this.pineDiaries = pineDiaries;
     }
 
     @NonNull
     @Override
     public BucketListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.bucket_list_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.diary_item, parent, false);
         return new BucketListViewHolder(view);
     }
 

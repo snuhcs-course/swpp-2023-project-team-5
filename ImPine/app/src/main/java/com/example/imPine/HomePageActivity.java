@@ -1,52 +1,118 @@
 package com.example.imPine;
 
 import android.os.Bundle;
+import android.content.Intent;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.Arrays;
-import java.util.List;
-
-// Define the HomePageActivity class extending AppCompatActivity
 public class HomePageActivity extends AppCompatActivity {
-
-    // Define a RecyclerView and Adapter as instance variables
-    private RecyclerView recyclerView;
-    private pineDiariesAdapter adapter;
-
-    // Define the onCreate method that runs when the activity is created
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home_page);
+        setContentView(R.layout.home_page);
 
-        recyclerView = findViewById(R.id.recyclerView);
+        // Diary button click
+        ImageButton diaryButton = findViewById(R.id.diary);
+        diaryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Start the DiaryPageActivity
+                Intent intent = new Intent(HomePageActivity.this, DiaryPageActivity.class);
+                startActivity(intent);
+            }
+        });
 
-        // Setting the LayoutManager for the RecyclerView
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        // Prediction button click
+        ImageButton predictionButton = findViewById(R.id.prediction);
+        predictionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HomePageActivity.this, PredictionPageActivity.class);
+                startActivity(intent);
+            }
+        });
 
-        // Create a list of sample bucket list items using BucketListItem class
-        List<PineDiary> pineDiaries = Arrays.asList(
-                new PineDiary("1", "Gave water", "2 cups", false),
-                new PineDiary("2", "Gave water", "2 cups", false),
-                new PineDiary("3", "Gave water", "2 cups", false),
-                new PineDiary("4", "Gave water", "2 cups", false),
-                new PineDiary("5", "Gave water", "2 cups", false),
-                new PineDiary("6", "Gave water", "2 cups", false),
-                new PineDiary("7", "Gave water", "2 cups", false),
-                new PineDiary("8", "Gave water", "2 cups", false),
-                new PineDiary("9", "Gave water", "2 cups", false),
-                new PineDiary("10", "Gave water", "2 cups", false),
-                new PineDiary("11", "Gave water", "2 cups", false)
+        // Friends button click
+        ImageButton friendButton = findViewById(R.id.friend);
+        friendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HomePageActivity.this, FriendsPageActivity.class);
+                startActivity(intent);
+            }
+        });
 
-        );
+        // Settings button click
+        ImageButton setButton = findViewById(R.id.set);
+        setButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HomePageActivity.this, SettingsPageActivity.class);
+                startActivity(intent);
+            }
+        });
 
-        // Create a new adapter with the sample list of BucketListItem objects
-        adapter = new pineDiariesAdapter(pineDiaries);
+        // User button click
+        ImageButton userButton = findViewById(R.id.user);
+        userButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HomePageActivity.this, UserPageActivity.class);
+                startActivity(intent);
+            }
+        });
 
-        // Set the adapter to the RecyclerView to display the items
-        recyclerView.setAdapter(adapter);
+        // Note button click
+        ImageButton noteButton = findViewById(R.id.note);
+        noteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(HomePageActivity.this, NotificationsPageActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        ImageView pineappleAvatar = findViewById(R.id.pineappleAvatar);
+
+        // Load the animations
+        final Animation swayRight = AnimationUtils.loadAnimation(this, R.anim.sway_right);
+        final Animation swayLeft = AnimationUtils.loadAnimation(this, R.anim.sway_left);
+
+        // Set animation listeners to create an infinite swaying effect
+        swayRight.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {}
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                pineappleAvatar.startAnimation(swayLeft);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+
+        swayLeft.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {}
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                pineappleAvatar.startAnimation(swayRight);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+
+        // Start the animation
+        pineappleAvatar.startAnimation(swayRight);
+
     }
 }
