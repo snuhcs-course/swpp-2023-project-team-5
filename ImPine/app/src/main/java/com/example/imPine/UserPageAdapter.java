@@ -14,10 +14,10 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 
-public class YourAdapter extends RecyclerView.Adapter<YourAdapter.ViewHolder> {
+public class UserPageAdapter extends RecyclerView.Adapter<UserPageAdapter.ViewHolder> {
     private List<UserDataModel> data; //
 
-    public YourAdapter(List<UserDataModel> data) {
+    public UserPageAdapter(List<UserDataModel> data) {
         this.data = data;
     }
 

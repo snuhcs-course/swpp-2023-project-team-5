@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,7 +14,7 @@ import java.util.List;
 
 public class UserPageActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
-    private YourAdapter adapter;
+    private UserPageAdapter adapter;
     private List<UserDataModel> data;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,7 +24,7 @@ public class UserPageActivity extends AppCompatActivity {
         data = new ArrayList<>(); // Initialize your data
         UserDataModel item1 = new UserDataModel("User Image:", "User Name:", "User ID:", R.drawable.edit);
         data.add(item1);
-        adapter = new YourAdapter(data);
+        adapter = new UserPageAdapter(data);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         // Diary button click
