@@ -102,15 +102,79 @@
     </LinearLayout>
 
     <TextView
-        android:layout_width="219dp"
-        android:layout_height="251dp"
-        android:text="noti page"
-        android:textSize="50dp"
-
-        app:layout_constraintBottom_toTopOf="@+id/footerBar"
+        android:id="@+id/textViewNotifications"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="Notifications"
+        android:textSize="24sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/headerBar" />
 
+    <View
+        android:id="@+id/rectangle1"
+        android:layout_width="362dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/gray"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewNotifications" />
+    <View
+        android:id="@+id/rectangle2"
+        android:layout_width="362dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/gray"
+    app:layout_constraintTop_toBottomOf="@+id/rectangle1"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent" />
+    <View
+        android:id="@+id/rectangle3"
+        android:layout_width="362dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/gray"
+        app:layout_constraintTop_toBottomOf="@+id/rectangle2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+    <View
+        android:id="@+id/rectangle4"
+        android:layout_width="362dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/gray"
+        app:layout_constraintTop_toBottomOf="@+id/rectangle3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+    <View
+        android:id="@+id/rectangle5"
+        android:layout_width="362dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/gray"
+        app:layout_constraintTop_toBottomOf="@+id/rectangle4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+    <View
+        android:id="@+id/rectangle6"
+        android:layout_width="362dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/gray"
+        app:layout_constraintTop_toBottomOf="@+id/rectangle5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+    <View
+        android:id="@+id/rectangle7"
+        android:layout_width="362dp"
+        android:layout_height="51dp"
+        android:layout_marginTop="20dp"
+        android:background="@color/gray"
+        app:layout_constraintTop_toBottomOf="@+id/rectangle6"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
