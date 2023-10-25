@@ -4,17 +4,19 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:background="@drawable/diary_item"
+    android:padding="16dp"
+    android:layout_marginBottom="15dp">
 
     <TextView
-        android:id="@+id/bucketListItemTitle"
+        android:id="@+id/diary_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Title"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
-        android:id="@+id/bucketListItemDescription"
+        android:id="@+id/diary_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Description"

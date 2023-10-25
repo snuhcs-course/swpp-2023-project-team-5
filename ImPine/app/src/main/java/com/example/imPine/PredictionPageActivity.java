@@ -21,6 +21,7 @@ public class PredictionPageActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Start the DiaryPageActivity
                 Intent intent = new Intent(PredictionPageActivity.this, DiaryPageActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
         });
@@ -31,6 +32,7 @@ public class PredictionPageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(PredictionPageActivity.this, HomePageActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
         });
@@ -41,6 +43,7 @@ public class PredictionPageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(PredictionPageActivity.this, FriendsPageActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
         });
@@ -51,6 +54,7 @@ public class PredictionPageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(PredictionPageActivity.this, SettingsPageActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
         });
@@ -61,6 +65,7 @@ public class PredictionPageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(PredictionPageActivity.this, UserPageActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
         });
@@ -71,6 +76,7 @@ public class PredictionPageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(PredictionPageActivity.this, NotificationsPageActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
         });

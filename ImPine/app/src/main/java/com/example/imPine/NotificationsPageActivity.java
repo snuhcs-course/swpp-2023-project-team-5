@@ -21,6 +21,7 @@ public class NotificationsPageActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Start the DiaryPageActivity
                 Intent intent = new Intent(NotificationsPageActivity.this, DiaryPageActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
         });
@@ -32,6 +33,7 @@ public class NotificationsPageActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Start the DiaryPageActivity
                 Intent intent = new Intent(NotificationsPageActivity.this, HomePageActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
         });
@@ -42,6 +44,7 @@ public class NotificationsPageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(NotificationsPageActivity.this, PredictionPageActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
         });
@@ -52,6 +55,7 @@ public class NotificationsPageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(NotificationsPageActivity.this, FriendsPageActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
         });
@@ -62,6 +66,7 @@ public class NotificationsPageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(NotificationsPageActivity.this, SettingsPageActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
         });
@@ -72,6 +77,7 @@ public class NotificationsPageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(NotificationsPageActivity.this, UserPageActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
         });
