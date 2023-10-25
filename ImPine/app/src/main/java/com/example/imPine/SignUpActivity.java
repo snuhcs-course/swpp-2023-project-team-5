@@ -71,7 +71,7 @@ public class SignUpActivity extends AppCompatActivity {
 //                        catch (FirebaseAuthInvalidCredentialsException malformedEmail) {
 //                            editTextEmail.setError("Invalid Email");
 //                            editTextEmail.requestFocus();
-//                        }
+//                       }
 //                        // if email is already in use
 //                        catch (FirebaseAuthUserCollisionException existEmail) {
 //                            editTextEmail.setError("Email already exists");
