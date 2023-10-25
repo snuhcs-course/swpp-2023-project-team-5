@@ -20,8 +20,8 @@
             android:background="@drawable/edittext_background"
             android:hint="Title"
             android:inputType="text"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp" />
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp" />
 
         <EditText
             android:id="@+id/diary_description"
@@ -31,10 +31,10 @@
             android:background="@drawable/edittext_background"
             android:hint="Description"
             android:inputType="textMultiLine"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:paddingTop="16dp"
-            android:paddingBottom="16dp" />
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
+            android:paddingTop="20dp"
+            android:paddingBottom="20dp" />
 
         <Button
             android:id="@+id/editButton"
