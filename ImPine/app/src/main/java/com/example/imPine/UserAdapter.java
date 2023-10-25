@@ -14,10 +14,10 @@ import com.bumptech.glide.Glide;
 import java.util.List;
 
 
-public class UserPageAdapter extends RecyclerView.Adapter<UserPageAdapter.ViewHolder> {
-    private List<UserDataModel> data; //
+public class UserAdapter extends RecyclerView.Adapter<UserAdapter.ViewHolder> {
+    private List<Users> data; //
 
-    public UserPageAdapter(List<UserDataModel> data) {
+    public UserAdapter(List<Users> data) {
         this.data = data;
     }
 
@@ -30,7 +30,7 @@ public class UserPageAdapter extends RecyclerView.Adapter<UserPageAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        UserDataModel item = data.get(position);
+        Users item = data.get(position);
         // Bind data to your list item's views here
         holder.textUserImage.setText(item.getUserImageText());
         holder.textUserName.setText(item.getUserNameText());
