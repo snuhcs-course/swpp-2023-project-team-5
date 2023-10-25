@@ -4,7 +4,8 @@ public class UserDataModel {
     private String userImageText;
     private String userNameText;
     private String userIDText;
-    private int editImageResource; // Assuming you use resource IDs for edit icons
+
+    private int editImageResource;
 
     public UserDataModel(String userImageText, String userNameText, String userIDText, int editImageResource) {
         this.userImageText = userImageText;

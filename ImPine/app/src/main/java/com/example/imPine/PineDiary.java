@@ -1,6 +1,8 @@
 package com.example.imPine;
 
-public class PineDiary {
+import java.io.Serializable;
+
+public class PineDiary implements Serializable {
     private String id;
     private String title;
     private String description;
@@ -10,8 +12,7 @@ public class PineDiary {
     }
 
     // Parameterized constructor
-    public PineDiary(String id, String title, String description, boolean completed) {
-        this.id = id;
+    public PineDiary(String title, String description, boolean completed) {
         this.title = title;
         this.description = description;
         this.completed = completed;

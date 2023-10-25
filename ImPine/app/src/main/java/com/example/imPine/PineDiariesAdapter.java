@@ -1,5 +1,6 @@
 package com.example.imPine;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,8 +9,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
+
 // Define the adapter class and extend it from RecyclerView.Adapter
-public class PineDiariesAdapter extends RecyclerView.Adapter<PineDiariesAdapter.BucketListViewHolder> {
+public class PineDiariesAdapter extends RecyclerView.Adapter<PineDiariesAdapter.PineDiaryViewHolder> {
 
     private List<PineDiary> pineDiaries;
 
@@ -19,16 +21,33 @@ public class PineDiariesAdapter extends RecyclerView.Adapter<PineDiariesAdapter.
 
     @NonNull
     @Override
-    public BucketListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.diary_item, parent, false);
-        return new BucketListViewHolder(view);
+    public PineDiaryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // Inflate the layout for each diary item
+        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.diary_item, parent, false);
+
+        // Create and return a new ViewHolder that wraps the inflated layout
+        return new PineDiaryViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull BucketListViewHolder holder, int position) {
-        PineDiary item = pineDiaries.get(position);
-        holder.bucketListItemTitle.setText(item.getTitle());
-        holder.bucketListItemDescription.setText(item.getDescription());
+    public void onBindViewHolder(@NonNull PineDiaryViewHolder holder, int position) {
+        // Get the diary object for the given position
+        PineDiary diary = pineDiaries.get(position);
+
+        // Set the values on holder's views
+         holder.titleTextView.setText(diary.getTitle());
+         holder.descriptionTextView.setText(diary.getDescription());
+
+        // When a diary item is clicked, start the DiaryDetailActivity
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), DiaryDetailActivity.class);
+
+            // Pass the diary details to the DiaryDetailActivity
+            intent.putExtra("DIARY_TITLE", diary.getTitle());
+            intent.putExtra("DIARY_DESCRIPTION", diary.getDescription());
+
+            v.getContext().startActivity(intent);
+        });
     }
 
     @Override
@@ -36,14 +55,15 @@ public class PineDiariesAdapter extends RecyclerView.Adapter<PineDiariesAdapter.
         return pineDiaries.size();
     }
 
-    public static class BucketListViewHolder extends RecyclerView.ViewHolder {
-        public TextView bucketListItemTitle;
-        public TextView bucketListItemDescription;
+    public static class PineDiaryViewHolder extends RecyclerView.ViewHolder {
+        TextView titleTextView;
+        TextView descriptionTextView;
 
-        public BucketListViewHolder(View view) {
-            super(view);
-            bucketListItemTitle = view.findViewById(R.id.bucketListItemTitle);
-            bucketListItemDescription = view.findViewById(R.id.bucketListItemDescription);
+        public PineDiaryViewHolder(@NonNull View itemView) {
+            super(itemView);
+            titleTextView = itemView.findViewById(R.id.diary_title);
+            descriptionTextView = itemView.findViewById(R.id.diary_description);
+            // Initialize other views if you have them
         }
     }
 }
