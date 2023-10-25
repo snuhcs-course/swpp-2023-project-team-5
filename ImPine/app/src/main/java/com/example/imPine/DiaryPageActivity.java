@@ -1,7 +1,18 @@
 package com.example.imPine;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -9,6 +20,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,6 +41,8 @@ public class DiaryPageActivity extends AppCompatActivity {
 
     private List<PineDiary> pineDiaries;
 
+    private boolean isDialogShown = false;
+
 
     // Define the onCreate method that runs when the activity is created
     @Override
@@ -43,12 +57,22 @@ public class DiaryPageActivity extends AppCompatActivity {
 
         // Create a list of sample bucket list items using BucketListItem class
         pineDiaries = new ArrayList<>(Arrays.asList(
-                new PineDiary("Gave water to Piney", "2 cups", false),
-                new PineDiary("Piney Sick", "leaves fell off", false),
-                new PineDiary("Piney Recovers", "looking well", false),
-                new PineDiary("Piney blossoms", "pineapple fruit!", false)
+                new PineDiary("1", "Gave water to Piney", "2 cups", false),
+                new PineDiary("2", "Piney Sick", "leaves fell off", false),
+                new PineDiary("3", "Piney Recovers", "looking well", false),
+                new PineDiary("4", "Piney blossoms", "pineapple fruit!", false),
+                new PineDiary("5", "Piney's First Anniversary", "One year with us!", false),
+                new PineDiary("6", "Trimmed Piney", "Removed dry leaves", false),
+                new PineDiary("7", "Fertilized Piney", "Used organic fertilizer", false),
+                new PineDiary("8", "Piney Grows", "Height increased by 5 inches", false),
+                new PineDiary("9", "Birds Nested on Piney", "Found a bird nest", false),
+                new PineDiary("10", "Piney during Rain", "Enjoyed the fresh rain", false),
+                new PineDiary("11", "Piney's New Shoots", "Spotted some new growth", false),
+                new PineDiary("12", "Piney in Winter", "Wrapped in protective layer", false),
+                new PineDiary("13", "Piney under Sun", "Getting some sunlight", false),
+                new PineDiary("14", "Piney's Soil", "Replenished top soil", false),
+                new PineDiary("15", "Piney's Companions", "Planted flowers around", false)
         ));
-
         // Add a new diary
         FloatingActionButton fabAddDiary = findViewById(R.id.fab_add_item);
         fabAddDiary.setOnClickListener(new View.OnClickListener() {
@@ -65,7 +89,7 @@ public class DiaryPageActivity extends AppCompatActivity {
         // Set the adapter to the RecyclerView to display the items
         recyclerView.setAdapter(adapter);
 
-        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
+        ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,0) {
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 int fromPosition = viewHolder.getAdapterPosition();
@@ -77,8 +101,9 @@ public class DiaryPageActivity extends AppCompatActivity {
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                // Handle deletion if needed in the future
+                // deletion
             }
+
         };
 
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleCallback);
@@ -162,6 +187,7 @@ public class DiaryPageActivity extends AppCompatActivity {
             PineDiary receivedDiary = (PineDiary) data.getSerializableExtra("newDiary");
             if (receivedDiary != null) {
                 pineDiaries.add(receivedDiary);
+                receivedDiary.setId(String.valueOf(pineDiaries.size()));
                 adapter.notifyDataSetChanged();
             }
         }

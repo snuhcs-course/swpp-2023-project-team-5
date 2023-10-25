@@ -35,8 +35,10 @@ public class PineDiariesAdapter extends RecyclerView.Adapter<PineDiariesAdapter.
         PineDiary diary = pineDiaries.get(position);
 
         // Set the values on holder's views
-         holder.titleTextView.setText(diary.getTitle());
-         holder.descriptionTextView.setText(diary.getDescription());
+        holder.titleTextView.setText(diary.getId()+ ". " + diary.getTitle());
+        String[] descriptionLines = diary.getDescription().split("\n", 2); // Split by the newline, limit to 2 parts
+        String firstLineOfDescription = descriptionLines[0];
+        holder.descriptionTextView.setText(firstLineOfDescription);
 
         // When a diary item is clicked, start the DiaryDetailActivity
         holder.itemView.setOnClickListener(v -> {

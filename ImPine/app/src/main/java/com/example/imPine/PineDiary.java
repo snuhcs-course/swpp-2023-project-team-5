@@ -12,6 +12,13 @@ public class PineDiary implements Serializable {
     }
 
     // Parameterized constructor
+    public PineDiary(String id, String title, String description, boolean completed) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.completed = completed;
+    }
+
     public PineDiary(String title, String description, boolean completed) {
         this.title = title;
         this.description = description;
