@@ -27,6 +27,12 @@ public class UserPageActivity extends AppCompatActivity {
         adapter = new UserAdapter(data);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+//        data = new ArrayList<>(); // Initialize your data
+//        UserDataModel item1 = new UserDataModel("User Image:", "User Name:", "User ID:", R.drawable.edit);
+//        data.add(item1);
+//        adapter = new UserPageAdapter(data);
+//        recyclerView.setAdapter(adapter);
+//        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         // Diary button click
         ImageButton diaryButton = findViewById(R.id.diary);
         diaryButton.setOnClickListener(new View.OnClickListener() {
