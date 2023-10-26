@@ -11,11 +11,11 @@ import java.util.List;
 
 
 // Define the adapter class and extend it from RecyclerView.Adapter
-public class PineDiariesAdapter extends RecyclerView.Adapter<PineDiariesAdapter.PineDiaryViewHolder> {
+public class DiariesAdapter extends RecyclerView.Adapter<DiariesAdapter.PineDiaryViewHolder> {
 
-    private List<PineDiary> pineDiaries;
+    private List<Diary> pineDiaries;
 
-    public PineDiariesAdapter(List<PineDiary> pineDiaries) {
+    public DiariesAdapter(List<Diary> pineDiaries) {
         this.pineDiaries = pineDiaries;
     }
 
@@ -32,7 +32,7 @@ public class PineDiariesAdapter extends RecyclerView.Adapter<PineDiariesAdapter.
     @Override
     public void onBindViewHolder(@NonNull PineDiaryViewHolder holder, int position) {
         // Get the diary object for the given position
-        PineDiary diary = pineDiaries.get(position);
+        Diary diary = pineDiaries.get(position);
 
         // Set the values on holder's views
         holder.titleTextView.setText(diary.getId()+ ". " + diary.getTitle());
