@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 //import android.hardware.biometrics.BiometricManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.EditText;
@@ -64,6 +65,22 @@ public class LoginActivity extends AppCompatActivity {
                         // Login success
                         Toast.makeText(LoginActivity.this, "Login Successful.", Toast.LENGTH_SHORT).show();
 
+                        // Get IdToken after successful login
+                        mAuth.getCurrentUser().getIdToken(true)
+                                .addOnCompleteListener(idTokenTask -> {
+                                    if (idTokenTask.isSuccessful()) {
+                                        String idToken = idTokenTask.getResult().getToken();
+                                        // Store the idToken in local storage (SharedPreferences or any other storage)
+                                        SharedPreferences sharedPref = getSharedPreferences("my_prefs", MODE_PRIVATE);
+                                        SharedPreferences.Editor editor = sharedPref.edit();
+                                        editor.putString("firebaseIdToken", idToken);
+                                        editor.apply();
+                                    } else {
+                                        // Handle the error in retrieving the IdToken
+                                        Log.e("LOGIN", "Failed to get IdToken", idTokenTask.getException());
+                                    }
+                                });
+
                         // Start the home page activity
                         Intent intent = new Intent(LoginActivity.this, HomePageActivity.class);
                         startActivity(intent);
@@ -74,4 +91,5 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
     }
+
 }
