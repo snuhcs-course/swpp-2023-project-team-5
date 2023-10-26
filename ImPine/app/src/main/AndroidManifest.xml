@@ -32,6 +32,8 @@
         <activity android:name=".SignUpActivity" />
         <activity android:name=".DiaryDetailActivity" />
         <activity android:name=".NewDiaryActivity" />
+        <activity android:name=".FriendsDetailActivity" />
+        <activity android:name=".SearchResultsActivity" />
         <activity android:name=".PredictionResultActivity" />
 
     </application>

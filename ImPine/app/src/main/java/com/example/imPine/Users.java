@@ -1,17 +1,15 @@
 package com.example.imPine;
 
-public class UserDataModel {
+public class Users {
     private String userImageText;
     private String userNameText;
     private String userIDText;
 
     private int editImageResource;
 
-    public UserDataModel(String userImageText, String userNameText, String userIDText, int editImageResource) {
-        this.userImageText = userImageText;
+    public Users(String userID, String userName) {
         this.userNameText = userNameText;
         this.userIDText = userIDText;
-        this.editImageResource = editImageResource;
     }
 
     public String getUserImageText() {

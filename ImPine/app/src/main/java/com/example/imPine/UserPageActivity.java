@@ -14,13 +14,19 @@ import java.util.List;
 
 public class UserPageActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
-    private UserPageAdapter adapter;
-    private List<UserDataModel> data;
+    private UserAdapter adapter;
+    private List<Users> data;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.user_page);
         recyclerView = findViewById(R.id.recyclerView);
+        data = new ArrayList<>(); // Initialize your data
+        Users item1 = new Users( "User Name:", "User ID:");
+        data.add(item1);
+        adapter = new UserAdapter(data);
+        recyclerView.setAdapter(adapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 //        data = new ArrayList<>(); // Initialize your data
 //        UserDataModel item1 = new UserDataModel("User Image:", "User Name:", "User ID:", R.drawable.edit);
 //        data.add(item1);
