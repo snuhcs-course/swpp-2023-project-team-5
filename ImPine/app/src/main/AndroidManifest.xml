@@ -31,6 +31,8 @@
         <activity android:name=".SignUpActivity" />
         <activity android:name=".DiaryDetailActivity" />
         <activity android:name=".NewDiaryActivity" />
+        <activity android:name=".PredictionResultActivity" />
+
     </application>
 
 </manifest>
