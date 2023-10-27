@@ -19,7 +19,7 @@ import java.util.List;
 public class FriendsDetailActivity extends AppCompatActivity {
 
     private TextView friendDetailName;
-    private List<PineDiary> samplePineDiaries = new ArrayList<>();
+    private List<Diary> samplePineDiaries = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,19 +36,19 @@ public class FriendsDetailActivity extends AppCompatActivity {
             // Handle the case where no name was passed to this activity.
             // Maybe finish the activity and show a toast.
             finish();
-            showToast("Friend details not available.");
+            showToast("Friends details not available.");
         }
 
 
         RecyclerView diariesRecyclerView = findViewById(R.id.diariesRecyclerView);
 
         // Populate with some sample PineDiaries for demo purposes
-        samplePineDiaries.add(new PineDiary("1", "Sample Diary Title 1", "Sample Diary Description 1", false));
-        samplePineDiaries.add(new PineDiary("2", "Sample Diary Title 2", "Sample Diary Description 2", false));
-        samplePineDiaries.add(new PineDiary("3", "Sample Diary Title 3", "Sample Diary Description 3", false));
+        samplePineDiaries.add(new Diary("1", "Sample Diary Title 1", "Sample Diary Description 1", false));
+        samplePineDiaries.add(new Diary("2", "Sample Diary Title 2", "Sample Diary Description 2", false));
+        samplePineDiaries.add(new Diary("3", "Sample Diary Title 3", "Sample Diary Description 3", false));
 
-        PineDiariesAdapter pineDiariesAdapter = new PineDiariesAdapter(samplePineDiaries);
-        diariesRecyclerView.setAdapter(pineDiariesAdapter);
+        DiaryAdapter diariesAdapter = new DiaryAdapter(samplePineDiaries);
+        diariesRecyclerView.setAdapter(diariesAdapter);
         diariesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
 

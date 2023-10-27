@@ -2,24 +2,24 @@ package com.example.imPine;
 
 import java.io.Serializable;
 
-public class PineDiary implements Serializable {
+public class Diary implements Serializable {
     private String id;
     private String title;
     private String description;
     private boolean completed;
 
-    public PineDiary() {
+    public Diary() {
     }
 
     // Parameterized constructor
-    public PineDiary(String id, String title, String description, boolean completed) {
+    public Diary(String id, String title, String description, boolean completed) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.completed = completed;
     }
 
-    public PineDiary(String title, String description, boolean completed) {
+    public Diary(String title, String description, boolean completed) {
         this.title = title;
         this.description = description;
         this.completed = completed;

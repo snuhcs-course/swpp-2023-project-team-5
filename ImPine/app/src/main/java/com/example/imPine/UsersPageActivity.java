@@ -12,9 +12,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserPageActivity extends AppCompatActivity {
+public class UsersPageActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
-    private UserAdapter adapter;
+    private UsersAdapter adapter;
     private List<Users> data;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +24,7 @@ public class UserPageActivity extends AppCompatActivity {
         data = new ArrayList<>(); // Initialize your data
         Users item1 = new Users( "User Name:", "User ID:");
         data.add(item1);
-        adapter = new UserAdapter(data);
+        adapter = new UsersAdapter(data);
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 //        data = new ArrayList<>(); // Initialize your data
@@ -39,7 +39,7 @@ public class UserPageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Start the DiaryPageActivity
-                Intent intent = new Intent(UserPageActivity.this, DiaryPageActivity.class);
+                Intent intent = new Intent(UsersPageActivity.this, DiaryPageActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
@@ -50,7 +50,7 @@ public class UserPageActivity extends AppCompatActivity {
         homeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(UserPageActivity.this, HomePageActivity.class);
+                Intent intent = new Intent(UsersPageActivity.this, HomePageActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
@@ -61,7 +61,7 @@ public class UserPageActivity extends AppCompatActivity {
         predictionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(UserPageActivity.this, PredictionPageActivity.class);
+                Intent intent = new Intent(UsersPageActivity.this, PredictionPageActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
@@ -72,7 +72,7 @@ public class UserPageActivity extends AppCompatActivity {
         friendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(UserPageActivity.this, FriendsPageActivity.class);
+                Intent intent = new Intent(UsersPageActivity.this, FriendsPageActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
@@ -83,7 +83,7 @@ public class UserPageActivity extends AppCompatActivity {
         setButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(UserPageActivity.this, SettingsPageActivity.class);
+                Intent intent = new Intent(UsersPageActivity.this, SettingsPageActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
@@ -95,7 +95,7 @@ public class UserPageActivity extends AppCompatActivity {
         noteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(UserPageActivity.this, NotificationsPageActivity.class);
+                Intent intent = new Intent(UsersPageActivity.this, NotificationsPageActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }

@@ -7,14 +7,14 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/pine"
         android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
+        android:roundIcon="@drawable/pine"
         android:supportsRtl="true"
         android:theme="@style/Theme.ImPine"
         tools:targetApi="31">
         <activity
-            android:name=".LoginActivity"
+            android:name=".AuthLoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,13 +27,13 @@
         <activity android:name=".PredictionPageActivity" />
         <activity android:name=".FriendsPageActivity" />
         <activity android:name=".SettingsPageActivity" />
-        <activity android:name=".UserPageActivity" />
+        <activity android:name=".UsersPageActivity" />
         <activity android:name=".NotificationsPageActivity" />
-        <activity android:name=".SignUpActivity" />
+        <activity android:name=".AuthSignUpActivity" />
         <activity android:name=".DiaryDetailActivity" />
-        <activity android:name=".NewDiaryActivity" />
+        <activity android:name=".DiaryNewActivity" />
         <activity android:name=".FriendsDetailActivity" />
-        <activity android:name=".SearchResultsActivity" />
+        <activity android:name=".FriendsSearchResultsActivity" />
         <activity android:name=".PredictionResultActivity" />
 
     </application>

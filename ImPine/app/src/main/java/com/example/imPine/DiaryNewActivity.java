@@ -8,7 +8,7 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class NewDiaryActivity extends AppCompatActivity {
+public class DiaryNewActivity extends AppCompatActivity {
 
     private EditText titleEditText;
     private EditText descriptionEditText;
@@ -30,7 +30,7 @@ public class NewDiaryActivity extends AppCompatActivity {
                 String description = descriptionEditText.getText().toString();
                 boolean completed = false; // default value for new entries
 
-                PineDiary newDiary = new PineDiary(title, description, completed);
+                Diary newDiary = new Diary(title, description, completed);
                 Intent resultIntent = new Intent();
                 resultIntent.putExtra("newDiary", newDiary);
                 setResult(RESULT_OK, resultIntent);

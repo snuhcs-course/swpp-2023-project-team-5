@@ -13,15 +13,15 @@ import java.util.List;
 public class
 FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendViewHolder> {
 
-    private List<Friend> friendList;
+    private List<Friends> friendList;
     private OnFriendClickListener listener;
 
-    public FriendAdapter(List<Friend> friendList, OnFriendClickListener listener) {
+    public FriendAdapter(List<Friends> friendList, OnFriendClickListener listener) {
         this.friendList = friendList;
         this.listener = listener;
     }
 
-    public void updateFriendList(List<Friend> newFriendList) {
+    public void updateFriendList(List<Friends> newFriendList) {
         this.friendList = newFriendList;
         notifyDataSetChanged();
     }
@@ -58,12 +58,12 @@ FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendViewHolder> {
             });
         }
 
-        public void bind(Friend friend) {
+        public void bind(Friends friend) {
             friendName.setText(friend.getUsername());
         }
     }
 
     public interface OnFriendClickListener {
-        void onFriendClick(Friend friend);
+        void onFriendClick(Friends friend);
     }
 }

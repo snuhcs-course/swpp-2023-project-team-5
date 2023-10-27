@@ -1,26 +1,13 @@
 package com.example.imPine;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -37,9 +24,9 @@ public class DiaryPageActivity extends AppCompatActivity {
 
     // Define a RecyclerView and Adapter as instance variables
     private RecyclerView recyclerView;
-    private PineDiariesAdapter adapter;
+    private DiaryAdapter adapter;
 
-    private List<PineDiary> pineDiaries;
+    private List<Diary> pineDiaries;
 
     private boolean isDialogShown = false;
 
@@ -57,34 +44,34 @@ public class DiaryPageActivity extends AppCompatActivity {
 
         // Create a list of sample bucket list items using BucketListItem class
         pineDiaries = new ArrayList<>(Arrays.asList(
-                new PineDiary("1", "Gave water to Piney", "2 cups", false),
-                new PineDiary("2", "Piney Sick", "leaves fell off", false),
-                new PineDiary("3", "Piney Recovers", "looking well", false),
-                new PineDiary("4", "Piney blossoms", "pineapple fruit!", false),
-                new PineDiary("5", "Piney's First Anniversary", "One year with us!", false),
-                new PineDiary("6", "Trimmed Piney", "Removed dry leaves", false),
-                new PineDiary("7", "Fertilized Piney", "Used organic fertilizer", false),
-                new PineDiary("8", "Piney Grows", "Height increased by 5 inches", false),
-                new PineDiary("9", "Birds Nested on Piney", "Found a bird nest", false),
-                new PineDiary("10", "Piney during Rain", "Enjoyed the fresh rain", false),
-                new PineDiary("11", "Piney's New Shoots", "Spotted some new growth", false),
-                new PineDiary("12", "Piney in Winter", "Wrapped in protective layer", false),
-                new PineDiary("13", "Piney under Sun", "Getting some sunlight", false),
-                new PineDiary("14", "Piney's Soil", "Replenished top soil", false),
-                new PineDiary("15", "Piney's Companions", "Planted flowers around", false)
+                new Diary("1", "Gave water to Piney", "2 cups", false),
+                new Diary("2", "Piney Sick", "leaves fell off", false),
+                new Diary("3", "Piney Recovers", "looking well", false),
+                new Diary("4", "Piney blossoms", "pineapple fruit!", false),
+                new Diary("5", "Piney's First Anniversary", "One year with us!", false),
+                new Diary("6", "Trimmed Piney", "Removed dry leaves", false),
+                new Diary("7", "Fertilized Piney", "Used organic fertilizer", false),
+                new Diary("8", "Piney Grows", "Height increased by 5 inches", false),
+                new Diary("9", "Birds Nested on Piney", "Found a bird nest", false),
+                new Diary("10", "Piney during Rain", "Enjoyed the fresh rain", false),
+                new Diary("11", "Piney's New Shoots", "Spotted some new growth", false),
+                new Diary("12", "Piney in Winter", "Wrapped in protective layer", false),
+                new Diary("13", "Piney under Sun", "Getting some sunlight", false),
+                new Diary("14", "Piney's Soil", "Replenished top soil", false),
+                new Diary("15", "Piney's Companions", "Planted flowers around", false)
         ));
         // Add a new diary
         FloatingActionButton fabAddDiary = findViewById(R.id.fab_add_item);
         fabAddDiary.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(DiaryPageActivity.this, NewDiaryActivity.class);
+                Intent intent = new Intent(DiaryPageActivity.this, DiaryNewActivity.class);
                 startActivityForResult(intent, 1);
             }
         });
 
         // Create a new adapter with the sample list of BucketListItem objects
-        adapter = new PineDiariesAdapter(pineDiaries);
+        adapter = new DiaryAdapter(pineDiaries);
 
         // Set the adapter to the RecyclerView to display the items
         recyclerView.setAdapter(adapter);
@@ -160,7 +147,7 @@ public class DiaryPageActivity extends AppCompatActivity {
         userButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(DiaryPageActivity.this, UserPageActivity.class);
+                Intent intent = new Intent(DiaryPageActivity.this, UsersPageActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
@@ -184,7 +171,7 @@ public class DiaryPageActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == 1 && resultCode == RESULT_OK && data != null) {
-            PineDiary receivedDiary = (PineDiary) data.getSerializableExtra("newDiary");
+            Diary receivedDiary = (Diary) data.getSerializableExtra("newDiary");
             if (receivedDiary != null) {
                 pineDiaries.add(receivedDiary);
                 receivedDiary.setId(String.valueOf(pineDiaries.size()));
