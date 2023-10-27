@@ -5,6 +5,12 @@ from django.contrib.auth.models import User
 from .models import Plant
 from .serializer import PlantSerializer
 
+class PlantUser(APIView):
+    def get(self, request, user_id):
+        plants = Plant.objects.filter(user_id=user_id)
+        serializer = PlantSerializer(plants, many=True)
+        return Response({"plants": serializer.data})
+
 class PlantGet(APIView):
     def get(self, request, plant_id):
         plant = Plant.objects.get(id=plant_id)
