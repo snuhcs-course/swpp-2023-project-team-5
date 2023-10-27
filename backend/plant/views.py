@@ -34,6 +34,15 @@ class PlantBasic(APIView):
             return Response({"plant": serializer.data})
         else:
             return Response({"plant": serializer.errors})
+    
+    def delete(self, request):
+        plant_id = request.data.get('plant_id', None)
+        try:
+            plant = Plant.objects.get(id=plant_id)
+        except:
+            return Response({'plant_id': 'Plant does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+        plant.delete()
+        return Response({"plant": "deleted"})
 
 class PlantUser(APIView):
     def get(self, request, user_id):
