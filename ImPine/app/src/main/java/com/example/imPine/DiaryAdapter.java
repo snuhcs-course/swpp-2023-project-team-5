@@ -11,11 +11,11 @@ import java.util.List;
 
 
 // Define the adapter class and extend it from RecyclerView.Adapter
-public class DiariesAdapter extends RecyclerView.Adapter<DiariesAdapter.PineDiaryViewHolder> {
+public class DiaryAdapter extends RecyclerView.Adapter<DiaryAdapter.PineDiaryViewHolder> {
 
     private List<Diary> pineDiaries;
 
-    public DiariesAdapter(List<Diary> pineDiaries) {
+    public DiaryAdapter(List<Diary> pineDiaries) {
         this.pineDiaries = pineDiaries;
     }
 

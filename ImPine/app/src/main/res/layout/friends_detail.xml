@@ -12,7 +12,7 @@
         android:padding="10dp">
 
 
-        <!-- Friend's Name -->
+        <!-- Friends's Name -->
         <TextView
             android:id="@+id/friendDetailName"
             android:layout_width="match_parent"

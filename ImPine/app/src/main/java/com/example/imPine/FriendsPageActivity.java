@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.SearchView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,7 +21,7 @@ public class FriendsPageActivity extends AppCompatActivity {
     SearchView friendSearchView;
     RecyclerView friendsRecyclerView;
     FriendAdapter friendAdapter;
-    List<Friend> friends = new ArrayList<>();
+    List<Friends> friends = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,12 +43,12 @@ public class FriendsPageActivity extends AppCompatActivity {
         friendsRecyclerView.setAdapter(friendAdapter);
 
         // Sample data:
-        friends.add(new Friend("1", "Alice"));
-        friends.add(new Friend("2","Bob"));
-        friends.add(new Friend("3","Friend3"));
-        friends.add(new Friend("4","Friend4"));
-        friends.add(new Friend("5","Friend5"));
-        friends.add(new Friend("6","Friend6"));
+        friends.add(new Friends("1", "Alice"));
+        friends.add(new Friends("2","Bob"));
+        friends.add(new Friends("3","Friend3"));
+        friends.add(new Friends("4","Friend4"));
+        friends.add(new Friends("5","Friend5"));
+        friends.add(new Friends("6","Friend6"));
         //... add more friends
         friendAdapter.notifyDataSetChanged();
 
@@ -75,8 +74,8 @@ public class FriendsPageActivity extends AppCompatActivity {
         friendSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                // Navigate to SearchResultsActivity with the search query
-                Intent intent = new Intent(FriendsPageActivity.this, SearchResultsActivity.class);
+                // Navigate to FriendsSearchResultsActivity with the search query
+                Intent intent = new Intent(FriendsPageActivity.this, FriendsSearchResultsActivity.class);
                 intent.putExtra("SEARCH_QUERY", query);
                 intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
@@ -143,7 +142,7 @@ public class FriendsPageActivity extends AppCompatActivity {
         userButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(FriendsPageActivity.this, UserPageActivity.class);
+                Intent intent = new Intent(FriendsPageActivity.this, UsersPageActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }

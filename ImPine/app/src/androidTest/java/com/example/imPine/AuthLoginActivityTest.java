@@ -6,7 +6,6 @@ import static androidx.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.matcher.ViewMatchers.hasErrorText;
 import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent;
@@ -18,16 +17,15 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.intent.Intents;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 @RunWith(AndroidJUnit4.class)
-public class LoginActivityTest {
+public class AuthLoginActivityTest {
 
     @Rule
-    public ActivityScenarioRule<LoginActivity> activityRule = new ActivityScenarioRule<LoginActivity>(LoginActivity.class);
+    public ActivityScenarioRule<AuthLoginActivity> activityRule = new ActivityScenarioRule<AuthLoginActivity>(AuthLoginActivity.class);
 
     @Test
     public void emailFieldIsDisplayed() {
@@ -69,7 +67,7 @@ public class LoginActivityTest {
     @Test
     public void navigateToSignUpActivity() {
         onView(withId(R.id.buttonSignUp)).perform(click());
-        intended(hasComponent(SignUpActivity.class.getName()));
+        intended(hasComponent(AuthSignUpActivity.class.getName()));
     }
 
     @After

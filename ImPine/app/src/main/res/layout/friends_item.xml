@@ -22,7 +22,7 @@
                     android:layout_marginRight="16dp"
                     android:src="@drawable/profile_basic"/>
 
-                <!-- Friend's Name -->
+                <!-- Friends's Name -->
                 <TextView
                     android:id="@+id/friendName"
                     android:layout_width="wrap_content"

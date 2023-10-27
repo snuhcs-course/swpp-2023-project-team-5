@@ -9,11 +9,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
-import com.google.firebase.auth.FirebaseAuthUserCollisionException;
-import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 
-public class SignUpActivity extends AppCompatActivity {
+public class AuthSignUpActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private EditText editTextEmail, editTextPassword, editTextPasswordConfirm, editTextUsername;
 
@@ -56,11 +53,11 @@ public class SignUpActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         // Successfully registered the user
-                        Toast.makeText(SignUpActivity.this, "Sign Up Successful.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AuthSignUpActivity.this, "Sign Up Successful.", Toast.LENGTH_SHORT).show();
 
                         // Navigate back to the login page
-                        Intent intent = new Intent(SignUpActivity.this, LoginActivity.class);
-                        intent.putExtra("email", email); // Pass email to LoginActivity
+                        Intent intent = new Intent(AuthSignUpActivity.this, AuthLoginActivity.class);
+                        intent.putExtra("email", email); // Pass email to AuthLoginActivity
                         startActivity(intent);
                         finish();
                     } else {
@@ -85,7 +82,7 @@ public class SignUpActivity extends AppCompatActivity {
                         // any other exceptions, handle or log them accordingly
                         catch (Exception e) {
                             Log.e("FirebaseAuth", "Sign Up Error", e);
-                            Toast.makeText(SignUpActivity.this, "Sign Up Failed.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(AuthSignUpActivity.this, "Sign Up Failed.", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
