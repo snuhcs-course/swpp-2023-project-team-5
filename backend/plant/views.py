@@ -21,7 +21,19 @@ class PlantBasic(APIView):
             return Response({"plant": serializer.data})
         else:
             return Response({"plant": serializer.errors})
-
+        
+    def put(self, request):
+        plant_id = request.data.get('plant_id', None)
+        try:
+            plant = Plant.objects.get(id=plant_id)
+        except:
+            return Response({'plant_id': 'Plant does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = PlantSerializer(plant, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"plant": serializer.data})
+        else:
+            return Response({"plant": serializer.errors})
 
 class PlantUser(APIView):
     def get(self, request, user_id):
