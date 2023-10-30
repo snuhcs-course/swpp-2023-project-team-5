@@ -8,7 +8,8 @@ import matplotlib.pyplot as plt
 import statsmodels.api as sm
 import pandas as pd
 import numpy as np
-
+import matplotlib
+matplotlib.use("agg")
 from errors import rmse, smape
 
 
@@ -168,14 +169,14 @@ def main(args):
     print(f"[SMAPE error]: {smape(ans, pred)}")
 
     test_vs_pred = pd.DataFrame({'Actual': ans, 'Predictions': pred})
-    test_vs_pred.plot().get_figure().savefig(f'{subdir}/prediction.png')
+    test_vs_pred.plot().get_figure().savefig('prediction.png')
 
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--base-path', type=str, default='./')
+    parser.add_argument('--base-path', type=str, default='..')
     parser.add_argument('--lag', type=int, default=4)
     parser.add_argument('--ma', type=int, default=0)
     parser.add_argument('--test-set-ratio', type=float, default=0.1)
