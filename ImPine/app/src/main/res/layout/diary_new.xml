@@ -20,6 +20,8 @@
             android:layout_marginBottom="30dp"
             android:background="@drawable/edittext_background"
             android:hint="Title"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp"
             android:inputType="text" />
 
 
@@ -30,6 +32,8 @@
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/edittext_background"
                 android:hint="Description"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
                 android:inputType="textMultiLine" />
 
             <Button
