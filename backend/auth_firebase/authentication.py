@@ -24,8 +24,8 @@ default_app = firebase_admin.initialize_app(cred)
 """FIREBASE AUTHENTICATION"""
 class FirebaseAuthentication(BaseAuthentication):
     """override authenticate method and write our custom firebase authentication."""
-    def authenticate(self, request):
-        
+
+    def getAuthorizationToken(self, request):
         """Get the authorization Token, It raise exception when no authorization Token is given"""
         auth_header = request.META.get("HTTP_AUTHORIZATION")
         if not auth_header:
@@ -49,6 +49,16 @@ class FirebaseAuthentication(BaseAuthentication):
         except Exception:
             raise(exceptions.FirebaseError())
         
+        return uid
+
+    def authenticate(self, request):
+        
+        """Get the uid of an user"""
+        try:
+            fb_uid = self.getAuthorizationToken(request)
+        except Exception:
+            raise(exceptions.FirebaseError())
+        
         """Get or create the user"""
-        user, created = User.objects.get_or_create(username=uid)
+        user = User.objects.get(username=fb_uid)
         return (user, None)
