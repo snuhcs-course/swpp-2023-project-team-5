@@ -180,7 +180,7 @@ if __name__ == '__main__':
     parser.add_argument('--lag', type=int, default=4)
     parser.add_argument('--ma', type=int, default=0)
     parser.add_argument('--test-set-ratio', type=float, default=0.1)
-    parser.add_argument('--model', type=str, default='var')
+    parser.add_argument('--model', type=str, default='arima')
 
     args = parser.parse_args()
     subdir = f"./log/{args.model}-test_set_ratio_{args.test_set_ratio}-MA_{args.ma}"

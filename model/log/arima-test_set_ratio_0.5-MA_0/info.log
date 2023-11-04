@@ -1,0 +1,162 @@
+RUNNING THE L-BFGS-B CODE
+
+           * * *
+
+Machine precision = 2.220D-16
+ N =          120     M =           10
+
+At X0         0 variables are exactly at the bounds
+
+At iterate    0    f=  2.06806D+03    |proj g|=  5.49187D+05
+
+At iterate    5    f=  3.41960D+00    |proj g|=  1.55946D+00
+
+At iterate   10    f=  3.37095D+00    |proj g|=  4.57739D+00
+
+At iterate   15    f=  3.33966D+00    |proj g|=  1.54447D+00
+
+At iterate   20    f=  3.22472D+00    |proj g|=  8.70695D+00
+
+At iterate   25    f=  3.13634D+00    |proj g|=  6.25620D+00
+
+At iterate   30    f=  3.01256D+00    |proj g|=  1.37344D+01
+
+At iterate   35    f=  2.91634D+00    |proj g|=  6.85450D+00
+
+At iterate   40    f=  2.87238D+00    |proj g|=  6.03771D+00
+
+At iterate   45    f=  2.75199D+00    |proj g|=  4.23519D+01
+
+At iterate   50    f=  2.70797D+00    |proj g|=  5.75338D+00
+
+           * * *
+
+Tit   = total number of iterations
+Tnf   = total number of function evaluations
+Tnint = total number of segments explored during Cauchy searches
+Skip  = number of BFGS updates skipped
+Nact  = number of active bounds at final generalized Cauchy point
+Projg = norm of the final projected gradient
+F     = final function value
+
+           * * *
+
+   N    Tit     Tnf  Tnint  Skip  Nact     Projg        F
+  120     50     59      1     0     0   5.753D+00   2.708D+00
+  F =   2.7079655625609118     
+
+STOP: TOTAL NO. of ITERATIONS REACHED LIMIT                 
+shape of original data: (770, 9)
+
+=====================Checking Stationarity (ADF Test)=====================
+[T_mean] is stationary (True)
+ADF Statistic: -4.911783264267824	p-value: 3.3078613442995705e-05
+
+[Wind speed] is stationary (True)
+ADF Statistic: -10.223168063184527	p-value: 5.259613550092192e-18
+
+[Rain] is stationary (True)
+ADF Statistic: -3.985508363910413	p-value: 0.0014883238838001396
+
+[Humidity] is stationary (True)
+ADF Statistic: -9.428039362145967	p-value: 5.281309427063156e-16
+
+[Cloud] is stationary (True)
+ADF Statistic: -11.300573357028828	p-value: 1.3106072735952212e-20
+
+[Pressure] is stationary (True)
+ADF Statistic: -7.891087815507864	p-value: 4.434610632058812e-12
+
+[solar radiation*] is stationary (False)
+ADF Statistic: -2.0003795593948626	p-value: 0.2864067004031831
+
+[Soil Moisture*] is stationary (False)
+ADF Statistic: -1.8169582082849571	p-value: 0.3720755073572704
+
+[FCR status] is stationary (False)
+ADF Statistic: -2.659500390966181	p-value: 0.08131245813291088
+
+
+=====================Get Diff=====================
+
+=====================Granger Causality Test=====================
+[Wind speed==>T_mean] 1 2 3 
+[Rain==>T_mean] 3 4 
+[Humidity==>T_mean] 1 2 3 4 
+[Cloud==>T_mean] 1 2 3 4 
+[Pressure==>T_mean] NO RELATION
+[solar radiation*==>T_mean] NO RELATION
+[Soil Moisture*==>T_mean] 1 2 3 
+[FCR status==>T_mean] 1 2 3 4 
+[T_mean==>Wind speed] 1 
+[Rain==>Wind speed] NO RELATION
+[Humidity==>Wind speed] 1 2 
+[Cloud==>Wind speed] NO RELATION
+[Pressure==>Wind speed] NO RELATION
+[solar radiation*==>Wind speed] NO RELATION
+[Soil Moisture*==>Wind speed] NO RELATION
+[FCR status==>Wind speed] NO RELATION
+[T_mean==>Rain] 1 2 3 4 
+[Wind speed==>Rain] 1 2 3 4 
+[Humidity==>Rain] 3 4 
+[Cloud==>Rain] 1 
+[Pressure==>Rain] 1 2 3 
+[solar radiation*==>Rain] NO RELATION
+[Soil Moisture*==>Rain] NO RELATION
+[FCR status==>Rain] 1 2 3 4 
+[T_mean==>Humidity] 1 2 3 4 
+[Wind speed==>Humidity] 1 2 
+[Rain==>Humidity] NO RELATION
+[Cloud==>Humidity] 1 2 3 4 
+[Pressure==>Humidity] 2 3 4 
+[solar radiation*==>Humidity] NO RELATION
+[Soil Moisture*==>Humidity] 1 2 3 4 
+[FCR status==>Humidity] 1 2 3 4 
+[T_mean==>Cloud] NO RELATION
+[Wind speed==>Cloud] NO RELATION
+[Rain==>Cloud] 1 2 3 4 
+[Humidity==>Cloud] 3 4 
+[Pressure==>Cloud] 3 4 
+[solar radiation*==>Cloud] NO RELATION
+[Soil Moisture*==>Cloud] NO RELATION
+[FCR status==>Cloud] NO RELATION
+[T_mean==>Pressure] 3 
+[Wind speed==>Pressure] NO RELATION
+[Rain==>Pressure] NO RELATION
+[Humidity==>Pressure] NO RELATION
+[Cloud==>Pressure] NO RELATION
+[solar radiation*==>Pressure] NO RELATION
+[Soil Moisture*==>Pressure] NO RELATION
+[FCR status==>Pressure] NO RELATION
+[T_mean==>solar radiation*] NO RELATION
+[Wind speed==>solar radiation*] NO RELATION
+[Rain==>solar radiation*] NO RELATION
+[Humidity==>solar radiation*] NO RELATION
+[Cloud==>solar radiation*] NO RELATION
+[Pressure==>solar radiation*] NO RELATION
+[Soil Moisture*==>solar radiation*] 2 3 4 
+[FCR status==>solar radiation*] NO RELATION
+[T_mean==>Soil Moisture*] NO RELATION
+[Wind speed==>Soil Moisture*] NO RELATION
+[Rain==>Soil Moisture*] 1 2 3 4 
+[Humidity==>Soil Moisture*] NO RELATION
+[Cloud==>Soil Moisture*] NO RELATION
+[Pressure==>Soil Moisture*] NO RELATION
+[solar radiation*==>Soil Moisture*] 1 2 3 4 
+[FCR status==>Soil Moisture*] 1 2 4 
+[T_mean==>FCR status] 1 2 3 4 
+[Wind speed==>FCR status] 2 3 4 
+[Rain==>FCR status] 1 2 3 4 
+[Humidity==>FCR status] 2 3 4 
+[Cloud==>FCR status] 2 3 4 
+[Pressure==>FCR status] 1 2 3 4 
+[solar radiation*==>FCR status] NO RELATION
+[Soil Moisture*==>FCR status] NO RELATION
+
+=====================Reducing Variables=====================
+Returning default variables for now...
+
+=====================Initializing and Training model / Getting Predictions=====================
+
+[RMSE error]: 1.3760285542508743
+[SMAPE error]: 50.451582117735654
