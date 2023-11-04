@@ -45,11 +45,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'auth_firebase',
     'plant',
-<<<<<<< Updated upstream
     'myAuth',
-=======
     'follow',
->>>>>>> Stashed changes
 ]
 
 MIDDLEWARE = [
