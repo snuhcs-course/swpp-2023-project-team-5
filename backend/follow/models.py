@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 class Follow(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    follow_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='follow_id')
+    follow_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='follows')
     
     def __str__(self):
         return str(self.user_id) + " follows " + str(self.follow_id)
