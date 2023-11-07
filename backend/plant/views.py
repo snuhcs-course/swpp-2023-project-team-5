@@ -7,15 +7,14 @@ from .serializer import PlantSerializer
 
 class PlantBasic(APIView):
     def post(self, request):
-        user_id = request.data.get('user_id', None)
+        user = request.user
+
+        data = request.data
+        request.data._mutable  = True
+        request.data['user_id'] = user.id
+        request.data._mutable = False
         
-        # Check if the user with the provided user_id exists
-        try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            return Response({'user_id': 'User does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        serializer = PlantSerializer(data=request.data)
+        serializer = PlantSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
             return Response({"plant": serializer.data})
@@ -23,11 +22,17 @@ class PlantBasic(APIView):
             return Response({"plant": serializer.errors})
         
     def put(self, request):
+        user = request.user
+
         plant_id = request.data.get('plant_id', None)
         try:
             plant = Plant.objects.get(id=plant_id)
         except:
             return Response({'plant_id': 'Plant does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if user.id != plant.user_id:
+            return Response({'plant_id': 'Plant does not belong to user.'}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = PlantSerializer(plant, data=request.data)
         if serializer.is_valid():
             serializer.save()

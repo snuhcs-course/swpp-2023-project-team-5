@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 class Plant(models.Model):
     name = models.CharField(max_length=100)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    birthday = models.DateField()
+    birthday = models.DateField(auto_now=True)
     height = models.IntegerField()
     status = models.CharField(max_length=100)
     last_watered = models.DateField()
