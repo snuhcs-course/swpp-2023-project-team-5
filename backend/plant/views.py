@@ -41,11 +41,16 @@ class PlantBasic(APIView):
             return Response({"plant": serializer.errors})
     
     def delete(self, request):
+        user = request.user
         plant_id = request.data.get('plant_id', None)
         try:
             plant = Plant.objects.get(id=plant_id)
         except:
             return Response({'plant_id': 'Plant does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if user.id != plant.user_id:
+            return Response({'plant_id': 'Plant does not belong to user.'}, status=status.HTTP_400_BAD_REQUEST)
+
         plant.delete()
         return Response({"plant": "deleted"})
 
@@ -57,6 +62,10 @@ class PlantUser(APIView):
 
 class PlantGet(APIView):
     def get(self, request, plant_id):
-        plant = Plant.objects.get(id=plant_id)
+        try:
+            plant = Plant.objects.get(id=plant_id)
+        except:
+            return Response({'plant_id': 'Plant does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = PlantSerializer(plant)
         return Response({"plant": serializer.data})
