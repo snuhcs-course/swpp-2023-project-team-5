@@ -7,45 +7,44 @@
     android:padding="20dp">
 
     <EditText
-        android:layout_marginTop="30dp"
         android:id="@+id/editPlantName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
         android:background="@drawable/edittext_background"
-        android:padding="20dp"
-        android:hint="Enter Rain"
-        android:inputType="numberDecimal" />
+        android:hint="Enter Name"
+        android:padding="20dp" />
 
     <EditText
-        android:id="@+id/editWindSpeed"
+        android:id="@+id/editHeight"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/edittext_background"
         android:padding="20dp"
-        android:hint="Enter Wind Speed"
+        android:hint="Enter Height of Pineapple (cm)"
         android:layout_marginTop="25dp"
         android:inputType="numberDecimal" />
 
-    <EditText
-        android:id="@+id/editHumidity"
+    <ImageView
+        android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/edittext_background"
-        android:padding="20dp"
-        android:hint="Enter Humidity"
+        android:layout_height="294dp"
         android:layout_marginTop="25dp"
-        android:inputType="numberDecimal" />
+        android:contentDescription="@string/pineapple_image"
+        android:background="@drawable/edittext_background"
+        android:scaleType="centerCrop" />
 
-    <EditText
-        android:id="@+id/editCloud"
-        android:layout_width="match_parent"
+    <Button
+        android:id="@+id/btn_take_picture"
+        android:layout_width="192dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/edittext_background"
-        android:padding="20dp"
+        android:layout_gravity="center_horizontal"
+
         android:layout_marginTop="25dp"
-        android:hint="Enter Cloud"
-        android:inputType="numberDecimal"
-        android:layout_marginBottom="50dp"/>
+        android:backgroundTint="@color/green"
+        android:text="Take Picture"
+        android:textColor="@color/black" />
+
 
     <Button
         android:id="@+id/btn_save"
@@ -56,5 +55,6 @@
         android:backgroundTint="@color/green"
         android:text="Save"
         android:textColor="@color/black" />
+
 
 </LinearLayout>
