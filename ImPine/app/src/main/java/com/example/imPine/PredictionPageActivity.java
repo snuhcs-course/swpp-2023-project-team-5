@@ -23,18 +23,18 @@ public class PredictionPageActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 EditText editRain = findViewById(R.id.editRain);
-                EditText editWindSpeed = findViewById(R.id.editWindSpeed);
+                EditText editTemp = findViewById(R.id.editTemperature);
                 EditText editHumidity = findViewById(R.id.editHumidity);
                 EditText editCloud = findViewById(R.id.editCloud);
 
                 String rainValue = editRain.getText().toString().trim();
-                String windSpeedValue = editWindSpeed.getText().toString().trim();
+                String temperatureValue = editTemp.getText().toString().trim();
                 String humidityValue = editHumidity.getText().toString().trim();
                 String cloudValue = editCloud.getText().toString().trim();
 
                 Intent intent = new Intent(PredictionPageActivity.this, PredictionResultActivity.class);
                 intent.putExtra("rainValue", rainValue);
-                intent.putExtra("windSpeedValue", windSpeedValue);
+                intent.putExtra("temperatureValue", temperatureValue);
                 intent.putExtra("humidityValue", humidityValue);
                 intent.putExtra("cloudValue", cloudValue);
 

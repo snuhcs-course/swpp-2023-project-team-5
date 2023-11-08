@@ -51,6 +51,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/headerBar">
 
+
+        <EditText
+            android:id="@+id/editTemperature"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_background"
+            android:padding="20dp"
+            android:hint="Enter Temperature"
+            android:layout_marginTop="15dp"
+            android:inputType="numberDecimal" />
+
         <EditText
             android:id="@+id/editRain"
             android:layout_width="match_parent"
@@ -58,17 +69,9 @@
             android:background="@drawable/edittext_background"
             android:padding="20dp"
             android:hint="Enter Rain"
-            android:inputType="numberDecimal" />
-
-        <EditText
-            android:id="@+id/editWindSpeed"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/edittext_background"
-            android:padding="20dp"
-            android:hint="Enter Wind Speed"
             android:layout_marginTop="15dp"
             android:inputType="numberDecimal" />
+
 
         <EditText
             android:id="@+id/editHumidity"

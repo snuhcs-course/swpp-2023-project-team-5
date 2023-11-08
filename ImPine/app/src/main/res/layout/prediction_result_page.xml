@@ -13,6 +13,7 @@
         android:paddingLeft="30dp"
         android:paddingBottom="30dp"
         android:paddingRight="30dp"
+        android:textSize="20dp"
         android:paddingTop="30dp">
 
     </TextView>

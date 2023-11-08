@@ -123,6 +123,7 @@ public class MakePlantActivity extends AppCompatActivity {
                     Toast.makeText(MakePlantActivity.this, "Plant saved!", Toast.LENGTH_SHORT).show();
                     navigateToHomePage();
                 } else {
+                    navigateToHomePage();
                     handleResponseError(response);
                 }
             }
@@ -164,9 +165,9 @@ public class MakePlantActivity extends AppCompatActivity {
         if (response.errorBody() != null) {
             try {
                 String errorBodyString = response.errorBody().string();
-                // If the response is HTML, truncate and log a portion of it
+                // If the response is HTML, log the entire response for debugging
                 if (errorBodyString.trim().startsWith("<!DOCTYPE html>")) {
-                    Log.e("MakePlantActivity", "HTML response received, this is likely not a JSON: " + errorBodyString.substring(0, Math.min(errorBodyString.length(), 500)));
+                    Log.e("MakePlantActivity", "HTML response received, full error page: " + errorBodyString);
                     message += "HTML response received. Check logs for details.";
                 } else {
                     // Try to parse it as JSON
