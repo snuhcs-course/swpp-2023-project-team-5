@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'auth_firebase',
     'plant',
+    'myAuth',
+    'follow',
 ]
 
 MIDDLEWARE = [
