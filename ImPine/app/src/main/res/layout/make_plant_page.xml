@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/yellow"
+    android:padding="20dp">
+
+    <EditText
+        android:layout_marginTop="30dp"
+        android:id="@+id/editPlantName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edittext_background"
+        android:padding="20dp"
+        android:hint="Enter Rain"
+        android:inputType="numberDecimal" />
+
+    <EditText
+        android:id="@+id/editWindSpeed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edittext_background"
+        android:padding="20dp"
+        android:hint="Enter Wind Speed"
+        android:layout_marginTop="25dp"
+        android:inputType="numberDecimal" />
+
+    <EditText
+        android:id="@+id/editHumidity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edittext_background"
+        android:padding="20dp"
+        android:hint="Enter Humidity"
+        android:layout_marginTop="25dp"
+        android:inputType="numberDecimal" />
+
+    <EditText
+        android:id="@+id/editCloud"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/edittext_background"
+        android:padding="20dp"
+        android:layout_marginTop="25dp"
+        android:hint="Enter Cloud"
+        android:inputType="numberDecimal"
+        android:layout_marginBottom="50dp"/>
+
+    <Button
+        android:id="@+id/btn_save"
+        android:layout_width="192dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="25dp"
+        android:backgroundTint="@color/green"
+        android:text="Save"
+        android:textColor="@color/black" />
+
+</LinearLayout>

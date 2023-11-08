@@ -36,6 +36,8 @@
         <activity android:name=".FriendsDetailActivity" />
         <activity android:name=".FriendsSearchResultsActivity" />
         <activity android:name=".PredictionResultActivity" />
+        <activity android:name=".TutorialActivity" />
+        <activity android:name=".MakePlantActivity"></activity>
 
     </application>
 

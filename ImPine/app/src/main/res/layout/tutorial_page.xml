@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/yellow"
+    android:padding="16dp">
+
+    <ScrollView
+        android:id="@+id/scrollViewTutorial"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/btn_get_started"
+        android:layout_alignParentTop="true">
+
+        <TextView
+            android:id="@+id/textViewTutorialContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Information about growing pineapples...\n\n"
+            android:textSize="16sp"
+            android:padding="16dp" />
+        <!-- Add more TextViews or other components with information as needed -->
+    </ScrollView>
+
+    <Button
+        android:id="@+id/btn_get_started"
+        android:layout_width="291dp"
+        android:layout_height="59dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="32dp"
+        android:backgroundTint="@color/green"
+        android:text="Let's Get Started!"
+        android:textColor="@color/black"
+        android:textSize="20dp" />
+
+</RelativeLayout>
