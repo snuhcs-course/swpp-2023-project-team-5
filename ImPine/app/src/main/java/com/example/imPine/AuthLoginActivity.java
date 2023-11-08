@@ -11,6 +11,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
 
 public class AuthLoginActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
@@ -73,6 +75,7 @@ public class AuthLoginActivity extends AppCompatActivity {
                                         SharedPreferences sharedPref = getSharedPreferences("my_prefs", MODE_PRIVATE);
                                         SharedPreferences.Editor editor = sharedPref.edit();
                                         editor.putString("firebaseIdToken", idToken);
+                                        Log.d("Fbtoken", idToken);
                                         editor.apply();
                                     } else {
                                         // Handle the error in retrieving the IdToken
@@ -82,11 +85,18 @@ public class AuthLoginActivity extends AppCompatActivity {
 
                         // Start the home page activity
                         Intent intent = new Intent(AuthLoginActivity.this, HomePageActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
-                        finish();  // This will finish the current activity and the user won't be able to go back to it
+                        finish();  // Finish the current activity and the user won't be able to go back to it
                     } else {
                         // If login fails, display a message to the user.
-                        Toast.makeText(AuthLoginActivity.this, "Authentication Failed.", Toast.LENGTH_SHORT).show();
+                        String errorMessage = "Authentication Failed.";
+                        if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+                            errorMessage = "Invalid password.";
+                        } else if (task.getException() instanceof FirebaseAuthInvalidUserException) {
+                            errorMessage = "No account found with this email.";
+                        }
+                        Toast.makeText(AuthLoginActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
                     }
                 });
     }
