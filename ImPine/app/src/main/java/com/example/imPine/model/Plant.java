@@ -1,28 +1,30 @@
 package com.example.imPine.model;
 
+import java.util.Date;
+
 public class Plant {
     private String name;
-    private String height;
+    private int height;
+    private Date lastWatered;
 
-    public Plant(String name, String height) {
+    public Plant(String name, int height) {
         this.name = name;
         this.height = height;
     }
 
-    // Getters and setters are not always necessary, but they are a good practice.
+    public int getHeight() {
+        return height;
+    }
+
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public Date getLastWatered() {
+        return lastWatered;
     }
 
-    public String getHeight() {
-        return height;
-    }
-
-    public void setHeight(String height) {
-        this.height = height;
+    public void setLastWatered(Date lastWatered) {
+        this.lastWatered = lastWatered;
     }
 }

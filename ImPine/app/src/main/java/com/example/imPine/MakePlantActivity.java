@@ -95,7 +95,7 @@ public class MakePlantActivity extends AppCompatActivity {
             EditText heightEditText = findViewById(R.id.editHeight);
             String heightString = heightEditText.getText().toString();
 
-            Plant plant = new Plant(plantName, heightString);
+            Plant plant = (new Plant(plantName, Integer.parseInt(heightString)));
             getAuthToken(new AuthTokenCallback() {
                 @Override
                 public void onTokenReceived(String authToken) {

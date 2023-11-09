@@ -6,23 +6,26 @@
     android:layout_height="match_parent"
     tools:context=".DiaryPageActivity">
     <!-- Header Bar -->
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerBar"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/yellow"
         android:padding="20dp"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
             android:id="@+id/user"
             android:layout_width="50dp"
             android:layout_height="40dp"
-            android:layout_marginRight="270dp"
             android:background="@drawable/circular_button_yellow"
             android:scaleType="centerInside"
-            android:src="@drawable/user" />
+            android:src="@drawable/user"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
         <ImageButton
             android:id="@+id/note"
@@ -30,9 +33,11 @@
             android:layout_height="40dp"
             android:background="@drawable/circular_button_yellow"
             android:scaleType="centerInside"
-            android:src="@drawable/note" />
-
-    </LinearLayout>
+            android:src="@drawable/note"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
         android:id="@+id/footerBar"
@@ -110,6 +115,7 @@
         app:layout_constraintStart_toStartOf="parent"
         android:paddingLeft="15dp"
         android:paddingRight="15dp"
+        android:layout_marginTop="15dp"
         app:layout_constraintTop_toBottomOf="@+id/headerBar"
         tools:listitem="@layout/diary_item" />
 
