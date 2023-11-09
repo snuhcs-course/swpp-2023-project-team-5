@@ -7,10 +7,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -37,6 +39,8 @@ public class AuthLoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_page);
+        Button signUpButton = findViewById(R.id.buttonSignUp);
+        signUpButton.setText(Html.fromHtml(getString(R.string.sign_up_text)));
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
