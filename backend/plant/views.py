@@ -5,16 +5,23 @@ from django.contrib.auth.models import User
 from .models import Plant
 from .serializer import PlantSerializer
 
+from s3uploader.uploader import S3ImageUploader
+
 class PlantBasic(APIView):
     def post(self, request):
         user = request.user
 
-        data = request.data
-        request.data._mutable  = True
-        request.data['user_id'] = user.id
-        request.data._mutable = False
-        
-        serializer = PlantSerializer(data=data)
+        auth_data = {'user_id': user.id}
+
+        request.POST._mutable  = True
+        request.data.update(auth_data)
+
+        img = request.FILES.get("image")
+        if img != None:
+            url = S3ImageUploader(img).upload()
+            request.data.update({'image_src': url})
+
+        serializer = PlantSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response({"plant": serializer.data})
