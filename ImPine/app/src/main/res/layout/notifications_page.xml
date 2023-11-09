@@ -18,12 +18,12 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
-            android:id="@+id/user"
+            android:id="@+id/piney"
             android:layout_width="50dp"
             android:layout_height="40dp"
             android:background="@drawable/circular_button_yellow"
             android:scaleType="centerInside"
-            android:src="@drawable/user"
+            android:src="@drawable/pine_avatar"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
@@ -35,6 +35,7 @@
             android:background="@drawable/circular_button_yellow"
             android:scaleType="centerInside"
             android:src="@drawable/note"
+
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>

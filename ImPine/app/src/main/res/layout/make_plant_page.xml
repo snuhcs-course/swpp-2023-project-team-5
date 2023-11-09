@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:background="@drawable/edittext_background"
-        android:hint="Enter Name"
+        android:hint="Enter Pineapple Name"
         android:padding="20dp" />
 
     <EditText
@@ -34,6 +34,7 @@
         android:background="@drawable/edittext_background"
         android:scaleType="centerCrop" />
 
+
     <Button
         android:id="@+id/btn_take_picture"
         android:layout_width="192dp"
@@ -44,7 +45,6 @@
         android:backgroundTint="@color/green"
         android:text="Take Picture"
         android:textColor="@color/black" />
-
 
     <Button
         android:id="@+id/btn_save"

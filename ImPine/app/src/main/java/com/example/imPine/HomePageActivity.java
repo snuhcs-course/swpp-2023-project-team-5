@@ -1,5 +1,7 @@
 package com.example.imPine;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.content.Intent;
 import android.view.View;
@@ -73,6 +75,51 @@ public class HomePageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_page);
 
+        // TODO: get the pineapple profile
+//        ImageView pineappleProfile = findViewById(R.id.pineappleProfile);
+//        SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
+//        String imagePath = prefs.getString("profile_image_path", null);
+//        if (imagePath != null) {
+//            Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
+//            pineappleProfile.setImageBitmap(bitmap);
+//        }
+
+        ImageButton pineyButton = findViewById(R.id.piney);
+        // Load the animations
+        final Animation swayRight = AnimationUtils.loadAnimation(this, R.anim.sway_right);
+        final Animation swayLeft = AnimationUtils.loadAnimation(this, R.anim.sway_left);
+
+        // Set animation listeners to create an infinite swaying effect for piney
+        swayRight.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {}
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                pineyButton.startAnimation(swayLeft);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+
+        swayLeft.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {}
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                pineyButton.startAnimation(swayRight);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+
+        // Start the animation
+        pineyButton.startAnimation(swayRight);
+
+
         // Fetch the user's plants. Here I've assumed some userId, you'll need to use the appropriate user ID
         fetchUserPlants("YOUR_USER_ID_HERE");
 
@@ -121,16 +168,16 @@ public class HomePageActivity extends AppCompatActivity {
             }
         });
 
-        // User button click
-        ImageButton userButton = findViewById(R.id.user);
-        userButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(HomePageActivity.this, UsersPageActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
-            }
-        });
+        // Piney button click
+        ImageButton userButton = findViewById(R.id.piney);
+//        userButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(HomePageActivity.this, UsersPageActivity.class);
+//                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+//                startActivity(intent);
+//            }
+//        });
 
         // Note button click
         ImageButton noteButton = findViewById(R.id.note);
@@ -145,9 +192,6 @@ public class HomePageActivity extends AppCompatActivity {
 
         ImageView pineappleAvatar = findViewById(R.id.pineappleAvatar);
 
-        // Load the animations
-        final Animation swayRight = AnimationUtils.loadAnimation(this, R.anim.sway_right);
-        final Animation swayLeft = AnimationUtils.loadAnimation(this, R.anim.sway_left);
 
         // Set animation listeners to create an infinite swaying effect
         swayRight.setAnimationListener(new Animation.AnimationListener() {

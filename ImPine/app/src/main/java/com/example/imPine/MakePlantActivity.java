@@ -3,6 +3,7 @@ package com.example.imPine;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -26,6 +27,11 @@ import com.google.firebase.auth.FirebaseUser;
 
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -33,6 +39,41 @@ import retrofit2.Response;
 public class MakePlantActivity extends AppCompatActivity {
     private ActivityResultLauncher<Intent> cameraLauncher;
     private ImageView imageView;
+
+    private Uri imageUri;
+
+    private ActivityResultCallback<ActivityResult> cameraResultCallback = new ActivityResultCallback<ActivityResult>() {
+        @Override
+        public void onActivityResult(ActivityResult result) {
+            if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                Log.d("MakePlantActivity", "Image capture successful");
+                Bundle extras = result.getData().getExtras();
+                Bitmap imageBitmap = (Bitmap) extras.get("data");
+                imageView.setImageBitmap(imageBitmap);
+                // Save the bitmap as a file and get the path
+                imageUri = saveImage(imageBitmap);
+            } else {
+                // Handle other cases...
+            }
+        }
+    };
+
+    private Uri saveImage(Bitmap bitmap) {
+        // Use the application's cache directory for saving the image
+        File imageDir = new File(getCacheDir(), "images");
+        if (!imageDir.exists()) {
+            imageDir.mkdir();
+        }
+        File image = new File(imageDir, "pineappleProfile.png");
+        try (OutputStream out = new FileOutputStream(image)) {
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+            out.flush();
+            return Uri.fromFile(image);
+        } catch (IOException e) {
+            Log.e("MakePlantActivity", "Error saving image", e);
+            return null;
+        }
+    }
 
     private void getAuthToken(AuthTokenCallback authTokenCallback) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -155,6 +196,14 @@ public class MakePlantActivity extends AppCompatActivity {
     }
 
     private void navigateToHomePage() {
+//        if (imageUri != null) {
+//            Intent intent = new Intent(this, HomePageActivity.class);
+//            intent.putExtra("profile_image_path", imageUri.toString());
+//            startActivity(intent);
+//            finish();
+//        } else {
+//            Toast.makeText(this, "Error: Image not saved", Toast.LENGTH_SHORT).show();
+//        }
         Intent intent = new Intent(this, HomePageActivity.class);
         startActivity(intent);
         finish();
