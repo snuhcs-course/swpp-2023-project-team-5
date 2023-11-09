@@ -123,7 +123,7 @@ public class MakePlantActivity extends AppCompatActivity {
                     Toast.makeText(MakePlantActivity.this, "Plant saved!", Toast.LENGTH_SHORT).show();
                     navigateToHomePage();
                 } else {
-                    navigateToHomePage();
+//                    navigateToHomePage();
                     handleResponseError(response);
                 }
             }
