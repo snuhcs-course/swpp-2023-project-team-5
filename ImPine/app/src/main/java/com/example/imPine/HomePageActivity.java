@@ -1,7 +1,11 @@
 package com.example.imPine;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.content.Intent;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
@@ -26,10 +30,16 @@ import java.io.IOException;
 
 public class HomePageActivity extends AppCompatActivity {
 
+    private void setBoldLabel(TextView textView, String label, String value) {
+        SpannableString spannable = new SpannableString(label + " " + value);
+        spannable.setSpan(new StyleSpan(Typeface.BOLD), 0, label.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        textView.setText(spannable);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_page);
+
 
         ImageButton pineyButton = findViewById(R.id.piney);
         // Load the animations
@@ -93,7 +103,7 @@ public class HomePageActivity extends AppCompatActivity {
             public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
                 if (response.isSuccessful()) {
                     UserResponse userResponse = response.body();
-                    usernameTextView.setText("Username: " + userResponse.getUser().getName());
+                    setBoldLabel(usernameTextView, "Username: ", userResponse.getUser().getName());
                     String userId;
                     userId = userResponse.getUser().getId();
                     Log.d("HomePageActivity", "UserId: " + userId);
@@ -114,10 +124,11 @@ public class HomePageActivity extends AppCompatActivity {
                         public void onResponse(Call<PlantResponse> call, Response<PlantResponse> response) {
                             if (response.isSuccessful()) {
                                 PlantResponse plantResponse = response.body();
-                                pineappleNameTextView.setText("Pineapple Name: " + plantResponse.getPlants().get(0).getName());
-                                heightTextView.setText("Height: " + plantResponse.getPlants().get(0).getHeight() + "cm");
+                                setBoldLabel(pineappleNameTextView, "Pineapple Name: ", plantResponse.getPlants().get(0).getName());
+                                setBoldLabel(heightTextView, "Height: ", String.valueOf(plantResponse.getPlants().get(0).getHeight()) + "cm");
+                                setBoldLabel(statusTextView, "Status: ", plantResponse.getPlants().get(0).getStatus());
 //                                lastWateredTextView.setText("Last Watered Date: " + plantResponse.getPlants().get(0).getLastWatered());
-                                statusTextView.setText("Status: " + plantResponse.getPlants().get(0).getStatus());
+
 
                             } else {
                                 if (response.errorBody() != null) {

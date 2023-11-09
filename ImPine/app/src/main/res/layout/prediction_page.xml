@@ -65,6 +65,7 @@
             android:background="@drawable/edittext_background"
             android:padding="20dp"
             android:hint="Enter Temperature"
+            android:fontFamily="@font/short_stack"
             android:layout_marginTop="15dp"
             android:inputType="numberDecimal" />
 
@@ -75,6 +76,7 @@
             android:background="@drawable/edittext_background"
             android:padding="20dp"
             android:hint="Enter Rain"
+            android:fontFamily="@font/short_stack"
             android:layout_marginTop="15dp"
             android:inputType="numberDecimal" />
 
@@ -86,6 +88,7 @@
             android:background="@drawable/edittext_background"
             android:padding="20dp"
             android:hint="Enter Humidity"
+            android:fontFamily="@font/short_stack"
             android:layout_marginTop="15dp"
             android:inputType="numberDecimal" />
 
@@ -97,6 +100,7 @@
             android:padding="20dp"
             android:layout_marginTop="15dp"
             android:hint="Enter Cloud"
+            android:fontFamily="@font/short_stack"
             android:inputType="numberDecimal"
             android:layout_marginBottom="50dp"/>
 
@@ -108,6 +112,7 @@
             android:layout_marginTop="15dp"
             android:backgroundTint="@color/green"
             android:text="Predict"
+            android:fontFamily="@font/short_stack"
             android:textColor="@color/black" />
 
     </LinearLayout>

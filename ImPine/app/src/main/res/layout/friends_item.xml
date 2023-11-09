@@ -26,6 +26,7 @@
                 <TextView
                     android:id="@+id/friendName"
                     android:layout_width="wrap_content"
+                    android:fontFamily="@font/short_stack"
                     android:layout_height="wrap_content"
                     android:padding="15dp"
                     android:text="Friend Name" />
