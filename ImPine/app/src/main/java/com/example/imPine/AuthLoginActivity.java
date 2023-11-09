@@ -1,12 +1,16 @@
 package com.example.imPine;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -48,6 +52,20 @@ public class AuthLoginActivity extends AppCompatActivity {
         if (email != null) {
             editTextEmail.setText(email); // Set the email
         }
+
+        ConstraintLayout mainLayout = findViewById(R.id.mainLayout);
+
+        mainLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (getCurrentFocus() != null) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                    getCurrentFocus().clearFocus(); // Optional: Clear focus from the current EditText
+                }
+                return false;
+            }
+        });
     }
 
     private void navigateToSignUp() {

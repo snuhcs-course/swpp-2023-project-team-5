@@ -1,15 +1,19 @@
 package com.example.imPine;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 // Rain, Wind Speed, Humidity, Cloud
 public class PredictionPageActivity extends AppCompatActivity {
@@ -145,6 +149,20 @@ public class PredictionPageActivity extends AppCompatActivity {
                 Intent intent = new Intent(PredictionPageActivity.this, NotificationsPageActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
+            }
+        });
+
+        ConstraintLayout mainLayout = findViewById(R.id.mainLayout);
+
+        mainLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (getCurrentFocus() != null) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                    getCurrentFocus().clearFocus(); // Optional: Clear focus from the current EditText
+                }
+                return false;
             }
         });
     }

@@ -31,6 +31,41 @@ public class HomePageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_page);
 
+        ImageButton pineyButton = findViewById(R.id.piney);
+        // Load the animations
+        final Animation swayRight = AnimationUtils.loadAnimation(this, R.anim.sway_right);
+        final Animation swayLeft = AnimationUtils.loadAnimation(this, R.anim.sway_left);
+
+        // Set animation listeners to create an infinite swaying effect for piney
+        swayRight.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {}
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                pineyButton.startAnimation(swayLeft);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+
+        swayLeft.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {}
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                pineyButton.startAnimation(swayRight);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+
+        // Start the animation
+        pineyButton.startAnimation(swayRight);
+
         // TODO: get the pineapple profile
 //        ImageView pineappleProfile = findViewById(R.id.pineappleProfile);
 //        SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
@@ -114,44 +149,6 @@ public class HomePageActivity extends AppCompatActivity {
                 Log.e("HomePageActivity", "Network error when fetching user details: " + t.getMessage());
             }
         });
-
-
-
-
-        ImageButton pineyButton = findViewById(R.id.piney);
-        // Load the animations
-        final Animation swayRight = AnimationUtils.loadAnimation(this, R.anim.sway_right);
-        final Animation swayLeft = AnimationUtils.loadAnimation(this, R.anim.sway_left);
-
-        // Set animation listeners to create an infinite swaying effect for piney
-        swayRight.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {}
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                pineyButton.startAnimation(swayLeft);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {}
-        });
-
-        swayLeft.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {}
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                pineyButton.startAnimation(swayRight);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {}
-        });
-
-        // Start the animation
-        pineyButton.startAnimation(swayRight);
 
         // Diary button click
         ImageButton diaryButton = findViewById(R.id.diary);
