@@ -19,9 +19,9 @@
             android:layout_height="wrap_content"
             android:padding="20dp"
             android:fontFamily="@font/short_stack"
-            android:background="@color/yellow"
             android:textSize="24sp"
             android:layout_marginBottom="5dp"
+            android:background="@drawable/rounded_corners"
             tools:text="Friend's Name" />
 
         <TextView
@@ -30,10 +30,10 @@
             android:layout_height="wrap_content"
             android:padding="20dp"
             android:fontFamily="@font/short_stack"
-            android:background="@color/yellow"
             android:textSize="24sp"
             android:layout_marginBottom="5dp"
             android:text="Piney"
+            android:background="@drawable/rounded_corners"
             tools:text="Pineapple's Name" />
 
         <ImageView
@@ -47,11 +47,11 @@
         <TextView
             android:id="@+id/diaryTV"
             android:text="Diaries"
+            android:background="@drawable/rounded_corners"
             android:fontFamily="@font/short_stack"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="20dp"
-            android:background="@color/yellow"
             android:textSize="24sp"
             android:layout_marginBottom="15dp" />
 
