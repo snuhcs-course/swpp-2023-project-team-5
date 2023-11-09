@@ -8,19 +8,17 @@ from .serializer import PlantSerializer
 class PlantBasic(APIView):
     def post(self, request):
         user = request.user
+        data = request.data.copy()  # Make a copy of the data which is mutable
+        data['user_id'] = user.id  # Add or change the data in the mutable copy
 
-        data = request.data
-        request.data._mutable  = True
-        request.data['user_id'] = user.id
-        request.data._mutable = False
-        
         serializer = PlantSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
-            return Response({"plant": serializer.data})
+            return Response({"plant": serializer.data}, status=status.HTTP_201_CREATED)
         else:
-            return Response({"plant": serializer.errors})
-        
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
     def put(self, request):
         user = request.user
 
