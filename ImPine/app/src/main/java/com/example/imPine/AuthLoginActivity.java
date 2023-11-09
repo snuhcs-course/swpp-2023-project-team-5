@@ -1,7 +1,10 @@
 package com.example.imPine;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.EditText;
@@ -91,6 +94,9 @@ public class AuthLoginActivity extends AppCompatActivity {
             if (task.isSuccessful()) {
                 String idToken = task.getResult().getToken();
                 String authToken = "Bearer " + idToken;
+                // Save the token here
+                saveAuthToken(idToken);
+
                 Log.d("fbtoken", idToken);
                 // Use Retrofit to create a service for the API interface
                 ApiInterface apiService = RetrofitClient.getClient().create(ApiInterface.class);
@@ -158,4 +164,17 @@ public class AuthLoginActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
+    private void saveAuthToken(String token) {
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(getString(R.string.saved_auth_token), token);
+        editor.apply();
+    }
+
+    private String getAuthToken() {
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        return sharedPreferences.getString(getString(R.string.saved_auth_token), null);
+    }
+
 }
