@@ -9,6 +9,7 @@ class Plant(models.Model):
     birthday = models.DateField(auto_now=True)
     height = models.IntegerField()
     status = models.CharField(max_length=100)
+    image_src = models.CharField(max_length=100, default="")
     last_watered = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
