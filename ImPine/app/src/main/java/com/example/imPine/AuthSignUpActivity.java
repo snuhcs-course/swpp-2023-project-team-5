@@ -8,7 +8,15 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.imPine.model.SignUpRequest;
+import com.example.imPine.model.SignUpResponse;
+import com.example.imPine.network.ApiInterface;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class AuthSignUpActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -49,42 +57,69 @@ public class AuthSignUpActivity extends AppCompatActivity {
             return;
         }
 
+        // Sign up with Firebase
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
-                        // Successfully registered the user
-                        Toast.makeText(AuthSignUpActivity.this, "Sign Up Successful.", Toast.LENGTH_SHORT).show();
-
-                        // Navigate back to the login page
-                        Intent intent = new Intent(AuthSignUpActivity.this, AuthLoginActivity.class);
-                        intent.putExtra("email", email); // Pass email to AuthLoginActivity
-                        startActivity(intent);
-                        finish();
+                        // Firebase sign up success, now get the Firebase token
+                        FirebaseUser firebaseUser = mAuth.getCurrentUser();
+                        if (firebaseUser != null) {
+                            firebaseUser.getIdToken(true)
+                                    .addOnCompleteListener(task1 -> {
+                                        if (task1.isSuccessful()) {
+                                            // Got the token, now sign up on your backend
+                                            String firebaseToken = task1.getResult().getToken();
+                                            signUpOnBackend(user, email, firebaseToken);
+                                        } else {
+                                            // Handle error - Could not get Firebase token
+                                            Toast.makeText(AuthSignUpActivity.this, "Failed to get Firebase token: " + task1.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+                        }
                     } else {
-                        try {
-                            throw task.getException();
-                        }
-//                        // if email is poorly formatted
-//                        catch (FirebaseAuthInvalidCredentialsException malformedEmail) {
-//                            editTextEmail.setError("Invalid Email");
-//                            editTextEmail.requestFocus();
-//                       }
-//                        // if email is already in use
-//                        catch (FirebaseAuthUserCollisionException existEmail) {
-//                            editTextEmail.setError("Email already exists");
-//                            editTextEmail.requestFocus();
-//                        }
-                        // if the password is too weak
-//                        catch (FirebaseAuthWeakPasswordException weakPassword) {
-//                            editTextPassword.setError("Password too short or weak");
-//                            editTextPassword.requestFocus();
-//                        }
-                        // any other exceptions, handle or log them accordingly
-                        catch (Exception e) {
-                            Log.e("FirebaseAuth", "Sign Up Error", e);
-                            Toast.makeText(AuthSignUpActivity.this, "Sign Up Failed.", Toast.LENGTH_SHORT).show();
-                        }
+                        // Firebase sign up failed
+                        Toast.makeText(AuthSignUpActivity.this, "Firebase Authentication failed: " + task.getException().getMessage(),
+                                Toast.LENGTH_LONG).show();
                     }
                 });
     }
+
+    private void signUpOnBackend(String username, String email, String firebaseToken) {
+        ApiInterface apiInterface = RetrofitClient.getClient().create(ApiInterface.class);
+
+        // Creating the sign-up request with the username and email
+        SignUpRequest signUpRequest = new SignUpRequest(username, email);
+
+        // Making the call to your backend
+        Call<SignUpResponse> call = apiInterface.createUser("Bearer " + firebaseToken, signUpRequest);
+
+        call.enqueue(new Callback<SignUpResponse>() {
+            @Override
+            public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
+                if (response.isSuccessful()) {
+                    // Backend sign up success
+                    Toast.makeText(AuthSignUpActivity.this, "Backend Sign Up Successful.", Toast.LENGTH_SHORT).show();
+                    // Proceed to login activity and pass the email
+                    navigateToLogin(email);
+                } else {
+                    // Backend sign up failed with response from server
+                    Toast.makeText(AuthSignUpActivity.this, "Backend Sign Up Failed: " + response.message(), Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<SignUpResponse> call, Throwable t) {
+                // Backend sign up failed with no response from server (network error, etc.)
+                Toast.makeText(AuthSignUpActivity.this, "Backend Sign Up Failed: " + t.getMessage(), Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void navigateToLogin(String email) {
+        Intent intent = new Intent(AuthSignUpActivity.this, AuthLoginActivity.class);
+        intent.putExtra("email", email);
+        startActivity(intent);
+        finish(); // Finish this activity so the user can't navigate back to it
+    }
 }
+
