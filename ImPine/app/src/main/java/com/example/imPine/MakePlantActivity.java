@@ -3,13 +3,13 @@ package com.example.imPine;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.icu.text.SimpleDateFormat;
 import androidx.exifinterface.media.ExifInterface;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -27,7 +27,6 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
@@ -41,6 +40,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -49,6 +49,10 @@ import java.io.OutputStream;
 import java.util.Date;
 import java.util.Locale;
 
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -85,9 +89,14 @@ public class MakePlantActivity extends AppCompatActivity {
         try (OutputStream out = new FileOutputStream(image)) {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
             out.flush();
-            return Uri.fromFile(image);
+            Uri savedImageUri = Uri.fromFile(image);
+
+            // Log the path of the saved image
+            Log.d("MakePlantActivityPic", "Saved image path: " + savedImageUri.getPath());
+
+            return savedImageUri;
         } catch (IOException e) {
-            Log.e("MakePlantActivity", "Error saving image", e);
+            Log.e("MakePlantActivityPic", "Error saving image", e);
             return null;
         }
     }
@@ -168,10 +177,11 @@ public class MakePlantActivity extends AppCompatActivity {
             String heightString = heightEditText.getText().toString();
 
             Plant plant = (new Plant(plantName, Integer.parseInt(heightString)));
+            Log.e("MakePlantActivityPic", "imageUri: " + currentPhotoPath);
             getAuthToken(new AuthTokenCallback() {
                 @Override
                 public void onTokenReceived(String authToken) {
-                    createPlant(plant, authToken);
+                    createPlant(plant, authToken, imageUri);
                 }
 
                 @Override
@@ -182,31 +192,76 @@ public class MakePlantActivity extends AppCompatActivity {
         });
     }
 
-    private void createPlant(Plant plant, String authToken) {
-        ApiInterface apiService = RetrofitClient.getClient().create(ApiInterface.class);
-        // Log the URL here
-        Log.d("MakePlantActivity", "Attempting to create plant at URL: " + RetrofitClient.getBaseUrl() + "/api/plant/");
-        Log.d("MakePlantActivity", "Token: " + authToken);
-        Call<Plant> call = apiService.createPlant(authToken, plant);
-        call.enqueue(new Callback<>() {
-            @Override
-            public void onResponse(Call<Plant> call, Response<Plant> response) {
-                if (response.isSuccessful()) {
-                    Toast.makeText(MakePlantActivity.this, "Plant saved!", Toast.LENGTH_SHORT).show();
-                    navigateToHomePage();
-                } else {
-//                    navigateToHomePage();
-                    handleResponseError(response);
-                }
-            }
-
-            @Override
-            public void onFailure(Call<Plant> call, Throwable t) {
-                Toast.makeText(MakePlantActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                Log.e("MakePlantActivity", "Network error", t);
-            }
-        });
+    private MultipartBody.Part prepareFilePart(String partName, Uri fileUri) {
+        File file = new File(fileUri.getPath());
+        // Create RequestBody instance from file
+        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+        // MultipartBody.Part is used to send also the actual file name
+        return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
     }
+
+
+    public String getRealPathFromURI(Uri contentUri) {
+        String[] proj = { MediaStore.Images.Media.DATA };
+        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            String path = cursor.getString(column_index);
+            cursor.close();
+            return path;
+        }
+        return null;
+    }
+    public static byte[] getBytesFromInputStream(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+        int bufferSize = 1024;
+        byte[] buffer = new byte[bufferSize];
+
+        int len;
+        while ((len = inputStream.read(buffer)) != -1) {
+            byteBuffer.write(buffer, 0, len);
+        }
+        return byteBuffer.toByteArray();
+    }
+    private void createPlant(Plant plant, String authToken, Uri imageUri) {
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(imageUri);
+            byte[] fileBytes = getBytesFromInputStream(inputStream);
+            RequestBody requestFile = RequestBody.create(MediaType.parse(getContentResolver().getType(imageUri)), fileBytes);
+            MultipartBody.Part body = MultipartBody.Part.createFormData("image", "image.jpg", requestFile);
+
+            ApiInterface apiService = RetrofitClient.getClient().create(ApiInterface.class);
+            Log.d("MakePlantActivity", "Attempting to create plant at URL: " + RetrofitClient.getBaseUrl() + "/api/plant/");
+            Log.d("MakePlantActivity", "Token: " + authToken);
+
+            RequestBody name = RequestBody.create(MultipartBody.FORM, plant.getName());
+            RequestBody height = RequestBody.create(MultipartBody.FORM, String.valueOf(plant.getHeight()));
+
+            Call<ResponseBody> call = apiService.createPlant(authToken, name, height, body);
+
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    if (response.isSuccessful()) {
+                        Toast.makeText(MakePlantActivity.this, "Plant saved!", Toast.LENGTH_SHORT).show();
+                        navigateToHomePage();
+                    } else {
+                        handleResponseError(response);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    Toast.makeText(MakePlantActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("MakePlantActivity", "Network error", t);
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e("MakePlantActivity", "Error: " + e.getMessage());
+        }
+    }
+
 
 
     private void dispatchTakePictureIntent() {
@@ -216,15 +271,22 @@ public class MakePlantActivity extends AppCompatActivity {
             File photoFile = null;
             try {
                 photoFile = createImageFile();
+                Log.d("MakePlantActivityPic", "File created at path: " + photoFile.getAbsolutePath());
+                if(photoFile.exists()){
+                    Log.d("MakePlantActivityPic", "The file exists!");
+                } else {
+                    Log.d("MakePlantActivityPic", "The file does not exist.");
+                }
             } catch (IOException ex) {
                 // Error occurred while creating the File
-                Log.e("MakePlantActivity", "Error occurred while creating the image file", ex);
+                Log.e("MakePlantActivityPic", "Error occurred while creating the image file", ex);
             }
             // Continue only if the File was successfully created
             if (photoFile != null) {
                 imageUri = FileProvider.getUriForFile(this,
-                        "your.package.fileprovider",
+                        "com.example.imPine.fileprovider",
                         photoFile);
+                Log.d("MakePlantActivityPic", "Uri obtained for file: " + imageUri.toString());
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                 cameraLauncher.launch(takePictureIntent);
             }
@@ -243,6 +305,7 @@ public class MakePlantActivity extends AppCompatActivity {
 
         // Save a file: path for use with ACTION_VIEW intents
         currentPhotoPath = image.getAbsolutePath();
+        Log.d("MakePlantActivityPic", "createImageFile - Path: " + currentPhotoPath);
         return image;
     }
 
@@ -321,7 +384,7 @@ public class MakePlantActivity extends AppCompatActivity {
         finish();
     }
 
-    private void handleResponseError(Response<Plant> response) {
+    private void handleResponseError(Response<ResponseBody> response) {
         String message = "An error occurred: ";
         if (response.errorBody() != null) {
             try {

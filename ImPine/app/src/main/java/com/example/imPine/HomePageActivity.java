@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.example.imPine.model.Plant;
 import com.example.imPine.model.PlantResponse;
 import com.example.imPine.model.UserResponse;
@@ -127,8 +128,17 @@ public class HomePageActivity extends AppCompatActivity {
                                 setBoldLabel(pineappleNameTextView, "Pineapple Name: ", plantResponse.getPlants().get(0).getName());
                                 setBoldLabel(heightTextView, "Height: ", String.valueOf(plantResponse.getPlants().get(0).getHeight()) + "cm");
                                 setBoldLabel(statusTextView, "Status: ", plantResponse.getPlants().get(0).getStatus());
+                                String imagePath = plantResponse.getPlants().get(0).getImage();
+                                if (imagePath != null && !imagePath.isEmpty()) {
+                                    ImageView pineappleProfile = findViewById(R.id.pineappleProfile);
+                                    Glide.with(HomePageActivity.this)
+                                            .load(imagePath) // Use Glide or another image loading library to handle image loading and caching
+                                            .into(pineappleProfile);
+                                    Log.d("HomePageActivityPic", "Loading...");
+                                } else {
+                                    Log.d("HomePageActivityPic", "No image path for the plant: " + imagePath);
 //                                lastWateredTextView.setText("Last Watered Date: " + plantResponse.getPlants().get(0).getLastWatered());
-
+                                }
 
                             } else {
                                 if (response.errorBody() != null) {

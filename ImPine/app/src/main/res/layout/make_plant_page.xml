@@ -19,7 +19,7 @@
 
     <EditText
         android:id="@+id/editHeight"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/edittext_background"
         android:padding="20dp"
@@ -47,7 +47,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="top|center_horizontal"
-            android:backgroundTint="@color/green"
+            android:backgroundTint="@color/grayLight"
             android:text="Take a Picture of Your Pineapple"
             android:fontFamily="@font/short_stack"
             android:textColor="@color/black" />
