@@ -16,10 +16,14 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResult;
@@ -62,6 +66,7 @@ public class MakePlantActivity extends AppCompatActivity {
     private ImageView imageView;
     private String currentPhotoPath;
     private Uri imageUri;
+    private RelativeLayout loadingPanel;
 
     private ActivityResultCallback<ActivityResult> cameraResultCallback = new ActivityResultCallback<ActivityResult>() {
         @Override
@@ -123,10 +128,21 @@ public class MakePlantActivity extends AppCompatActivity {
         void onTokenError(Exception e);
     }
 
+    private void showProgressBar() {
+        loadingPanel.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressBar() {
+        loadingPanel.setVisibility(View.GONE);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.make_plant_page);
+
+        // Initialize the loadingPanel
+        loadingPanel = findViewById(R.id.loadingPanel);
+
 
         LinearLayout mainLayout = findViewById(R.id.mainLayout);
 
@@ -172,23 +188,44 @@ public class MakePlantActivity extends AppCompatActivity {
 
         findViewById(R.id.btn_save).setOnClickListener(v -> {
             EditText nameEditText = findViewById(R.id.editPlantName);
-            String plantName = nameEditText.getText().toString();
+            String plantName = nameEditText.getText().toString().trim();
             EditText heightEditText = findViewById(R.id.editHeight);
-            String heightString = heightEditText.getText().toString();
+            String heightString = heightEditText.getText().toString().trim();
 
-            Plant plant = (new Plant(plantName, Integer.parseInt(heightString)));
-            Log.e("MakePlantActivityPic", "imageUri: " + currentPhotoPath);
-            getAuthToken(new AuthTokenCallback() {
-                @Override
-                public void onTokenReceived(String authToken) {
-                    createPlant(plant, authToken, imageUri);
+            // Check if any of the fields are empty or if the imageUri is null
+            if (plantName.isEmpty() || heightString.isEmpty() || imageUri == null) {
+                String message = "Please fill in all fields and take a picture.";
+                if (plantName.isEmpty() || heightString.isEmpty()) {
+                    message = "Please fill in all fields!";
                 }
+                else if(imageUri == null) {
+                    message = "Please take a picture of your pineapple!";
+                }
+                Toast.makeText(MakePlantActivity.this, message, Toast.LENGTH_SHORT).show();
+            } else {
+                // If fields are filled and an image is taken, continue with the save process
+                try {
+                    int plantHeight = Integer.parseInt(heightString);
+                    Plant plant = new Plant(plantName, plantHeight);
+                    Log.e("MakePlantActivityPic", "imageUri: " + imageUri.toString());
+                    showProgressBar(); // Show the ProgressBar before starting the network request
+                    getAuthToken(new AuthTokenCallback() {
+                        @Override
+                        public void onTokenReceived(String authToken) {
+                            createPlant(plant, authToken, imageUri);
+                        }
 
-                @Override
-                public void onTokenError(Exception e) {
-                    Log.e("MakePlantActivity", "Authentication error", e);
+                        @Override
+                        public void onTokenError(Exception e) {
+                            Log.e("MakePlantActivity", "Authentication error", e);
+                            hideProgressBar(); // Hide progress bar if there is an error
+                        }
+                    });
+                } catch (NumberFormatException e) {
+                    String message = "Please enter the height without any decimal points!";
+                    Toast.makeText(MakePlantActivity.this, message, Toast.LENGTH_LONG).show();
                 }
-            });
+            }
         });
     }
 
@@ -242,6 +279,7 @@ public class MakePlantActivity extends AppCompatActivity {
             call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    hideProgressBar(); // Hide the ProgressBar on response
                     if (response.isSuccessful()) {
                         Toast.makeText(MakePlantActivity.this, "Plant saved!", Toast.LENGTH_SHORT).show();
                         navigateToHomePage();
@@ -252,6 +290,7 @@ public class MakePlantActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    hideProgressBar(); // Hide the ProgressBar on response
                     Toast.makeText(MakePlantActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                     Log.e("MakePlantActivity", "Network error", t);
                 }

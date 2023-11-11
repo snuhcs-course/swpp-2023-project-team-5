@@ -110,15 +110,15 @@
 
             <ImageView
                 android:id="@+id/pineappleAvatar"
-                android:layout_width="365dp"
-                android:layout_height="458dp"
+                android:layout_width="195dp"
+                android:layout_height="241dp"
+                android:layout_marginTop="20dp"
                 android:contentDescription="Pineapple Profile"
                 android:src="@drawable/pine_avatar"
-                app:layout_constraintTop_toBottomOf="@+id/status"
-                android:layout_marginTop="10dp"
                 app:layout_constraintBottom_toTopOf="@id/pineappleProfile"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/status" />
 
             <ImageView
                 android:id="@+id/pineappleProfile"
@@ -128,6 +128,15 @@
                 android:contentDescription="Pineapple Avatar"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/pineappleAvatar"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <ImageView
+                android:id="@+id/margin"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="20dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/pineappleProfile"
                 app:layout_constraintStart_toStartOf="parent" />
 
 
