@@ -203,6 +203,7 @@ public class HomePageActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Start the DiaryPageActivity
                 Intent intent = new Intent(HomePageActivity.this, DiaryPageActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
         });
