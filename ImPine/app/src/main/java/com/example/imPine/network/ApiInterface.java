@@ -55,4 +55,7 @@ public interface ApiInterface {
 
     @POST("/api/follow/{user_id}")
     Call<ResponseBody> followUser(@Header("Authorization") String authToken, @Path("user_id") int userId);
+
+    @POST("/predict_fcr/")
+    Call<ResponseBody> predictFcrStatus(@Body RequestBody params);
 }
