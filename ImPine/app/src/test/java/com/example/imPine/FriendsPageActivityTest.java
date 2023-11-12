@@ -13,8 +13,8 @@ public class FriendsPageActivityTest {
     @Test
     public void testSwapFriendsOrder() {
         List<Friends> testFriends = new ArrayList<>();
-        testFriends.add(new Friends("1", "Alice"));
-        testFriends.add(new Friends("2", "Bob"));
+        testFriends.add(new Friends(1, "Alice"));
+        testFriends.add(new Friends(2, "Bob"));
 
         // Swap elements
         Collections.swap(testFriends, 0, 1);

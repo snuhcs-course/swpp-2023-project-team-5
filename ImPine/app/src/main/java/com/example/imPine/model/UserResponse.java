@@ -13,5 +13,4 @@ public class UserResponse {
         this.user = user;
     }
 
-    // toString(), etc., if needed
 }

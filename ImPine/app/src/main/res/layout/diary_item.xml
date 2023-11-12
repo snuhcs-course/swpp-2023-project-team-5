@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:background="@drawable/diary_item"
-    android:padding="16dp"
+    android:padding="25dp"
     android:layout_marginBottom="15dp">
 
     <TextView

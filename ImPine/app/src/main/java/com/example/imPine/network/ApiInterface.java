@@ -1,4 +1,5 @@
 package com.example.imPine.network;
+import com.example.imPine.model.FollowListResponse;
 import com.example.imPine.model.Plant;
 import com.example.imPine.model.PlantResponse;
 import com.example.imPine.model.SignUpRequest;
@@ -38,4 +39,10 @@ public interface ApiInterface {
             @Part("height") RequestBody height,
             @Part MultipartBody.Part image
     );
+
+    @GET("/api/follow")
+    Call<FollowListResponse> getFollowList(@Header("Authorization") String authToken);
+
+    @POST("/api/follow/{user_id}")
+    Call<ResponseBody> followUser(@Header("Authorization") String authToken, @Path("user_id") int userId);
 }
