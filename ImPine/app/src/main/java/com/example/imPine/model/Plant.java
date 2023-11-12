@@ -11,6 +11,7 @@ public class Plant {
 
     private String image_src;
     private int avatar;
+    private int id;
     public Plant() {
     }
 
@@ -22,6 +23,14 @@ public class Plant {
         this.name = name;
         this.height = height;
         this.image_src = image_src;
+    }
+
+    public int getPlant_id() {
+        return id;
+    }
+
+    public void setPlant_id(int plant_id) {
+        this.id = plant_id;
     }
 
     public int getAvatar() {

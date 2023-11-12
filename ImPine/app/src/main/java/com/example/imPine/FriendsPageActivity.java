@@ -288,8 +288,5 @@ public class FriendsPageActivity extends AppCompatActivity {
         setContentView(R.layout.friends_page);
 
         setupUI();
-
-//        fetchFriends(this); // Fetch friends from API
-
     }
 }

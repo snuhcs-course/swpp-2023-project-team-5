@@ -30,7 +30,7 @@ import retrofit2.Response;
 import java.io.IOException;
 
 public class HomePageActivity extends AppCompatActivity {
-
+    private PlantResponse plantResponse;
     private void setBoldLabel(TextView textView, String label, String value) {
         SpannableString spannable = new SpannableString(label + " " + value);
         spannable.setSpan(new StyleSpan(Typeface.BOLD), 0, label.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -40,7 +40,6 @@ public class HomePageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_page);
-
 
         ImageButton pineyButton = findViewById(R.id.piney);
         // Load the animations
@@ -124,7 +123,7 @@ public class HomePageActivity extends AppCompatActivity {
                         @Override
                         public void onResponse(Call<PlantResponse> call, Response<PlantResponse> response) {
                             if (response.isSuccessful()) {
-                                PlantResponse plantResponse = response.body();
+                                plantResponse = response.body();
                                 setBoldLabel(pineappleNameTextView, "Pineapple Name: ", plantResponse.getPlants().get(0).getName());
                                 setBoldLabel(heightTextView, "Height: ", String.valueOf(plantResponse.getPlants().get(0).getHeight()) + "cm");
                                 setBoldLabel(statusTextView, "Status: ", plantResponse.getPlants().get(0).getStatus());
@@ -168,6 +167,32 @@ public class HomePageActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<UserResponse> call, Throwable t) {
                 Log.e("HomePageActivity", "Network error when fetching user details: " + t.getMessage());
+            }
+        });
+
+        // Find the Edit button by its ID
+        ImageButton editButton = findViewById(R.id.editButton);
+
+        // Set an OnClickListener for the Edit button
+        editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Get the current pineapple name, height, and image URL
+                String pineappleName = plantResponse.getPlants().get(0).getName(); // Replace with the actual name
+                int height = plantResponse.getPlants().get(0).getHeight(); // Replace with the actual height
+                String imageURL = plantResponse.getPlants().get(0).getImage(); // Replace with the actual image URL
+
+                // Create an Intent to navigate to the edit page
+                Intent editIntent = new Intent(HomePageActivity.this, EditPlantActivity.class);
+
+                // Pass the name, height, and image URL as extras in the Intent
+                editIntent.putExtra("pineappleName", pineappleName);
+                editIntent.putExtra("height", height);
+                editIntent.putExtra("imageURL", imageURL);
+
+                // Start the EditPlantActivity with the Intent
+                editIntent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(editIntent);
             }
         });
 

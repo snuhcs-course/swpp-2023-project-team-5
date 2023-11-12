@@ -18,6 +18,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
 
@@ -37,6 +38,15 @@ public interface ApiInterface {
             @Header("Authorization") String authToken,
             @Part("name") RequestBody name,
             @Part("height") RequestBody height,
+            @Part MultipartBody.Part image
+    );
+    @Multipart
+    @PUT("/api/plant/")
+    Call<ResponseBody> editPlant(
+            @Header("Authorization") String authToken,
+            @Part("name") RequestBody name,
+            @Part("height") RequestBody height,
+            @Part("plant_id") RequestBody plantId,
             @Part MultipartBody.Part image
     );
 
