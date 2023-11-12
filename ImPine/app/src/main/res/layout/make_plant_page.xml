@@ -2,50 +2,98 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/mainLayout"
     android:orientation="vertical"
     android:background="@color/yellow"
     android:padding="20dp">
 
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        android:id="@+id/loadingPanel">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true" />
+
+        <ImageView
+            android:id="@+id/pineappleImage"
+            android:layout_width="182dp"
+            android:layout_height="181dp"
+            android:layout_above="@+id/loadingText"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="66dp"
+
+            android:src="@drawable/pine" />
+
+        <TextView
+            android:id="@+id/loadingText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Saving your pineapple!\n\n This process will take about 10 seconds..."
+            android:textSize="25dp"
+            android:fontFamily="@font/short_stack"
+            android:textStyle="bold"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/progressBar"
+            android:layout_marginTop="16dp"
+            android:textAlignment="center" />
+    </RelativeLayout>
+
+
     <EditText
-        android:layout_marginTop="30dp"
         android:id="@+id/editPlantName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
         android:background="@drawable/edittext_background"
-        android:padding="20dp"
-        android:hint="Enter Rain"
-        android:inputType="numberDecimal" />
+        android:hint="Enter Pineapple Name"
+        android:fontFamily="@font/short_stack"
+        android:padding="20dp" />
 
     <EditText
-        android:id="@+id/editWindSpeed"
+        android:id="@+id/editHeight"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/edittext_background"
         android:padding="20dp"
-        android:hint="Enter Wind Speed"
+        android:hint="Enter Height of Pineapple(cm)"
+        android:fontFamily="@font/short_stack"
         android:layout_marginTop="25dp"
         android:inputType="numberDecimal" />
 
-    <EditText
-        android:id="@+id/editHumidity"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/edittext_background"
-        android:padding="20dp"
-        android:hint="Enter Humidity"
-        android:layout_marginTop="25dp"
-        android:inputType="numberDecimal" />
+        android:layout_marginTop="25dp">
 
-    <EditText
-        android:id="@+id/editCloud"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/edittext_background"
-        android:padding="20dp"
-        android:layout_marginTop="25dp"
-        android:hint="Enter Cloud"
-        android:inputType="numberDecimal"
-        android:layout_marginBottom="50dp"/>
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="match_parent"
+            android:layout_height="339dp"
+            android:background="@drawable/edittext_background"
+            android:contentDescription="@string/pineapple_image"
+            android:scaleType="centerCrop" />
+
+        <Button
+            android:layout_marginTop="10dp"
+            android:id="@+id/btn_take_picture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center_horizontal"
+            android:backgroundTint="@color/grayLight"
+            android:text="Take a Picture of Your Pineapple"
+            android:fontFamily="@font/short_stack"
+            android:textColor="@color/black" />
+
+    </FrameLayout>
+
 
     <Button
         android:id="@+id/btn_save"
@@ -55,6 +103,9 @@
         android:layout_marginTop="25dp"
         android:backgroundTint="@color/green"
         android:text="Save"
+        android:textSize="18dp"
+        android:fontFamily="@font/short_stack"
         android:textColor="@color/black" />
+
 
 </LinearLayout>

@@ -7,23 +7,26 @@
     android:background="@android:color/white">
 
     <!-- Header Bar -->
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerBar"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/yellow"
         android:padding="20dp"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
-            android:id="@+id/user"
+            android:id="@+id/piney"
             android:layout_width="50dp"
             android:layout_height="40dp"
-            android:layout_marginRight="270dp"
             android:background="@drawable/circular_button_yellow"
             android:scaleType="centerInside"
-            android:src="@drawable/user" />
+            android:src="@drawable/pine_avatar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
         <ImageButton
             android:id="@+id/note"
@@ -31,9 +34,11 @@
             android:layout_height="40dp"
             android:background="@drawable/circular_button_yellow"
             android:scaleType="centerInside"
-            android:src="@drawable/note" />
-
-    </LinearLayout>
+            android:src="@drawable/note"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
         android:id="@+id/footerBar"
@@ -96,7 +101,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:background="@drawable/circular_button_green"
+            android:background="@drawable/circular_button_darkgreen"
             android:scaleType="centerInside"
             android:src="@drawable/set" />
     </LinearLayout>

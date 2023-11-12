@@ -1,19 +1,31 @@
 package com.example.imPine;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.imPine.model.Plant;
+import com.example.imPine.model.PlantResponse;
+import com.example.imPine.model.UserResponse;
 import com.example.imPine.network.ApiInterface;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+
 import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -27,6 +39,8 @@ public class AuthLoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_page);
+        Button signUpButton = findViewById(R.id.buttonSignUp);
+        signUpButton.setText(Html.fromHtml(getString(R.string.sign_up_text)));
 
         // Initialize Firebase Auth
         mAuth = FirebaseAuth.getInstance();
@@ -42,6 +56,20 @@ public class AuthLoginActivity extends AppCompatActivity {
         if (email != null) {
             editTextEmail.setText(email); // Set the email
         }
+
+        ConstraintLayout mainLayout = findViewById(R.id.mainLayout);
+
+        mainLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (getCurrentFocus() != null) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                    getCurrentFocus().clearFocus(); // Optional: Clear focus from the current EditText
+                }
+                return false;
+            }
+        });
     }
 
     private void navigateToSignUp() {
@@ -87,43 +115,66 @@ public class AuthLoginActivity extends AppCompatActivity {
         mAuth.getCurrentUser().getIdToken(true).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 String idToken = task.getResult().getToken();
+                String authToken = "Bearer " + idToken;
+                // Save the token here
+                saveAuthToken(idToken);
+
+                Log.d("fbtoken", idToken);
                 // Use Retrofit to create a service for the API interface
                 ApiInterface apiService = RetrofitClient.getClient().create(ApiInterface.class);
-                String userId = mAuth.getCurrentUser().getUid();
-                String authToken = "Bearer " + idToken; // Assuming idToken is correct.
-                String requestUrl = RetrofitClient.getClient().baseUrl().toString() + "api/plant/user/" + userId;
 
-                Log.d("AuthLoginActivity", "Requesting URL: " + requestUrl);
-                Call<List<Plant>> call = apiService.getUserPlants("Bearer " + idToken, userId);
-
-                call.enqueue(new Callback<List<Plant>>() {
+                // First, make a call to getUser to fetch the user ID
+                Call<UserResponse> callUser = apiService.getUser(authToken);
+                callUser.enqueue(new Callback<UserResponse>() {
                     @Override
-                    public void onResponse(Call<List<Plant>> call, Response<List<Plant>> response) {
-                        if (response.isSuccessful()) {
-                            List<Plant> plants = response.body();
-                            if (plants == null || plants.isEmpty()) {
-                                // No plants found, navigate to tutorial
-                                navigateToActivity(TutorialActivity.class);
-                            } else {
-                                // Plants found, navigate to home page
-                                navigateToActivity(HomePageActivity.class);
-                            }
+                    public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+                        if (response.isSuccessful() && response.body() != null) {
+                            String userId = response.body().getUser().getId();
+                            Log.d("AuthLoginActivity", "User ID: " + userId); // Add this line to check the userID.
+                            // Now make a call to getUserPlants using the fetched userID
+                            Call<PlantResponse> callPlants = apiService.getUserPlants(authToken, userId);
+                            callPlants.enqueue(new Callback<PlantResponse>() {
+                               @Override
+                                public void onResponse(Call<PlantResponse> call, Response<PlantResponse> response) {
+                                    if (response.isSuccessful()) {
+                                        PlantResponse plantResponse = response.body();
+                                        List<Plant> plants = plantResponse != null ? plantResponse.getPlants() : null;
+                                        if (plants != null && !plants.isEmpty()) {
+                                            for (Plant plant : plants) {
+                                                Log.d("AuthLoginActivity", "Plant ID: " + plant.toString());
+                                            }
+                                            navigateToActivity(HomePageActivity.class);
+                                        } else {
+                                            Log.d("AuthLoginActivity", "No plants found for the user.");
+                                            navigateToActivity(TutorialActivity.class);
+                                        }
+                                    } else {
+                                        Log.e("AuthLoginActivity", "Error fetching plants: " + response.code());
+                                        Toast.makeText(AuthLoginActivity.this, "Error fetching plants.", Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+
+                                @Override
+                                public void onFailure(Call<PlantResponse> call, Throwable t) {
+                                    Log.e("AuthLoginActivity", "Network error or API is down", t);
+                                    Toast.makeText(AuthLoginActivity.this, "Check your network connection.", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                         } else {
-                            // Handle the backend error
-                            Log.e("AuthLoginActivity", "Error fetching plants: " + response.code());
-                            Toast.makeText(AuthLoginActivity.this, "Error fetching plants.", Toast.LENGTH_SHORT).show();
+                            // Handle error in getting the userID
+                            Log.e("AuthLoginActivity", "Error fetching user ID: " + response.code());
+                            Toast.makeText(AuthLoginActivity.this, "Error fetching user ID.", Toast.LENGTH_SHORT).show();
                         }
                     }
 
                     @Override
-                    public void onFailure(Call<List<Plant>> call, Throwable t) {
-                        // Handle the network error
-                        Log.e("AuthLoginActivity", "Network error or API is down", t);
-                        Toast.makeText(AuthLoginActivity.this, "Check your network connection.", Toast.LENGTH_SHORT).show();
+                    public void onFailure(Call<UserResponse> call, Throwable t) {
+                        Log.e("AuthLoginActivity", "Error getting user ID", t);
+                        Toast.makeText(AuthLoginActivity.this, "Error during authentication.", Toast.LENGTH_SHORT).show();
                     }
                 });
             } else {
-                // Handle the error
+                // Handle the error in getting the auth token
                 Log.e("AuthLoginActivity", "Error getting auth token", task.getException());
                 Toast.makeText(AuthLoginActivity.this, "Error during authentication.", Toast.LENGTH_SHORT).show();
             }
@@ -135,4 +186,17 @@ public class AuthLoginActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
+    private void saveAuthToken(String token) {
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(getString(R.string.saved_auth_token), token);
+        editor.apply();
+    }
+
+    private String getAuthToken() {
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        return sharedPreferences.getString(getString(R.string.saved_auth_token), null);
+    }
+
 }

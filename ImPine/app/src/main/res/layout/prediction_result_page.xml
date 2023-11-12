@@ -2,8 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/yellow"
-   >
+    android:background="@color/yellow">
     <TextView
         android:id="@+id/result"
         android:layout_margin="20dp"
@@ -13,6 +12,8 @@
         android:paddingLeft="30dp"
         android:paddingBottom="30dp"
         android:paddingRight="30dp"
+        android:textSize="20dp"
+        android:fontFamily="@font/short_stack"
         android:paddingTop="30dp">
 
     </TextView>

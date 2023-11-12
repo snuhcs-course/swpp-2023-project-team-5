@@ -2,28 +2,32 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white">
 
     <!-- Header Bar -->
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerBar"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/yellow"
         android:padding="20dp"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageButton
-            android:id="@+id/user"
+            android:id="@+id/piney"
             android:layout_width="50dp"
             android:layout_height="40dp"
-            android:layout_marginRight="270dp"
             android:background="@drawable/circular_button_yellow"
             android:scaleType="centerInside"
-            android:src="@drawable/user" />
+            android:src="@drawable/pine_avatar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
 
         <ImageButton
             android:id="@+id/note"
@@ -31,9 +35,11 @@
             android:layout_height="40dp"
             android:background="@drawable/circular_button_yellow"
             android:scaleType="centerInside"
-            android:src="@drawable/note" />
-
-    </LinearLayout>
+            android:src="@drawable/note"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
     <!-- Prediction Input Fields -->
@@ -51,6 +57,18 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/headerBar">
 
+
+        <EditText
+            android:id="@+id/editTemperature"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_background"
+            android:padding="20dp"
+            android:hint="Enter Temperature"
+            android:fontFamily="@font/short_stack"
+            android:layout_marginTop="15dp"
+            android:inputType="numberDecimal" />
+
         <EditText
             android:id="@+id/editRain"
             android:layout_width="match_parent"
@@ -58,17 +76,10 @@
             android:background="@drawable/edittext_background"
             android:padding="20dp"
             android:hint="Enter Rain"
-            android:inputType="numberDecimal" />
-
-        <EditText
-            android:id="@+id/editWindSpeed"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@drawable/edittext_background"
-            android:padding="20dp"
-            android:hint="Enter Wind Speed"
+            android:fontFamily="@font/short_stack"
             android:layout_marginTop="15dp"
             android:inputType="numberDecimal" />
+
 
         <EditText
             android:id="@+id/editHumidity"
@@ -77,6 +88,7 @@
             android:background="@drawable/edittext_background"
             android:padding="20dp"
             android:hint="Enter Humidity"
+            android:fontFamily="@font/short_stack"
             android:layout_marginTop="15dp"
             android:inputType="numberDecimal" />
 
@@ -88,6 +100,7 @@
             android:padding="20dp"
             android:layout_marginTop="15dp"
             android:hint="Enter Cloud"
+            android:fontFamily="@font/short_stack"
             android:inputType="numberDecimal"
             android:layout_marginBottom="50dp"/>
 
@@ -99,6 +112,7 @@
             android:layout_marginTop="15dp"
             android:backgroundTint="@color/green"
             android:text="Predict"
+            android:fontFamily="@font/short_stack"
             android:textColor="@color/black" />
 
     </LinearLayout>
@@ -142,7 +156,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:background="@drawable/circular_button_green"
+            android:background="@drawable/circular_button_darkgreen"
             android:scaleType="centerInside"
             android:src="@drawable/prediction" />
 

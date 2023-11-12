@@ -1,13 +1,19 @@
 package com.example.imPine;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -27,6 +33,43 @@ public class FriendsPageActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.friends_page);
+
+        ImageButton pineyButton = findViewById(R.id.piney);
+
+        // Load the animations
+        final Animation swayRight = AnimationUtils.loadAnimation(this, R.anim.sway_right);
+        final Animation swayLeft = AnimationUtils.loadAnimation(this, R.anim.sway_left);
+
+        // Set animation listeners to create an infinite swaying effect for piney
+        swayRight.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {}
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                pineyButton.startAnimation(swayLeft);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+
+        swayLeft.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {}
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                pineyButton.startAnimation(swayRight);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+
+        // Start the animation
+        pineyButton.startAnimation(swayRight);
+
 
         friendSearchView = findViewById(R.id.friendSearchView);
         friendsRecyclerView = findViewById(R.id.friendsRecyclerView);
@@ -138,15 +181,15 @@ public class FriendsPageActivity extends AppCompatActivity {
         });
 
         // User button click
-        ImageButton userButton = findViewById(R.id.user);
-        userButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(FriendsPageActivity.this, UsersPageActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
-            }
-        });
+        ImageButton userButton = findViewById(R.id.piney);
+//        userButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(FriendsPageActivity.this, UsersPageActivity.class);
+//                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+//                startActivity(intent);
+//            }
+//        });
 
         // Note button click
         ImageButton noteButton = findViewById(R.id.note);
@@ -156,6 +199,20 @@ public class FriendsPageActivity extends AppCompatActivity {
                 Intent intent = new Intent(FriendsPageActivity.this, NotificationsPageActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
+            }
+        });
+
+        ConstraintLayout mainLayout = findViewById(R.id.mainLayout);
+
+        mainLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (getCurrentFocus() != null) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                    getCurrentFocus().clearFocus(); // Optional: Clear focus from the current EditText
+                }
+                return false;
             }
         });
     }

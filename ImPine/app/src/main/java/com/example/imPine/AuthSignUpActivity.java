@@ -1,10 +1,15 @@
 package com.example.imPine;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -36,6 +41,19 @@ public class AuthSignUpActivity extends AppCompatActivity {
 
 
         findViewById(R.id.buttonSignUp).setOnClickListener(v -> signUp());
+        ConstraintLayout mainLayout = findViewById(R.id.mainLayout);
+
+        mainLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (getCurrentFocus() != null) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                    getCurrentFocus().clearFocus(); // Optional: Clear focus from the current EditText
+                }
+                return false;
+            }
+        });
     }
 
     private void signUp() {
@@ -98,19 +116,19 @@ public class AuthSignUpActivity extends AppCompatActivity {
             public void onResponse(Call<SignUpResponse> call, Response<SignUpResponse> response) {
                 if (response.isSuccessful()) {
                     // Backend sign up success
-                    Toast.makeText(AuthSignUpActivity.this, "Backend Sign Up Successful.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AuthSignUpActivity.this, "Sign Up Successful.", Toast.LENGTH_SHORT).show();
                     // Proceed to login activity and pass the email
                     navigateToLogin(email);
                 } else {
                     // Backend sign up failed with response from server
-                    Toast.makeText(AuthSignUpActivity.this, "Backend Sign Up Failed: " + response.message(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(AuthSignUpActivity.this, "Sign Up Failed: " + response.message(), Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(Call<SignUpResponse> call, Throwable t) {
                 // Backend sign up failed with no response from server (network error, etc.)
-                Toast.makeText(AuthSignUpActivity.this, "Backend Sign Up Failed: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                Toast.makeText(AuthSignUpActivity.this, "Sign Up Failed: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }

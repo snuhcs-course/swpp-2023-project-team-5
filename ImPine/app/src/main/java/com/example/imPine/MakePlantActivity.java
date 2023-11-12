@@ -1,24 +1,110 @@
 package com.example.imPine;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.icu.text.SimpleDateFormat;
+import androidx.exifinterface.media.ExifInterface;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
+
+import android.Manifest;
+
 import com.example.imPine.model.Plant;
 import com.example.imPine.network.ApiInterface;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
-import java.io.IOException;
+import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Date;
+import java.util.Locale;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class MakePlantActivity extends AppCompatActivity {
-    // ... Other member variables ...
+    private ActivityResultLauncher<Intent> cameraLauncher;
+    private ImageView imageView;
+    private String currentPhotoPath;
+    private Uri imageUri;
+    private RelativeLayout loadingPanel;
+
+    private ActivityResultCallback<ActivityResult> cameraResultCallback = new ActivityResultCallback<ActivityResult>() {
+        @Override
+        public void onActivityResult(ActivityResult result) {
+            if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                Log.d("MakePlantActivity", "Image capture successful");
+                Bundle extras = result.getData().getExtras();
+                Bitmap imageBitmap = (Bitmap) extras.get("data");
+                imageView.setImageBitmap(imageBitmap);
+                // Save the bitmap as a file and get the path
+                imageUri = saveImage(imageBitmap);
+            } else {
+                // Handle other cases...
+            }
+        }
+    };
+
+    private Uri saveImage(Bitmap bitmap) {
+        // Use the application's cache directory for saving the image
+        File imageDir = new File(getCacheDir(), "images");
+        if (!imageDir.exists()) {
+            imageDir.mkdir();
+        }
+        File image = new File(imageDir, "pineappleProfile.png");
+        try (OutputStream out = new FileOutputStream(image)) {
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+            out.flush();
+            Uri savedImageUri = Uri.fromFile(image);
+
+            // Log the path of the saved image
+            Log.d("MakePlantActivityPic", "Saved image path: " + savedImageUri.getPath());
+
+            return savedImageUri;
+        } catch (IOException e) {
+            Log.e("MakePlantActivityPic", "Error saving image", e);
+            return null;
+        }
+    }
 
     private void getAuthToken(AuthTokenCallback authTokenCallback) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -42,77 +128,322 @@ public class MakePlantActivity extends AppCompatActivity {
         void onTokenError(Exception e);
     }
 
+    private void showProgressBar() {
+        loadingPanel.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressBar() {
+        loadingPanel.setVisibility(View.GONE);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.make_plant_page);
 
-        // ... Initialize your input fields ...
+        // Initialize the loadingPanel
+        loadingPanel = findViewById(R.id.loadingPanel);
 
-        // Save button
+
+        LinearLayout mainLayout = findViewById(R.id.mainLayout);
+
+        mainLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (getCurrentFocus() != null) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                    getCurrentFocus().clearFocus(); // Optional: Clear focus from the current EditText
+                }
+                return false;
+            }
+        });
+
+        imageView = findViewById(R.id.imageView);
+
+        cameraLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK) {
+                        Log.d("MakePlantActivity", "Image capture successful");
+                        // No need to get extras, image should be saved to the file
+                        try {
+                            setPic();
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    } else if (result.getResultCode() == RESULT_CANCELED) {
+                        Log.d("MakePlantActivity", "Image capture cancelled by user");
+                    } else {
+                        Log.e("MakePlantActivity", "Image capture failed with result code: " + result.getResultCode());
+                    }
+                });
+
+        findViewById(R.id.btn_take_picture).setOnClickListener(v -> {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 100);
+            } else {
+                dispatchTakePictureIntent();
+            }
+        });
+
         findViewById(R.id.btn_save).setOnClickListener(v -> {
-            // ... Get data from input fields ...
             EditText nameEditText = findViewById(R.id.editPlantName);
-            String plantName = nameEditText.getText().toString();
-            // ... Get other plant data ...
+            String plantName = nameEditText.getText().toString().trim();
+            EditText heightEditText = findViewById(R.id.editHeight);
+            String heightString = heightEditText.getText().toString().trim();
 
-            // ... Construct plant object from data ...
-            Plant plant = new Plant();
-            plant.setName(plantName);
-            // ... Set other data ...
-
-            getAuthToken(new AuthTokenCallback() {
-                @Override
-                public void onTokenReceived(String authToken) {
-                    // Now that we have the auth token, we can proceed to create the plant
-                    ApiInterface apiService = RetrofitClient.getClient().create(ApiInterface.class);
-                    Call<Plant> call = apiService.createPlant(authToken, plant);
-                    call.enqueue(new Callback<Plant>() {
+            // Check if any of the fields are empty or if the imageUri is null
+            if (plantName.isEmpty() || heightString.isEmpty() || imageUri == null) {
+                String message = "Please fill in all fields and take a picture.";
+                if (plantName.isEmpty() || heightString.isEmpty()) {
+                    message = "Please fill in all fields!";
+                }
+                else if(imageUri == null) {
+                    message = "Please take a picture of your pineapple!";
+                }
+                Toast.makeText(MakePlantActivity.this, message, Toast.LENGTH_SHORT).show();
+            } else {
+                // If fields are filled and an image is taken, continue with the save process
+                try {
+                    int plantHeight = Integer.parseInt(heightString);
+                    Plant plant = new Plant(plantName, plantHeight);
+                    Log.e("MakePlantActivityPic", "imageUri: " + imageUri.toString());
+                    showProgressBar(); // Show the ProgressBar before starting the network request
+                    getAuthToken(new AuthTokenCallback() {
                         @Override
-                        public void onResponse(Call<Plant> call, Response<Plant> response) {
-                            if (response.isSuccessful()) {
-                                // Plant created successfully, handle response body if needed
-                                Toast.makeText(MakePlantActivity.this, "Plant saved!", Toast.LENGTH_SHORT).show();
-                                navigateToHomePage();
-                            } else {
-                                // Server returned an error
-                                String errorMessage = "Failed to save plant. Error code: " + response.code();
-                                try {
-                                    // Convert error body to a string
-                                    String errorBody = response.errorBody().string();
-                                    // Log the error body or show it in the UI as appropriate
-                                    Log.e("MakePlantActivity", "Error Body: " + errorBody);
-                                    errorMessage += "\n" + errorBody;
-                                } catch (IOException e) {
-                                    // Handle IOException from errorBody().string()
-                                    Log.e("MakePlantActivity", "Error extracting error body", e);
-                                    errorMessage += "\n" + "Error extracting error information";
-                                }
-                                Toast.makeText(MakePlantActivity.this, errorMessage, Toast.LENGTH_LONG).show();
-                            }
+                        public void onTokenReceived(String authToken) {
+                            createPlant(plant, authToken, imageUri);
                         }
 
                         @Override
-                        public void onFailure(Call<Plant> call, Throwable t) {
-                            // Network error or other unexpected error occurred
-                            Toast.makeText(MakePlantActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
-                            Log.e("MakePlantActivity", "Network error", t);
+                        public void onTokenError(Exception e) {
+                            Log.e("MakePlantActivity", "Authentication error", e);
+                            hideProgressBar(); // Hide progress bar if there is an error
                         }
                     });
+                } catch (NumberFormatException e) {
+                    String message = "Please enter the height without any decimal points!";
+                    Toast.makeText(MakePlantActivity.this, message, Toast.LENGTH_LONG).show();
                 }
-
-                @Override
-                public void onTokenError(Exception e) {
-                    // Authentication error occurred, handle it
-                    Toast.makeText(MakePlantActivity.this, "Authentication error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            });
+            }
         });
     }
 
+    private MultipartBody.Part prepareFilePart(String partName, Uri fileUri) {
+        File file = new File(fileUri.getPath());
+        // Create RequestBody instance from file
+        RequestBody requestFile = RequestBody.create(MediaType.parse("multipart/form-data"), file);
+        // MultipartBody.Part is used to send also the actual file name
+        return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
+    }
+
+
+    public String getRealPathFromURI(Uri contentUri) {
+        String[] proj = { MediaStore.Images.Media.DATA };
+        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            String path = cursor.getString(column_index);
+            cursor.close();
+            return path;
+        }
+        return null;
+    }
+    public static byte[] getBytesFromInputStream(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+        int bufferSize = 1024;
+        byte[] buffer = new byte[bufferSize];
+
+        int len;
+        while ((len = inputStream.read(buffer)) != -1) {
+            byteBuffer.write(buffer, 0, len);
+        }
+        return byteBuffer.toByteArray();
+    }
+    private void createPlant(Plant plant, String authToken, Uri imageUri) {
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(imageUri);
+            byte[] fileBytes = getBytesFromInputStream(inputStream);
+            RequestBody requestFile = RequestBody.create(MediaType.parse(getContentResolver().getType(imageUri)), fileBytes);
+            MultipartBody.Part body = MultipartBody.Part.createFormData("image", "image.jpg", requestFile);
+
+            ApiInterface apiService = RetrofitClient.getClient().create(ApiInterface.class);
+            Log.d("MakePlantActivity", "Attempting to create plant at URL: " + RetrofitClient.getBaseUrl() + "/api/plant/");
+            Log.d("MakePlantActivity", "Token: " + authToken);
+
+            RequestBody name = RequestBody.create(MultipartBody.FORM, plant.getName());
+            RequestBody height = RequestBody.create(MultipartBody.FORM, String.valueOf(plant.getHeight()));
+
+            Call<ResponseBody> call = apiService.createPlant(authToken, name, height, body);
+
+            call.enqueue(new Callback<ResponseBody>() {
+                @Override
+                public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                    hideProgressBar(); // Hide the ProgressBar on response
+                    if (response.isSuccessful()) {
+                        Toast.makeText(MakePlantActivity.this, "Plant saved!", Toast.LENGTH_SHORT).show();
+                        navigateToHomePage();
+                    } else {
+                        handleResponseError(response);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ResponseBody> call, Throwable t) {
+                    hideProgressBar(); // Hide the ProgressBar on response
+                    Toast.makeText(MakePlantActivity.this, "Network error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.e("MakePlantActivity", "Network error", t);
+                }
+            });
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e("MakePlantActivity", "Error: " + e.getMessage());
+        }
+    }
+
+
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            // Create the File where the photo should go
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+                Log.d("MakePlantActivityPic", "File created at path: " + photoFile.getAbsolutePath());
+                if(photoFile.exists()){
+                    Log.d("MakePlantActivityPic", "The file exists!");
+                } else {
+                    Log.d("MakePlantActivityPic", "The file does not exist.");
+                }
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                Log.e("MakePlantActivityPic", "Error occurred while creating the image file", ex);
+            }
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                imageUri = FileProvider.getUriForFile(this,
+                        "com.example.imPine.fileprovider",
+                        photoFile);
+                Log.d("MakePlantActivityPic", "Uri obtained for file: " + imageUri.toString());
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                cameraLauncher.launch(takePictureIntent);
+            }
+        }
+    }
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",   /* suffix */
+                storageDir      /* directory */
+        );
+
+        // Save a file: path for use with ACTION_VIEW intents
+        currentPhotoPath = image.getAbsolutePath();
+        Log.d("MakePlantActivityPic", "createImageFile - Path: " + currentPhotoPath);
+        return image;
+    }
+
+    private Bitmap rotateImageIfRequired(Bitmap img, String selectedImage) throws IOException {
+        ExifInterface ei = new ExifInterface(selectedImage);
+        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                return rotateImage(img, 90);
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                return rotateImage(img, 180);
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                return rotateImage(img, 270);
+            default:
+                return img;
+        }
+    }
+
+    private static Bitmap rotateImage(Bitmap img, int degree) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degree);
+        Bitmap rotatedImg = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
+        img.recycle();
+        return rotatedImg;
+    }
+    private void setPic() throws IOException {
+        // Get the dimensions of the View
+        int targetW = imageView.getWidth();
+        int targetH = imageView.getHeight();
+
+        // Get the dimensions of the bitmap
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(currentPhotoPath, bmOptions);
+        int photoW = bmOptions.outWidth;
+        int photoH = bmOptions.outHeight;
+
+        // Determine how much to scale down the image
+        int scaleFactor = Math.max(1, Math.min(photoW / targetW, photoH / targetH));
+
+        // Decode the image file into a Bitmap sized to fill the View
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true;
+
+        Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath, bmOptions);
+        bitmap = rotateImageIfRequired(bitmap, currentPhotoPath);
+
+        imageView.setImageBitmap(bitmap);
+    }
+
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == 100 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            dispatchTakePictureIntent();
+        } else {
+            Toast.makeText(this, "Camera permission is required to use this feature", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void navigateToHomePage() {
+//        if (imageUri != null) {
+//            Intent intent = new Intent(this, HomePageActivity.class);
+//            intent.putExtra("profile_image_path", imageUri.toString());
+//            startActivity(intent);
+//            finish();
+//        } else {
+//            Toast.makeText(this, "Error: Image not saved", Toast.LENGTH_SHORT).show();
+//        }
         Intent intent = new Intent(this, HomePageActivity.class);
         startActivity(intent);
         finish();
     }
+
+    private void handleResponseError(Response<ResponseBody> response) {
+        String message = "An error occurred: ";
+        if (response.errorBody() != null) {
+            try {
+                String errorBodyString = response.errorBody().string();
+                // If the response is HTML, log the entire response for debugging
+                if (errorBodyString.trim().startsWith("<!DOCTYPE html>")) {
+                    Log.e("MakePlantActivity", "HTML response received, full error page: " + errorBodyString);
+                    message += "HTML response received. Check logs for details.";
+                } else {
+                    // Try to parse it as JSON
+                    JSONObject errorJson = new JSONObject(errorBodyString);
+                    message += errorJson.optString("message", "Unknown error");
+                }
+            } catch (Exception e) {
+                Log.e("MakePlantActivity", "Error parsing error body", e);
+            }
+        } else {
+            message += "Unknown error";
+        }
+        Toast.makeText(MakePlantActivity.this, message, Toast.LENGTH_SHORT).show();
+    }
+
 }

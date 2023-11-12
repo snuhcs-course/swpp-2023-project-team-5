@@ -1,7 +1,12 @@
 package com.example.imPine;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.content.Intent;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -9,73 +14,162 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import android.content.SharedPreferences;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
-import org.json.JSONArray;
-import org.json.JSONException;
-
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
+import com.example.imPine.model.Plant;
+import com.example.imPine.model.PlantResponse;
+import com.example.imPine.model.UserResponse;
+import com.example.imPine.network.ApiInterface;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import java.io.IOException;
 
 public class HomePageActivity extends AppCompatActivity {
-    private OkHttpClient client = new OkHttpClient();
-    private static final String BASE_URL = "http://localhost:8000";
-    private void fetchUserPlants(String userId) {
-        String url = BASE_URL + "/api/plants/user/" + userId;
 
-        // Prepare the request with the necessary headers (like the Authorization header if needed)
-        SharedPreferences sharedPref = getSharedPreferences("my_prefs", MODE_PRIVATE);
-        String token = sharedPref.getString("firebaseIdToken", null);
-
-        Request request = new Request.Builder()
-                .url(url)
-                .addHeader("Authorization", "Bearer " + token)
-                .build();
-
-        // Make the request asynchronously
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                // Handle the error
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    // Handle the successful response. Parse the plants' data
-                    String responseBody = response.body().string();
-                    JSONArray plants = null;
-                    try {
-                        plants = new JSONArray(responseBody);
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-                    if (plants.length() == 0) {
-                        // No plants found. Show the "create plant" button
-                    } else {
-                        // Display the plant on the screen
-                    }
-                } else {
-                    // Handle the unsuccessful response
-                }
-            }
-        });
+    private void setBoldLabel(TextView textView, String label, String value) {
+        SpannableString spannable = new SpannableString(label + " " + value);
+        spannable.setSpan(new StyleSpan(Typeface.BOLD), 0, label.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        textView.setText(spannable);
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_page);
 
-        // Fetch the user's plants. Here I've assumed some userId, you'll need to use the appropriate user ID
-        fetchUserPlants("YOUR_USER_ID_HERE");
 
+        ImageButton pineyButton = findViewById(R.id.piney);
+        // Load the animations
+        final Animation swayRight = AnimationUtils.loadAnimation(this, R.anim.sway_right);
+        final Animation swayLeft = AnimationUtils.loadAnimation(this, R.anim.sway_left);
+
+        // Set animation listeners to create an infinite swaying effect for piney
+        swayRight.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {}
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                pineyButton.startAnimation(swayLeft);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+
+        swayLeft.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {}
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                pineyButton.startAnimation(swayRight);
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {}
+        });
+
+        // Start the animation
+        pineyButton.startAnimation(swayRight);
+
+        // TODO: get the pineapple profile
+//        ImageView pineappleProfile = findViewById(R.id.pineappleProfile);
+//        SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
+//        String imagePath = prefs.getString("profile_image_path", null);
+//        if (imagePath != null) {
+//            Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
+//            pineappleProfile.setImageBitmap(bitmap);
+//        }
+
+        // Retrieve the name of the SharedPreferences file and the key for the auth token from the resources
+        String prefsFile = getString(R.string.preference_file_key);
+        String authTokenKey = getString(R.string.saved_auth_token);
+
+        // Retrieve the auth token from SharedPreferences
+        SharedPreferences prefs = getSharedPreferences(prefsFile, MODE_PRIVATE);
+        String authToken = "Bearer " + prefs.getString(authTokenKey, null); // Second parameter is the default value.
+
+        // Make sure you have RetrofitClient set up to provide the Retrofit instance
+        ApiInterface apiService = RetrofitClient.getClient().create(ApiInterface.class);
+        TextView usernameTextView = findViewById(R.id.username);
+        // Get User Details
+        Call<UserResponse> userCall = apiService.getUser(authToken);
+        userCall.enqueue(new Callback<UserResponse>() {
+            @Override
+            public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+                if (response.isSuccessful()) {
+                    UserResponse userResponse = response.body();
+                    setBoldLabel(usernameTextView, "Username: ", userResponse.getUser().getName());
+                    String userId;
+                    userId = userResponse.getUser().getId();
+                    Log.d("HomePageActivity", "UserId: " + userId);
+                    // Get Plant Details for the User
+                    // Assuming you have a way to get the user's ID, pass it to the getUserPlants method
+                    Log.d("HomePageActivity", "UserId before GET: " + userId);
+                    Log.d("HomePageActivity", "AuthToken: " + authToken);
+
+                    Call<PlantResponse> plantCall = apiService.getUserPlants(authToken, userId);
+                    TextView pineappleNameTextView, heightTextView, lastWateredTextView, statusTextView;
+                    pineappleNameTextView = findViewById(R.id.pineappleName);
+                    heightTextView= findViewById(R.id.height);
+//                    lastWateredTextView = findViewById(R.id.lastWatered);
+                    statusTextView = findViewById(R.id.status);
+
+                    plantCall.enqueue(new Callback<PlantResponse>() {
+                        @Override
+                        public void onResponse(Call<PlantResponse> call, Response<PlantResponse> response) {
+                            if (response.isSuccessful()) {
+                                PlantResponse plantResponse = response.body();
+                                setBoldLabel(pineappleNameTextView, "Pineapple Name: ", plantResponse.getPlants().get(0).getName());
+                                setBoldLabel(heightTextView, "Height: ", String.valueOf(plantResponse.getPlants().get(0).getHeight()) + "cm");
+                                setBoldLabel(statusTextView, "Status: ", plantResponse.getPlants().get(0).getStatus());
+                                String imagePath = plantResponse.getPlants().get(0).getImage();
+                                if (imagePath != null && !imagePath.isEmpty()) {
+                                    ImageView pineappleProfile = findViewById(R.id.pineappleProfile);
+                                    Glide.with(HomePageActivity.this)
+                                            .load(imagePath) // Use Glide or another image loading library to handle image loading and caching
+                                            .into(pineappleProfile);
+                                    Log.d("HomePageActivityPic", "Loading...");
+                                } else {
+                                    Log.d("HomePageActivityPic", "No image path for the plant: " + imagePath);
+//                                lastWateredTextView.setText("Last Watered Date: " + plantResponse.getPlants().get(0).getLastWatered());
+                                }
+
+                            } else {
+                                if (response.errorBody() != null) {
+                                    try {
+                                        // Convert the error body to a string
+                                        String errorString = response.errorBody().string();
+                                        Log.e("HomePageActivity", "Error fetching plant details: " + errorString);
+                                    } catch (IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(Call<PlantResponse> call, Throwable t) {
+                            Log.e("HomePageActivity", "Network error when fetching plant details: " + t.getMessage());
+                        }
+                    });
+
+                } else {
+                    // Handle the error
+                    Log.e("HomePageActivity", "Error fetching user details: " + response.errorBody());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserResponse> call, Throwable t) {
+                Log.e("HomePageActivity", "Network error when fetching user details: " + t.getMessage());
+            }
+        });
 
         // Diary button click
         ImageButton diaryButton = findViewById(R.id.diary);
@@ -121,16 +215,16 @@ public class HomePageActivity extends AppCompatActivity {
             }
         });
 
-        // User button click
-        ImageButton userButton = findViewById(R.id.user);
-        userButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(HomePageActivity.this, UsersPageActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
-            }
-        });
+        // Piney button click
+        ImageButton userButton = findViewById(R.id.piney);
+//        userButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent intent = new Intent(HomePageActivity.this, UsersPageActivity.class);
+//                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+//                startActivity(intent);
+//            }
+//        });
 
         // Note button click
         ImageButton noteButton = findViewById(R.id.note);
@@ -145,9 +239,6 @@ public class HomePageActivity extends AppCompatActivity {
 
         ImageView pineappleAvatar = findViewById(R.id.pineappleAvatar);
 
-        // Load the animations
-        final Animation swayRight = AnimationUtils.loadAnimation(this, R.anim.sway_right);
-        final Animation swayLeft = AnimationUtils.loadAnimation(this, R.anim.sway_left);
 
         // Set animation listeners to create an infinite swaying effect
         swayRight.setAnimationListener(new Animation.AnimationListener() {
@@ -180,4 +271,5 @@ public class HomePageActivity extends AppCompatActivity {
         pineappleAvatar.startAnimation(swayRight);
 
     }
+
 }

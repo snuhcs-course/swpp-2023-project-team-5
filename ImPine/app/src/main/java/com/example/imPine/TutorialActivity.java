@@ -19,5 +19,6 @@ public class TutorialActivity extends AppCompatActivity {
     private void navigateToMakePlantActivity() {
         Intent intent = new Intent(TutorialActivity.this, MakePlantActivity.class);
         startActivity(intent);
+        finish();
     }
 }
