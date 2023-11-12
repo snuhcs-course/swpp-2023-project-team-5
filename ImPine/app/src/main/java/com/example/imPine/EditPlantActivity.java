@@ -238,6 +238,7 @@ public class EditPlantActivity extends AppCompatActivity {
             editPlant(Integer.toString(existingPlant.getPlant_id()), newName, newHeight, imageUri);
         } else {
             Toast.makeText(this, "No changes to update", Toast.LENGTH_SHORT).show();
+            navigateToHomePage();
         }
     }
 
