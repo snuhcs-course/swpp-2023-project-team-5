@@ -205,7 +205,7 @@ public class EditPlantActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<PlantResponse> call, Response<PlantResponse> response) {
                 if (response.isSuccessful() && response.body() != null && !response.body().getPlants().isEmpty()) {
-                    compareAndEditPlant(response.body().getPlants().get(0));
+                    compareAndEditPlant(response.body().getPlants().get(0), userId);
                     Log.e("EditPlantActivity", "getPlantDetails: Plant_id" + response.body().getPlants().get(0).getName() + "// " + response.body().getPlants().get(0).getPlant_id());
                 } else {
                     Log.e("EditPlantActivity", "No plants found for user");
@@ -219,7 +219,7 @@ public class EditPlantActivity extends AppCompatActivity {
         });
     }
 
-    private void compareAndEditPlant(Plant existingPlant) {
+    private void compareAndEditPlant(Plant existingPlant, String userId) {
         String newName = nameEditText.getText().toString().trim();
         String newHeight = heightEditText.getText().toString().trim();
 
@@ -235,7 +235,7 @@ public class EditPlantActivity extends AppCompatActivity {
             Log.d("EditPlantActivity", "New Image Path: " + (imageUri != null ? imageUri.toString() : "null"));
 
             // Call the method to edit the plant
-            editPlant(Integer.toString(existingPlant.getPlant_id()), newName, newHeight, imageUri);
+            editPlant(Integer.toString(existingPlant.getPlant_id()), newName, newHeight, imageUri, userId);
         } else {
             Toast.makeText(this, "No changes to update", Toast.LENGTH_SHORT).show();
             navigateToHomePage();
@@ -254,12 +254,13 @@ public class EditPlantActivity extends AppCompatActivity {
         }
         return byteBuffer.toByteArray();
     }
-    private void editPlant(String plantId, String newName, String newHeight, Uri imageUri) {
+    private void editPlant(String plantId, String newName, String newHeight, Uri imageUri, String userId) {
         String authToken = AuthLoginActivity.getAuthToken(this);
         ApiInterface apiService = RetrofitClient.getClient().create(ApiInterface.class);
 
         RequestBody name = RequestBody.create(MediaType.parse("multipart/form-data"), newName);
         RequestBody height = RequestBody.create(MediaType.parse("multipart/form-data"), newHeight);
+        RequestBody userIdBody = RequestBody.create(MediaType.parse("multipart/form-data"), userId); // Create RequestBody for userId
         RequestBody plantIdBody = RequestBody.create(MediaType.parse("multipart/form-data"), plantId);
 
         MultipartBody.Part body = null;
@@ -274,7 +275,7 @@ public class EditPlantActivity extends AppCompatActivity {
             }
         }
 
-        Call<ResponseBody> call = apiService.editPlant(authToken, name, height, plantIdBody, body);
+        Call<ResponseBody> call = apiService.editPlant(authToken, name, height, userIdBody, plantIdBody, body); // Include userIdBody here
         call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
