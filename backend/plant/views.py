@@ -39,6 +39,13 @@ class PlantBasic(APIView):
         
         if user.id != plant.user_id.id:
             return Response({'plant_id': 'Plant does not belong to user.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        request.POST._mutable  = True
+
+        img = request.FILES.get("image")
+        if img != None:
+            url = S3ImageUploader(img).upload()
+            request.data.update({'image_src': url})
 
         serializer = PlantSerializer(plant, data=request.data, partial=True)
         if serializer.is_valid():
