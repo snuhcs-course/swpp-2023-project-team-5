@@ -37,10 +37,10 @@ class PlantBasic(APIView):
         except:
             return Response({'plant_id': 'Plant does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
         
-        if user.id != plant.user_id:
+        if user.id != plant.user_id.id:
             return Response({'plant_id': 'Plant does not belong to user.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = PlantSerializer(plant, data=request.data)
+        serializer = PlantSerializer(plant, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response({"plant": serializer.data})
