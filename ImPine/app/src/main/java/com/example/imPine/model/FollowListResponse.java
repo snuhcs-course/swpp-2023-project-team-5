@@ -13,5 +13,9 @@ public class FollowListResponse {
         return follows;
     }
 
+    public void setFollows(List<Friends> friendsList) {
+        follows = friendsList;
+    }
+
     // Add getters, setters, and constructors as needed
 }

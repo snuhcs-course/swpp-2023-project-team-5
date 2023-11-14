@@ -187,7 +187,7 @@ public class AuthLoginActivity extends AppCompatActivity {
         finish();
     }
 
-    private void saveAuthToken(String token) {
+    void saveAuthToken(String token) {
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(getString(R.string.saved_auth_token), token);
