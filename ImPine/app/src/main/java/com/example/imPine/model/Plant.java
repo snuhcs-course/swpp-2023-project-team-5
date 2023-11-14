@@ -1,12 +1,10 @@
 package com.example.imPine.model;
 
-import java.util.Date;
-
 public class Plant {
     private String name;
     private int height;
 
-    private String lastWatered;
+    private String last_watered;
     private String status;
 
     private String image_src;
@@ -57,8 +55,8 @@ public class Plant {
         return name;
     }
 
-    public String getLastWatered() {
-        return lastWatered;
+    public String getLast_watered() {
+        return last_watered;
     }
     public String getStatus() {
         return status;
@@ -68,8 +66,8 @@ public class Plant {
         this.height = height;
     }
 
-    public void setLastWatered(String lastWatered) {
-        this.lastWatered = lastWatered;
+    public void setLast_watered(String last_watered) {
+        this.last_watered = last_watered;
     }
 
     public void setName(String name) {

@@ -1,51 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+<LinearLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/mainLayout"
     android:orientation="vertical"
     android:background="@color/yellow"
     android:padding="20dp">
-
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_centerInParent="true"
-        android:visibility="gone"
-        android:id="@+id/loadingPanel">
-
-        <ProgressBar
-            android:id="@+id/progressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerInParent="true" />
-
-        <ImageView
-            android:id="@+id/pineappleImage"
-            android:layout_width="182dp"
-            android:layout_height="181dp"
-            android:layout_above="@+id/loadingText"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="66dp"
-
-            android:src="@drawable/pine" />
-
-        <TextView
-            android:id="@+id/loadingText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Saving your pineapple!\n\n This process will take about 10 seconds..."
-            android:textSize="25dp"
-            android:fontFamily="@font/short_stack"
-            android:textStyle="bold"
-            android:layout_centerHorizontal="true"
-            android:layout_below="@id/progressBar"
-            android:layout_marginTop="16dp"
-            android:textAlignment="center" />
-    </RelativeLayout>
-
 
     <EditText
         android:id="@+id/editPlantName"
@@ -67,6 +35,45 @@
         android:fontFamily="@font/short_stack"
         android:layout_marginTop="25dp"
         android:inputType="numberDecimal" />
+
+    <Spinner
+        android:id="@+id/spinnerStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:background="@drawable/edittext_background"
+        android:padding="20dp"
+        android:entries="@array/status_options" />
+
+    <EditText
+        android:id="@+id/editLastWatered"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:background="@drawable/edittext_background"
+        android:hint="Enter Last Watered Date"
+        android:fontFamily="@font/short_stack"
+        android:padding="20dp"
+        android:focusable="false"/>
+
+    <Spinner
+        android:id="@+id/spinnerAvatar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:background="@drawable/edittext_background"
+        android:padding="20dp"
+        android:entries="@array/avatar_options" />
+
+    <ImageView
+        android:id="@+id/AvatarView"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:background="@drawable/pine_avatar"
+        android:contentDescription="@string/pineapple_image"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center"
+        android:scaleType="centerCrop" />
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -106,6 +113,45 @@
         android:textSize="18dp"
         android:fontFamily="@font/short_stack"
         android:textColor="@color/black" />
-
-
 </LinearLayout>
+</ScrollView>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:background="@color/yellow"
+        android:visibility="gone"
+        android:id="@+id/loadingPanel">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true" />
+
+        <ImageView
+            android:id="@+id/pineappleImage"
+            android:layout_width="182dp"
+            android:layout_height="181dp"
+            android:layout_above="@+id/loadingText"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="66dp"
+
+            android:src="@drawable/pine" />
+
+        <TextView
+            android:id="@+id/loadingText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Saving your pineapple!\n\n This process will take about 10 seconds..."
+            android:textSize="25dp"
+            android:fontFamily="@font/short_stack"
+            android:textStyle="bold"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/progressBar"
+            android:layout_marginTop="16dp"
+            android:textAlignment="center" />
+    </RelativeLayout>
+</RelativeLayout>

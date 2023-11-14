@@ -40,12 +40,27 @@ public interface ApiInterface {
             @Part("height") RequestBody height,
             @Part MultipartBody.Part image
     );
+
+//    @Multipart
+//    @PUT("/api/plant/")
+//    Call<ResponseBody> editPlant(
+//            @Header("Authorization") String authToken,
+//            @Part("name") RequestBody name,
+//            @Part("height") RequestBody height,
+//            @Part("user_id") RequestBody userId,
+//            @Part("plant_id") RequestBody plantId,
+//            @Part MultipartBody.Part image
+//    );
+
     @Multipart
     @PUT("/api/plant/")
     Call<ResponseBody> editPlant(
             @Header("Authorization") String authToken,
             @Part("name") RequestBody name,
             @Part("height") RequestBody height,
+            @Part("status") RequestBody status,
+            @Part("last_watered") RequestBody lastWatered,
+            @Part("avatar") RequestBody avatar,
             @Part("user_id") RequestBody userId,
             @Part("plant_id") RequestBody plantId,
             @Part MultipartBody.Part image
