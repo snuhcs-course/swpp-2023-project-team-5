@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -33,11 +35,42 @@ public class DiaryPageActivity extends AppCompatActivity {
     private boolean isDialogShown = false;
 
 
+    private void setPineyImage(int avatarValue) {
+        int drawableResourceId = getAvatarDrawableId(avatarValue);
+        ImageView pineappleAvatar = findViewById(R.id.piney);
+
+        Glide.with(this)
+                .load(drawableResourceId)
+                .into(pineappleAvatar);
+    }
+    private int getAvatarDrawableId(int avatarValue) {
+        switch (avatarValue) {
+            case 0: return R.drawable.pine_avatar;
+            case 1: return R.drawable.twofatty;
+            case 2: return R.drawable.threelazy;
+            case 3: return R.drawable.fourbrowny;
+            case 4: return R.drawable.fivecooly;
+            case 5: return R.drawable.sixalien;
+            case 6: return R.drawable.sevenalien;
+            case 7: return R.drawable.eightavatar;
+            case 8: return R.drawable.nineavatar;
+            default: return R.drawable.pine_avatar;
+        }
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+       setPineyImage(HomePageActivity.avatarFromHome);
+    }
+
+
     // Define the onCreate method that runs when the activity is created
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.diary_page);
+
+        setPineyImage(HomePageActivity.avatarFromHome);
 
         ImageButton pineyButton = findViewById(R.id.piney);
 
@@ -170,36 +203,14 @@ public class DiaryPageActivity extends AppCompatActivity {
             }
         });
 
-        // Settings button click
-        ImageButton setButton = findViewById(R.id.set);
-        setButton.setOnClickListener(new View.OnClickListener() {
+        // logout button click
+        ImageButton outButton = findViewById(R.id.logOut);
+        outButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(DiaryPageActivity.this, SettingsPageActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                Intent intent = new Intent(DiaryPageActivity.this, AuthLoginActivity.class);
                 startActivity(intent);
-            }
-        });
-
-        // User button click
-        ImageButton userButton = findViewById(R.id.piney);
-//        userButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(DiaryPageActivity.this, UsersPageActivity.class);
-//                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-//                startActivity(intent);
-//            }
-//        });
-
-        // Note button click
-        ImageButton noteButton = findViewById(R.id.note);
-        noteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(DiaryPageActivity.this, NotificationsPageActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
+                finish();
             }
         });
 

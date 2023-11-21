@@ -365,8 +365,10 @@ public class EditPlantActivity extends AppCompatActivity {
         if (hasNameChanged || hasHeightChanged || hasStatusChanged || hasLastWateredChanged || hasAvatarChanged || hasImageChanged) {
             Log.d("EditPlantActivity", "Changes detected. Updating plant information.");
             editPlant(Integer.toString(existingPlant.getPlant_id()), newName, newHeight, newStatus, newLastWatered, Integer.toString(currentAvatar), userId);
+            HomePageActivity.avatarFromHome = currentAvatar;
         } else {
             Toast.makeText(this, "No changes to update", Toast.LENGTH_SHORT).show();
+            HomePageActivity.avatarFromHome = currentAvatar;
             navigateToHomePage();
         }
     }

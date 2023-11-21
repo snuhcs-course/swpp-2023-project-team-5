@@ -35,6 +35,8 @@ public class HomePageActivity extends AppCompatActivity {
     private PlantResponse plantResponse;
     private RelativeLayout loadingPanel;
 
+    public static int avatarFromHome;
+
     private void setAvatarImage(int avatarValue) {
         int drawableResourceId = getAvatarDrawableId(avatarValue);
         ImageView pineappleAvatar = findViewById(R.id.pineappleAvatar);
@@ -42,6 +44,13 @@ public class HomePageActivity extends AppCompatActivity {
         Glide.with(this)
                 .load(drawableResourceId)
                 .into(pineappleAvatar);
+    }
+    private void setPineyImage(int avatarValue) {
+        int drawableResourceId = getAvatarDrawableId(avatarValue);
+        ImageView piney = findViewById(R.id.piney);
+        Glide.with(this)
+                .load(drawableResourceId)
+                .into(piney);
     }
     private int getAvatarDrawableId(int avatarValue) {
         switch (avatarValue) {
@@ -63,12 +72,19 @@ public class HomePageActivity extends AppCompatActivity {
         spannable.setSpan(new StyleSpan(Typeface.BOLD), 0, label.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
         textView.setText(spannable);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d("HomePageActivity", "Resume after edit");
+        setPineyImage(HomePageActivity.avatarFromHome);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_page);
 
-
+//        setPineyImage(HomePageActivity.avatarFromHome);
         ImageButton pineyButton = findViewById(R.id.piney);
         // Load the animations
         final Animation swayRight = AnimationUtils.loadAnimation(this, R.anim.sway_right);
@@ -159,6 +175,8 @@ public class HomePageActivity extends AppCompatActivity {
                                 String imagePath = plantResponse.getPlants().get(0).getImage();
                                 int avatar = plantResponse.getPlants().get(0).getAvatar();
                                 setAvatarImage(avatar);
+                                setPineyImage(avatar);
+                                avatarFromHome = avatar;
 
 
                                 if (imagePath != null && !imagePath.isEmpty()) {
@@ -274,36 +292,14 @@ public class HomePageActivity extends AppCompatActivity {
             }
         });
 
-        // Settings button click
-        ImageButton setButton = findViewById(R.id.set);
-        setButton.setOnClickListener(new View.OnClickListener() {
+        // logout button click
+        ImageButton outButton = findViewById(R.id.logOut);
+        outButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(HomePageActivity.this, SettingsPageActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                Intent intent = new Intent(HomePageActivity.this, AuthLoginActivity.class);
                 startActivity(intent);
-            }
-        });
-
-        // Piney button click
-        ImageButton userButton = findViewById(R.id.piney);
-//        userButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(HomePageActivity.this, UsersPageActivity.class);
-//                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-//                startActivity(intent);
-//            }
-//        });
-
-        // Note button click
-        ImageButton noteButton = findViewById(R.id.note);
-        noteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(HomePageActivity.this, NotificationsPageActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
+                finish();
             }
         });
 

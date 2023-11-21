@@ -11,13 +11,43 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
+import com.bumptech.glide.Glide;
+
 // Rain, Wind Speed, Humidity, Cloud
 public class PredictionPageActivity extends AppCompatActivity {
 
+    private void setPineyImage(int avatarValue) {
+        int drawableResourceId = getAvatarDrawableId(avatarValue);
+        ImageView pineappleAvatar = findViewById(R.id.piney);
+
+        Glide.with(this)
+                .load(drawableResourceId)
+                .into(pineappleAvatar);
+    }
+    private int getAvatarDrawableId(int avatarValue) {
+        switch (avatarValue) {
+            case 0: return R.drawable.pine_avatar;
+            case 1: return R.drawable.twofatty;
+            case 2: return R.drawable.threelazy;
+            case 3: return R.drawable.fourbrowny;
+            case 4: return R.drawable.fivecooly;
+            case 5: return R.drawable.sixalien;
+            case 6: return R.drawable.sevenalien;
+            case 7: return R.drawable.eightavatar;
+            case 8: return R.drawable.nineavatar;
+            default: return R.drawable.pine_avatar;
+        }
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setPineyImage(HomePageActivity.avatarFromHome);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -119,39 +149,16 @@ public class PredictionPageActivity extends AppCompatActivity {
             }
         });
 
-        // Settings button click
-        ImageButton setButton = findViewById(R.id.set);
-        setButton.setOnClickListener(new View.OnClickListener() {
+        // logout button click
+        ImageButton outButton = findViewById(R.id.logOut);
+        outButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(PredictionPageActivity.this, SettingsPageActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                Intent intent = new Intent(PredictionPageActivity.this, AuthLoginActivity.class);
                 startActivity(intent);
+                finish();
             }
         });
-
-        // User button click
-        ImageButton userButton = findViewById(R.id.piney);
-//        userButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(PredictionPageActivity.this, UsersPageActivity.class);
-//                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-//                startActivity(intent);
-//            }
-//        });
-
-        // Note button click
-        ImageButton noteButton = findViewById(R.id.note);
-        noteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(PredictionPageActivity.this, NotificationsPageActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
-            }
-        });
-
         ConstraintLayout mainLayout = findViewById(R.id.mainLayout);
 
         mainLayout.setOnTouchListener(new View.OnTouchListener() {

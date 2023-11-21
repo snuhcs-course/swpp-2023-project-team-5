@@ -42,9 +42,6 @@
         <activity android:name=".DiaryPageActivity" />
         <activity android:name=".PredictionPageActivity" />
         <activity android:name=".FriendsPageActivity" />
-        <activity android:name=".SettingsPageActivity" />
-        <activity android:name=".UsersPageActivity" />
-        <activity android:name=".NotificationsPageActivity" />
         <activity android:name=".AuthSignUpActivity" />
         <activity android:name=".DiaryDetailActivity" />
         <activity android:name=".DiaryNewActivity" />
