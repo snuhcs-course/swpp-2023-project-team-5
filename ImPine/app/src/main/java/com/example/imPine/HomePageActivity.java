@@ -14,7 +14,9 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 
 import android.content.SharedPreferences;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -30,6 +32,8 @@ import retrofit2.Response;
 import java.io.IOException;
 
 public class HomePageActivity extends AppCompatActivity {
+    private PlantResponse plantResponse;
+    private RelativeLayout loadingPanel;
 
     private void setBoldLabel(TextView textView, String label, String value) {
         SpannableString spannable = new SpannableString(label + " " + value);
@@ -117,17 +121,18 @@ public class HomePageActivity extends AppCompatActivity {
                     TextView pineappleNameTextView, heightTextView, lastWateredTextView, statusTextView;
                     pineappleNameTextView = findViewById(R.id.pineappleName);
                     heightTextView= findViewById(R.id.height);
-//                    lastWateredTextView = findViewById(R.id.lastWatered);
+                    lastWateredTextView = findViewById(R.id.lastWatered);
                     statusTextView = findViewById(R.id.status);
 
                     plantCall.enqueue(new Callback<PlantResponse>() {
                         @Override
                         public void onResponse(Call<PlantResponse> call, Response<PlantResponse> response) {
                             if (response.isSuccessful()) {
-                                PlantResponse plantResponse = response.body();
+                                plantResponse = response.body();
                                 setBoldLabel(pineappleNameTextView, "Pineapple Name: ", plantResponse.getPlants().get(0).getName());
                                 setBoldLabel(heightTextView, "Height: ", String.valueOf(plantResponse.getPlants().get(0).getHeight()) + "cm");
                                 setBoldLabel(statusTextView, "Status: ", plantResponse.getPlants().get(0).getStatus());
+                                setBoldLabel(lastWateredTextView, "Last Watered Date: ", plantResponse.getPlants().get(0).getLast_watered());
                                 String imagePath = plantResponse.getPlants().get(0).getImage();
                                 if (imagePath != null && !imagePath.isEmpty()) {
                                     ImageView pineappleProfile = findViewById(R.id.pineappleProfile);
@@ -137,7 +142,6 @@ public class HomePageActivity extends AppCompatActivity {
                                     Log.d("HomePageActivityPic", "Loading...");
                                 } else {
                                     Log.d("HomePageActivityPic", "No image path for the plant: " + imagePath);
-//                                lastWateredTextView.setText("Last Watered Date: " + plantResponse.getPlants().get(0).getLastWatered());
                                 }
 
                             } else {
@@ -171,6 +175,42 @@ public class HomePageActivity extends AppCompatActivity {
             }
         });
 
+        // Find the Edit button by its ID
+        ImageButton editButton = findViewById(R.id.editButton);
+
+        // Set an OnClickListener for the Edit button
+        editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (plantResponse != null && plantResponse.getPlants() != null && !plantResponse.getPlants().isEmpty()) {
+                    Plant currentPlant = plantResponse.getPlants().get(0);
+
+                    // Get the current plant details
+                    String pineappleName = currentPlant.getName(); // Replace with the actual name
+                    int height = currentPlant.getHeight(); // Replace with the actual height
+                    String imageURL = currentPlant.getImage(); // Replace with the actual image URL
+                    String lastWatered = currentPlant.getLast_watered(); // Retrieve the last watered date
+                    String status = currentPlant.getStatus(); // Retrieve the status
+
+                    // Create an Intent to navigate to the edit page
+                    Intent editIntent = new Intent(HomePageActivity.this, EditPlantActivity.class);
+
+                    // Pass the plant details as extras in the Intent
+                    editIntent.putExtra("pineappleName", pineappleName);
+                    editIntent.putExtra("height", height);
+                    editIntent.putExtra("imageURL", imageURL);
+                    editIntent.putExtra("lastWatered", lastWatered);
+                    editIntent.putExtra("status", status);
+
+                    // Start the EditPlantActivity with the Intent
+                    startActivity(editIntent);
+                } else {
+                    Toast.makeText(HomePageActivity.this, "Plant details not available", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+
         // Diary button click
         ImageButton diaryButton = findViewById(R.id.diary);
         diaryButton.setOnClickListener(new View.OnClickListener() {
@@ -178,6 +218,7 @@ public class HomePageActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // Start the DiaryPageActivity
                 Intent intent = new Intent(HomePageActivity.this, DiaryPageActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
         });

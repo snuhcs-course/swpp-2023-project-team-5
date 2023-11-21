@@ -1,20 +1,36 @@
 package com.example.imPine;
 
+import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
+import com.example.imPine.model.Plant;
+import com.example.imPine.model.PlantResponse;
+import com.example.imPine.network.ApiInterface;
+
 import java.util.List;
 
-public class
-FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendViewHolder> {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
+public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendViewHolder> {
+
+    public interface OnFriendClickListener {
+        void onFriendClick(Friends friend);
+    }
     private List<Friends> friendList;
     private OnFriendClickListener listener;
+
+
 
     public FriendAdapter(List<Friends> friendList, OnFriendClickListener listener) {
         this.friendList = friendList;
@@ -45,10 +61,14 @@ FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendViewHolder> {
 
     class FriendViewHolder extends RecyclerView.ViewHolder {
         TextView friendName;
+        TextView friendEmail; // TextView for email
+        ImageView friendPlantImage; // ImageView for the plant image
 
         public FriendViewHolder(@NonNull View itemView) {
             super(itemView);
             friendName = itemView.findViewById(R.id.friendName);
+            friendEmail = itemView.findViewById(R.id.friendEmail);
+            friendPlantImage = itemView.findViewById(R.id.friendPlantImage); // Initialize the ImageView
 
             itemView.setOnClickListener(v -> {
                 int position = getAdapterPosition();
@@ -59,11 +79,42 @@ FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendViewHolder> {
         }
 
         public void bind(Friends friend) {
-            friendName.setText(friend.getUsername());
+            friendName.setText(friend.getName());
+            friendEmail.setText(friend.getEmail());
+            loadPlantImage(friend.getId(), itemView.getContext());
         }
-    }
 
-    public interface OnFriendClickListener {
-        void onFriendClick(Friends friend);
+        private void loadPlantImage(int userId, Context context) {
+            String authToken = AuthLoginActivity.getAuthToken(context);
+            if (authToken == null) {
+                Log.e("FriendAdapter", "Auth token is null");
+                return;
+            }
+
+            ApiInterface apiService = RetrofitClient.getClient().create(ApiInterface.class);
+            Call<PlantResponse> call = apiService.getUserPlants("Bearer " + authToken, String.valueOf(userId));
+
+            call.enqueue(new Callback<PlantResponse>() {
+                @Override
+                public void onResponse(Call<PlantResponse> call, Response<PlantResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        List<Plant> plants = response.body().getPlants();
+                        if (!plants.isEmpty()) {
+                            // Assuming Plant class has a method to get image URL
+                            String imageUrl = plants.get(0).getImage();
+                            Glide.with(context)
+                                    .load(imageUrl)
+                                    .circleCrop()
+                                    .into(friendPlantImage);
+                        }
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<PlantResponse> call, Throwable t) {
+                    Log.e("FriendViewHolder", "Failed to load plant image", t);
+                }
+            });
+        }
     }
 }

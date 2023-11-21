@@ -187,16 +187,16 @@ public class AuthLoginActivity extends AppCompatActivity {
         finish();
     }
 
-    private void saveAuthToken(String token) {
+    void saveAuthToken(String token) {
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(getString(R.string.saved_auth_token), token);
         editor.apply();
     }
 
-    private String getAuthToken() {
-        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        return sharedPreferences.getString(getString(R.string.saved_auth_token), null);
+    public static String getAuthToken(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        return sharedPreferences.getString(context.getString(R.string.saved_auth_token), null);
     }
 
 }

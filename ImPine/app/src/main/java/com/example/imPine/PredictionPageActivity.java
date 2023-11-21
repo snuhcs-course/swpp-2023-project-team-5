@@ -76,8 +76,8 @@ public class PredictionPageActivity extends AppCompatActivity {
                 String cloudValue = editCloud.getText().toString().trim();
 
                 Intent intent = new Intent(PredictionPageActivity.this, PredictionResultActivity.class);
-                intent.putExtra("rainValue", rainValue);
                 intent.putExtra("temperatureValue", temperatureValue);
+                intent.putExtra("rainValue", rainValue);
                 intent.putExtra("humidityValue", humidityValue);
                 intent.putExtra("cloudValue", cloudValue);
 

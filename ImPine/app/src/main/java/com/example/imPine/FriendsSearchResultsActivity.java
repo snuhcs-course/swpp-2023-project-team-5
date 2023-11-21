@@ -29,18 +29,18 @@ public class FriendsSearchResultsActivity extends AppCompatActivity {
         List<Friends> mockList = new ArrayList<>();
 
         // Add some mock friends to the list
-        mockList.add(new Friends("1", "Alice"));
-        mockList.add(new Friends("2", "Bob"));
-        mockList.add(new Friends("3", "Charlie"));
-        mockList.add(new Friends("4", "David"));
-        mockList.add(new Friends("5", "AAA"));
-        mockList.add(new Friends("6", "BBB"));
-        mockList.add(new Friends("7", "CCC"));
-        mockList.add(new Friends("8", "DDD"));
-        mockList.add(new Friends("9", "EEE"));
-        mockList.add(new Friends("10", "FFF"));
-        mockList.add(new Friends("11", "GGG"));
-        mockList.add(new Friends("12", "HHH"));
+//        mockList.add(new Friends("1", "Alice"));
+//        mockList.add(new Friends("2", "Bob"));
+//        mockList.add(new Friends("3", "Charlie"));
+//        mockList.add(new Friends("4", "David"));
+//        mockList.add(new Friends("5", "AAA"));
+//        mockList.add(new Friends("6", "BBB"));
+//        mockList.add(new Friends("7", "CCC"));
+//        mockList.add(new Friends("8", "DDD"));
+//        mockList.add(new Friends("9", "EEE"));
+//        mockList.add(new Friends("10", "FFF"));
+//        mockList.add(new Friends("11", "GGG"));
+//        mockList.add(new Friends("12", "HHH"));
 
 
         return mockList;
@@ -101,7 +101,7 @@ public class FriendsSearchResultsActivity extends AppCompatActivity {
                         final List<Friends> friendList = new ArrayList<>();
                         for (int i = 0; i < jsonArray.length(); i++) {
                             JSONObject jsonObject = jsonArray.getJSONObject(i);
-                            Friends friend = new Friends(String.valueOf(jsonObject.getInt("id")), jsonObject.getString("username"));
+                            Friends friend = new Friends((jsonObject.getInt("id")), jsonObject.getString("username"));
                             friendList.add(friend);
                         }
                         runOnUiThread(new Runnable() {

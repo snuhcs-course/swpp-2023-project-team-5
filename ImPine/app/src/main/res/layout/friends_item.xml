@@ -1,37 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:background="@drawable/diary_item"
-    android:padding="16dp"
+    android:padding="20dp"
     android:layout_marginBottom="20dp">
 
-        <LinearLayout
+        <!-- Profile Image -->
+        <ImageView
+            android:id="@+id/friendPlantImage"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginEnd="16dp"
+            android:src="@drawable/profile_basic"/>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:padding="16dp">
 
-                <!-- Profile Image -->
-                <ImageView
-                    android:id="@+id/friendProfileImage"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_marginRight="16dp"
-                    android:src="@drawable/profile_basic"/>
-
-                <!-- Friends's Name -->
-                <TextView
-                    android:id="@+id/friendName"
+                <LinearLayout
+                    android:id="@+id/container"
                     android:layout_width="wrap_content"
-                    android:fontFamily="@font/short_stack"
                     android:layout_height="wrap_content"
-                    android:padding="15dp"
-                    android:text="Friend Name" />
+                    android:orientation="vertical"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
 
-        </LinearLayout>
+                        <!-- Friend's Name -->
+                        <TextView
+                            android:id="@+id/friendName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/short_stack"
+                            android:text="Friend Name"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <!-- Friend's Email -->
+                        <TextView
+                            android:id="@+id/friendEmail"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/short_stack"
+                            android:text="Friend Email"
+                            android:textSize="16sp" />
+                </LinearLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>
-
