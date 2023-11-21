@@ -38,19 +38,9 @@ public interface ApiInterface {
             @Header("Authorization") String authToken,
             @Part("name") RequestBody name,
             @Part("height") RequestBody height,
+            @Part("avatar") RequestBody avatar,
             @Part MultipartBody.Part image
     );
-
-//    @Multipart
-//    @PUT("/api/plant/")
-//    Call<ResponseBody> editPlant(
-//            @Header("Authorization") String authToken,
-//            @Part("name") RequestBody name,
-//            @Part("height") RequestBody height,
-//            @Part("user_id") RequestBody userId,
-//            @Part("plant_id") RequestBody plantId,
-//            @Part MultipartBody.Part image
-//    );
 
     @Multipart
     @PUT("/api/plant/")
