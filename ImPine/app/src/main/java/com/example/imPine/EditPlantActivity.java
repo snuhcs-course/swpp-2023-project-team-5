@@ -81,7 +81,7 @@ public class EditPlantActivity extends AppCompatActivity {
     private Uri imageUri;
     private RelativeLayout loadingPanel;
     private EditText nameEditText, heightEditText, lastWateredEditText;
-    private Spinner statusSpinner, avatarSpinner;
+    private Spinner statusSpinner;
 
     private void showProgressBar() {
         loadingPanel.setVisibility(View.VISIBLE);
@@ -105,6 +105,18 @@ public class EditPlantActivity extends AppCompatActivity {
 
     };
 
+
+    private ImageView lastSelectedAvatar = null;
+    private int currentAvatar = 0; // Default value, update it based on the intent extra
+
+    private void highlightAvatar(ImageView avatar, int avatarValue) {
+        if (lastSelectedAvatar != null) {
+            lastSelectedAvatar.setBackgroundResource(R.drawable.avatar_border); // Reset previous avatar
+        }
+        avatar.setBackgroundResource(R.drawable.avatar_border_selected); // Highlight new avatar
+        lastSelectedAvatar = avatar;
+        currentAvatar = avatarValue; // Update the current avatar value
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,6 +125,41 @@ public class EditPlantActivity extends AppCompatActivity {
         loadingPanel = findViewById(R.id.loadingPanel);
 
         EditText editLastWatered = findViewById(R.id.editLastWatered);
+
+        ImageView avatar1 = findViewById(R.id.avatar1);
+        ImageView avatar2 = findViewById(R.id.avatar2);
+        ImageView avatar3 = findViewById(R.id.avatar3);
+        ImageView avatar4 = findViewById(R.id.avatar4);
+        ImageView avatar5 = findViewById(R.id.avatar5);
+        ImageView avatar6 = findViewById(R.id.avatar6);
+        ImageView avatar7 = findViewById(R.id.avatar7);
+        ImageView avatar8 = findViewById(R.id.avatar8);
+        ImageView avatar9 = findViewById(R.id.avatar9);
+
+        avatar1.setOnClickListener(v -> highlightAvatar(avatar1, 0));
+        avatar2.setOnClickListener(v -> highlightAvatar(avatar2, 1));
+        avatar3.setOnClickListener(v -> highlightAvatar(avatar3, 2));
+        avatar4.setOnClickListener(v -> highlightAvatar(avatar4, 3));
+        avatar5.setOnClickListener(v -> highlightAvatar(avatar5, 4));
+        avatar6.setOnClickListener(v -> highlightAvatar(avatar6, 5));
+        avatar7.setOnClickListener(v -> highlightAvatar(avatar7, 6));
+        avatar8.setOnClickListener(v -> highlightAvatar(avatar8, 7));
+        avatar9.setOnClickListener(v -> highlightAvatar(avatar9, 8));
+
+        // Highlight the current avatar based on the value you get from intent
+        currentAvatar = getIntent().getIntExtra("avatar", 0); // Get the current avatar value from the intent
+        switch (currentAvatar) {
+            case 0: highlightAvatar(avatar1, 0); break;
+            case 1: highlightAvatar(avatar2, 1); break;
+            case 2: highlightAvatar(avatar3, 2); break;
+            case 3: highlightAvatar(avatar4, 3); break;
+            case 4: highlightAvatar(avatar5, 4); break;
+            case 5: highlightAvatar(avatar6, 5); break;
+            case 6: highlightAvatar(avatar7, 6); break;
+            case 7: highlightAvatar(avatar8, 7); break;
+            case 8: highlightAvatar(avatar9, 8); break;
+        }
+
         editLastWatered.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -152,18 +199,6 @@ public class EditPlantActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         statusSpinner.setAdapter(adapter);
 
-        avatarSpinner = findViewById(R.id.spinnerAvatar);
-        ArrayAdapter<CharSequence> adapterAvatar = new ArrayAdapter<CharSequence>(this, android.R.layout.simple_spinner_item, getResources().getStringArray(R.array.avatar_options)) {
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                View view = super.getView(position, convertView, parent);
-                TextView textView = (TextView) view;
-                textView.setTypeface(ResourcesCompat.getFont(getContext(), R.font.short_stack));
-                return textView;
-            }
-        };
-        adapterAvatar.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        avatarSpinner.setAdapter(adapterAvatar);
 
         initUI();
         cameraLauncher = registerForActivityResult(
@@ -182,7 +217,7 @@ public class EditPlantActivity extends AppCompatActivity {
         heightEditText = findViewById(R.id.editHeight);
         lastWateredEditText = findViewById(R.id.editLastWatered);
         statusSpinner = findViewById(R.id.spinnerStatus);
-        avatarSpinner = findViewById(R.id.spinnerAvatar);
+//        avatarSpinner = findViewById(R.id.spinnerAvatar);
 
         // Extracting the intent values
         Intent intent = getIntent();
@@ -202,7 +237,6 @@ public class EditPlantActivity extends AppCompatActivity {
 
             // Assuming you have methods to set spinner values
             setSpinnerToValue(statusSpinner, status);
-            setSpinnerToValue(avatarSpinner, avatar);
             lastWateredEditText.setText(lastWatered);
         }
     }
@@ -320,20 +354,21 @@ public class EditPlantActivity extends AppCompatActivity {
         String newHeight = heightEditText.getText().toString().trim();
         String newStatus = ((TextView) statusSpinner.getSelectedView()).getText().toString();
         String newLastWatered = lastWateredEditText.getText().toString();
-        String newAvatar = ((TextView) avatarSpinner.getSelectedView()).getText().toString();
 
         boolean hasNameChanged = !existingPlant.getName().equals(newName);
         boolean hasHeightChanged = !String.valueOf(existingPlant.getHeight()).equals(newHeight);
         boolean hasStatusChanged = !existingPlant.getStatus().equals(newStatus);
         boolean hasLastWateredChanged = !existingPlant.getLast_watered().equals(newLastWatered);
-        boolean hasAvatarChanged = !String.valueOf(existingPlant.getAvatar()).equals(newAvatar);
+        boolean hasAvatarChanged = existingPlant.getAvatar() != currentAvatar;
         boolean hasImageChanged = imageUri != null && !existingPlant.getImage().equals(imageUri.toString());
 
         if (hasNameChanged || hasHeightChanged || hasStatusChanged || hasLastWateredChanged || hasAvatarChanged || hasImageChanged) {
             Log.d("EditPlantActivity", "Changes detected. Updating plant information.");
-            editPlant(Integer.toString(existingPlant.getPlant_id()), newName, newHeight, newStatus, newLastWatered, newAvatar, userId);
+            editPlant(Integer.toString(existingPlant.getPlant_id()), newName, newHeight, newStatus, newLastWatered, Integer.toString(currentAvatar), userId);
+            HomePageActivity.avatarFromHome = currentAvatar;
         } else {
             Toast.makeText(this, "No changes to update", Toast.LENGTH_SHORT).show();
+            HomePageActivity.avatarFromHome = currentAvatar;
             navigateToHomePage();
         }
     }

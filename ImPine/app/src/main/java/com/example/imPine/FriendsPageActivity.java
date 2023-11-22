@@ -10,6 +10,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.imPine.model.FollowListResponse;
 import com.example.imPine.network.ApiInterface;
 import com.google.firebase.auth.FirebaseAuth;
@@ -38,6 +40,29 @@ public class FriendsPageActivity extends AppCompatActivity {
     RecyclerView friendsRecyclerView;
     FriendAdapter friendAdapter;
     List<Friends> friends = new ArrayList<>();
+
+    private void setPineyImage(int avatarValue) {
+        int drawableResourceId = getAvatarDrawableId(avatarValue);
+        ImageView pineappleAvatar = findViewById(R.id.piney);
+
+        Glide.with(this)
+                .load(drawableResourceId)
+                .into(pineappleAvatar);
+    }
+    private int getAvatarDrawableId(int avatarValue) {
+        switch (avatarValue) {
+            case 0: return R.drawable.pine_avatar;
+            case 1: return R.drawable.twofatty;
+            case 2: return R.drawable.threelazy;
+            case 3: return R.drawable.fourbrowny;
+            case 4: return R.drawable.fivecooly;
+            case 5: return R.drawable.sixalien;
+            case 6: return R.drawable.sevenalien;
+            case 7: return R.drawable.eightavatar;
+            case 8: return R.drawable.nineavatar;
+            default: return R.drawable.pine_avatar;
+        }
+    }
 
     private void getAuthToken(MakePlantActivity.AuthTokenCallback authTokenCallback) {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -104,7 +129,8 @@ public class FriendsPageActivity extends AppCompatActivity {
         friendAdapter = new FriendAdapter(friends, friend -> {
             // Navigate to friend detail activity
             Intent intent = new Intent(FriendsPageActivity.this, FriendsDetailActivity.class);
-            intent.putExtra("FRIEND_NAME", friend.getName());
+            intent.putExtra("ID", friend.getId());
+            intent.putExtra("friendName", friend.getName());
             intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             startActivity(intent);
         });
@@ -197,36 +223,14 @@ public class FriendsPageActivity extends AppCompatActivity {
             }
         });
 
-        // Settings button click
-        ImageButton setButton = findViewById(R.id.set);
-        setButton.setOnClickListener(new View.OnClickListener() {
+        // logout button click
+        ImageButton outButton = findViewById(R.id.logOut);
+        outButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(FriendsPageActivity.this, SettingsPageActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                Intent intent = new Intent(FriendsPageActivity.this, AuthLoginActivity.class);
                 startActivity(intent);
-            }
-        });
-
-        // User button click
-        ImageButton userButton = findViewById(R.id.piney);
-//        userButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Intent intent = new Intent(FriendsPageActivity.this, UsersPageActivity.class);
-//                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-//                startActivity(intent);
-//            }
-//        });
-
-        // Note button click
-        ImageButton noteButton = findViewById(R.id.note);
-        noteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(FriendsPageActivity.this, NotificationsPageActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
+                finish();
             }
         });
 
@@ -249,8 +253,10 @@ public class FriendsPageActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        setPineyImage(HomePageActivity.avatarFromHome);
         // Check for new friends when the activity is resumed
         fetchFriends(this); // Fetch friends from API
+
     }
 
     private void fetchFriends(Context context) {

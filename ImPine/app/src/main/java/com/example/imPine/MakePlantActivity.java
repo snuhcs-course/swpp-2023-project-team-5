@@ -68,6 +68,23 @@ public class MakePlantActivity extends AppCompatActivity {
     private Uri imageUri;
     private RelativeLayout loadingPanel;
 
+    private int avatar = 0;
+    private ImageView lastSelectedAvatar = null;
+
+    private void handleAvatarClick(ImageView clickedAvatar, int avatarValue) {
+        if (lastSelectedAvatar != null) {
+            // Reset the background of the previously selected avatar
+            lastSelectedAvatar.setBackgroundResource(R.drawable.avatar_border);
+        }
+
+        // Highlight the clicked avatar
+        clickedAvatar.setBackgroundResource(R.drawable.avatar_border_selected);
+        lastSelectedAvatar = clickedAvatar;
+
+        // Update the avatar variable
+        this.avatar = avatarValue;
+    }
+
     private ActivityResultCallback<ActivityResult> cameraResultCallback = new ActivityResultCallback<ActivityResult>() {
         @Override
         public void onActivityResult(ActivityResult result) {
@@ -146,6 +163,18 @@ public class MakePlantActivity extends AppCompatActivity {
 
         LinearLayout mainLayout = findViewById(R.id.mainLayout);
 
+        // Set click listeners for the avatars
+        findViewById(R.id.avatar1).setOnClickListener(v -> handleAvatarClick((ImageView) v, 0));
+        findViewById(R.id.avatar2).setOnClickListener(v -> handleAvatarClick((ImageView) v, 1));
+        findViewById(R.id.avatar3).setOnClickListener(v -> handleAvatarClick((ImageView) v, 2));
+        findViewById(R.id.avatar4).setOnClickListener(v -> handleAvatarClick((ImageView) v, 3));
+        findViewById(R.id.avatar5).setOnClickListener(v -> handleAvatarClick((ImageView) v, 4));
+        findViewById(R.id.avatar6).setOnClickListener(v -> handleAvatarClick((ImageView) v, 5));
+        findViewById(R.id.avatar7).setOnClickListener(v -> handleAvatarClick((ImageView) v, 6));
+        findViewById(R.id.avatar8).setOnClickListener(v -> handleAvatarClick((ImageView) v, 7));
+        findViewById(R.id.avatar9).setOnClickListener(v -> handleAvatarClick((ImageView) v, 8));
+
+
         mainLayout.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -207,6 +236,7 @@ public class MakePlantActivity extends AppCompatActivity {
                 try {
                     int plantHeight = Integer.parseInt(heightString);
                     Plant plant = new Plant(plantName, plantHeight);
+                    plant.setAvatar(avatar);
                     Log.e("MakePlantActivityPic", "imageUri: " + imageUri.toString());
                     showProgressBar(); // Show the ProgressBar before starting the network request
                     getAuthToken(new AuthTokenCallback() {
@@ -273,8 +303,9 @@ public class MakePlantActivity extends AppCompatActivity {
 
             RequestBody name = RequestBody.create(MultipartBody.FORM, plant.getName());
             RequestBody height = RequestBody.create(MultipartBody.FORM, String.valueOf(plant.getHeight()));
+            RequestBody av= RequestBody.create(MultipartBody.FORM, String.valueOf(plant.getAvatar()));
 
-            Call<ResponseBody> call = apiService.createPlant(authToken, name, height, body);
+            Call<ResponseBody> call = apiService.createPlant(authToken, name, height, av, body);
 
             call.enqueue(new Callback<ResponseBody>() {
                 @Override

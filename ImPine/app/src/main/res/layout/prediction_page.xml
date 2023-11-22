@@ -30,17 +30,16 @@
             app:layout_constraintBottom_toBottomOf="parent"/>
 
         <ImageButton
-            android:id="@+id/note"
+            android:id="@+id/logOut"
             android:layout_width="50dp"
             android:layout_height="40dp"
             android:background="@drawable/circular_button_yellow"
             android:scaleType="centerInside"
-            android:src="@drawable/note"
+            android:src="@drawable/logout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
     <!-- Prediction Input Fields -->
     <LinearLayout
@@ -170,18 +169,8 @@
             android:background="@drawable/circular_button_green"
             android:scaleType="centerInside"
             android:src="@drawable/friend" />
-
-        <ImageButton
-            android:id="@+id/set"
-            android:layout_width="40dp"
-            android:layout_height="77dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_weight="1"
-            android:background="@drawable/circular_button_green"
-            android:scaleType="centerInside"
-            android:src="@drawable/set" />
     </LinearLayout>
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
