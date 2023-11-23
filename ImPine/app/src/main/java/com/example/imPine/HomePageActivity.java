@@ -178,7 +178,7 @@ public class HomePageActivity extends AppCompatActivity {
             public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
                 if (response.isSuccessful()) {
                     UserResponse userResponse = response.body();
-                    setBoldLabel(usernameTextView, "Username: ", userResponse.getUser().getName()+ "\n");
+                    setBoldLabel(usernameTextView, "Username: ", userResponse.getUser().getName());
                     String userId;
                     userId = userResponse.getUser().getId();
                     Log.d("HomePageActivity", "UserId: " + userId);
@@ -201,13 +201,13 @@ public class HomePageActivity extends AppCompatActivity {
                         public void onResponse(Call<PlantResponse> call, Response<PlantResponse> response) {
                             if (response.isSuccessful()) {
                                 plantResponse = response.body();
-                                setBoldLabel(pineappleNameTextView, "Pineapple Name: ", plantResponse.getPlants().get(0).getName() + "\n");
-                                setBoldLabel(heightTextView, "Height: ", String.valueOf(plantResponse.getPlants().get(0).getHeight()) + "cm" + "\n");
-                                setBoldLabel(statusTextView, "Status: ", plantResponse.getPlants().get(0).getStatus()+ "\n");
+                                setBoldLabel(pineappleNameTextView, "Pineapple Name: ", plantResponse.getPlants().get(0).getName());
+                                setBoldLabel(heightTextView, "Height: ", String.valueOf(plantResponse.getPlants().get(0).getHeight()) + "cm");
+                                setBoldLabel(statusTextView, "Status: ", plantResponse.getPlants().get(0).getStatus());
                                 String createdDate = plantResponse.getPlants().get(0).getFormattedCreatedAt();
                                 int daysOld = calculateDaysOld(createdDate);
-                                setBoldLabel(birthdayTextView, "Has been with me since: ", createdDate + "\n("+ daysOld + " days old)"+ "\n");
-                                setBoldLabel(lastWateredTextView, "Last Watered Date: ", plantResponse.getPlants().get(0).getLast_watered()+ "\n");
+                                setBoldLabel(birthdayTextView, "Has been with me since: \n", createdDate + "\n("+ daysOld + " days old)");
+                                setBoldLabel(lastWateredTextView, "Last Watered Date: ", plantResponse.getPlants().get(0).getLast_watered());
                                 String imagePath = plantResponse.getPlants().get(0).getImage();
                                 int avatar = plantResponse.getPlants().get(0).getAvatar();
                                 setAvatarImage(avatar, daysOld);

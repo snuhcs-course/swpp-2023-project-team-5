@@ -51,6 +51,7 @@ public class PredictionResultActivity extends AppCompatActivity {
                 + (coeffRain * Rain)
                 + (coeffHumidity * Humidity)
                 + (coeffCloud * Cloud);
+
         return predictedValue;
     }
     private void setBoldLabel(TextView textView, String label, String value) {
@@ -78,7 +79,7 @@ public class PredictionResultActivity extends AppCompatActivity {
         double fcr = predict(temperature, wind, rain, humidity, cloud) * 100;
         TextView textViewResult = findViewById(R.id.result);
         setBoldLabel(textViewResult, "Result: ", Double.toString(fcr) + "%");
-//                        textViewResult.setText(fcrStatus);
+
 //        // Create a new JSONObject and put the float values into it
 //        JSONObject jsonObject = new JSONObject();
 //        try {
@@ -86,14 +87,15 @@ public class PredictionResultActivity extends AppCompatActivity {
 //            jsonObject.put("T_mean", temperature);
 //            jsonObject.put("Humidity", humidity);
 //            jsonObject.put("Cloud", cloud);
+//            jsonObject.put("Wind", wind);
 //            // Add other parameters as needed
 //        } catch (JSONException e) {
 //            e.printStackTrace();  // Handle the exception
 //        }
-
+//
 //        RequestBody body = RequestBody.create(jsonObject.toString(), okhttp3.MediaType.parse("application/json; charset=utf-8"));
 //        ApiInterface apiInterface = RetrofitClient.getClient().create(ApiInterface.class);
-
+//
 //        Call<ResponseBody> call = apiInterface.predictFcrStatus(body);
 //        call.enqueue(new Callback<ResponseBody>() {
 //            @Override
