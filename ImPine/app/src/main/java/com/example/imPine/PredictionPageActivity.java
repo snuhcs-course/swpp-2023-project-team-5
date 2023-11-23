@@ -99,18 +99,22 @@ public class PredictionPageActivity extends AppCompatActivity {
                 EditText editTemp = findViewById(R.id.editTemperature);
                 EditText editHumidity = findViewById(R.id.editHumidity);
                 EditText editCloud = findViewById(R.id.editCloud);
+                EditText editWind = findViewById(R.id.editWind);
 
                 String rainValue = editRain.getText().toString().trim();
                 String temperatureValue = editTemp.getText().toString().trim();
                 String humidityValue = editHumidity.getText().toString().trim();
                 String cloudValue = editCloud.getText().toString().trim();
+                String windValue = editWind.getText().toString().trim();
 
                 Intent intent = new Intent(PredictionPageActivity.this, PredictionResultActivity.class);
                 intent.putExtra("temperatureValue", temperatureValue);
                 intent.putExtra("rainValue", rainValue);
                 intent.putExtra("humidityValue", humidityValue);
                 intent.putExtra("cloudValue", cloudValue);
+                intent.putExtra("windValue", windValue);
 
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
             }
         });

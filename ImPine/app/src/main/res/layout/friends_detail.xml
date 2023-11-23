@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
     android:layout_margin="15dp">
 
     <LinearLayout
@@ -55,6 +56,17 @@
             android:layout_gravity="center"
             android:layout_marginBottom="20dp"
             android:src="@drawable/pine_avatar" />
+
+        <TextView
+            android:id="@+id/old"
+            android:text="Days Old"
+            android:background="@drawable/rounded_corners"
+            android:fontFamily="@font/short_stack"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:textSize="24sp"
+            android:layout_marginBottom="15dp" />
 
         <ImageView
             android:id="@+id/pineappleProfile"

@@ -1,6 +1,7 @@
 package com.example.imPine;
 
 import android.graphics.Typeface;
+import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.content.Intent;
 import android.text.Spannable;
@@ -30,16 +31,46 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import java.io.IOException;
+import java.text.ParseException;
+import java.util.Date;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class HomePageActivity extends AppCompatActivity {
     private PlantResponse plantResponse;
     private RelativeLayout loadingPanel;
 
     public static int avatarFromHome;
+    private int calculateDaysOld(String createdDateStr) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        try {
+            Date createdDate = dateFormat.parse(createdDateStr);
+            Date currentDate = new Date(); // Current date
 
-    private void setAvatarImage(int avatarValue) {
+            // Calculate the difference in milliseconds
+            long diffInMillies = currentDate.getTime() - createdDate.getTime();
+
+            // Convert milliseconds to days
+            return (int) TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return -1; // Return -1 or some error code if parsing fails
+        }
+    }
+    private void setAvatarImage(int avatarValue, int daysOld) {
+        if (daysOld > 60) {
+            daysOld = 60;
+        }
         int drawableResourceId = getAvatarDrawableId(avatarValue);
         ImageView pineappleAvatar = findViewById(R.id.pineappleAvatar);
+
+        // Calculate the scale factor. For example, start at 0.3 times the size and increase by 0.1 every 3 days.
+        // The scale will be 1 (full size) after 30 days.
+        float scaleFactor = 0.3f + ((float) Math.min(daysOld / 3, 30) * (0.7f / 10));
+
+        // Now set the scale of the ImageView
+        pineappleAvatar.setScaleX(scaleFactor); // Scale in X
+        pineappleAvatar.setScaleY(scaleFactor); // Scale in Y
 
         Glide.with(this)
                 .load(drawableResourceId)
@@ -147,7 +178,7 @@ public class HomePageActivity extends AppCompatActivity {
             public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
                 if (response.isSuccessful()) {
                     UserResponse userResponse = response.body();
-                    setBoldLabel(usernameTextView, "Username: ", userResponse.getUser().getName());
+                    setBoldLabel(usernameTextView, "Username: ", userResponse.getUser().getName()+ "\n");
                     String userId;
                     userId = userResponse.getUser().getId();
                     Log.d("HomePageActivity", "UserId: " + userId);
@@ -157,24 +188,29 @@ public class HomePageActivity extends AppCompatActivity {
                     Log.d("HomePageActivity", "AuthToken: " + authToken);
 
                     Call<PlantResponse> plantCall = apiService.getUserPlants(authToken, userId);
-                    TextView pineappleNameTextView, heightTextView, lastWateredTextView, statusTextView;
+                    TextView pineappleNameTextView, heightTextView, lastWateredTextView, statusTextView, birthdayTextView;
                     pineappleNameTextView = findViewById(R.id.pineappleName);
                     heightTextView= findViewById(R.id.height);
                     lastWateredTextView = findViewById(R.id.lastWatered);
                     statusTextView = findViewById(R.id.status);
+                    birthdayTextView = findViewById(R.id.birthday);
+                    int daysOld = 0;
 
                     plantCall.enqueue(new Callback<PlantResponse>() {
                         @Override
                         public void onResponse(Call<PlantResponse> call, Response<PlantResponse> response) {
                             if (response.isSuccessful()) {
                                 plantResponse = response.body();
-                                setBoldLabel(pineappleNameTextView, "Pineapple Name: ", plantResponse.getPlants().get(0).getName());
-                                setBoldLabel(heightTextView, "Height: ", String.valueOf(plantResponse.getPlants().get(0).getHeight()) + "cm");
-                                setBoldLabel(statusTextView, "Status: ", plantResponse.getPlants().get(0).getStatus());
-                                setBoldLabel(lastWateredTextView, "Last Watered Date: ", plantResponse.getPlants().get(0).getLast_watered());
+                                setBoldLabel(pineappleNameTextView, "Pineapple Name: ", plantResponse.getPlants().get(0).getName() + "\n");
+                                setBoldLabel(heightTextView, "Height: ", String.valueOf(plantResponse.getPlants().get(0).getHeight()) + "cm" + "\n");
+                                setBoldLabel(statusTextView, "Status: ", plantResponse.getPlants().get(0).getStatus()+ "\n");
+                                String createdDate = plantResponse.getPlants().get(0).getFormattedCreatedAt();
+                                int daysOld = calculateDaysOld(createdDate);
+                                setBoldLabel(birthdayTextView, "Has been with me since: ", createdDate + "\n("+ daysOld + " days old)"+ "\n");
+                                setBoldLabel(lastWateredTextView, "Last Watered Date: ", plantResponse.getPlants().get(0).getLast_watered()+ "\n");
                                 String imagePath = plantResponse.getPlants().get(0).getImage();
                                 int avatar = plantResponse.getPlants().get(0).getAvatar();
-                                setAvatarImage(avatar);
+                                setAvatarImage(avatar, daysOld);
                                 setPineyImage(avatar);
                                 avatarFromHome = avatar;
 

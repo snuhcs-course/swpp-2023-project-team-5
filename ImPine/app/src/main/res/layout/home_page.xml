@@ -88,14 +88,26 @@
                 app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
+                android:id="@+id/birthday"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:textSize="20dp"
+                android:text="Birthday: "
+                android:fontFamily="@font/short_stack"
+                app:layout_constraintTop_toBottomOf="@+id/height"
+                android:layout_marginLeft="20dp"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <TextView
                 android:id="@+id/lastWatered"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:textSize="20dp"
-                android:text="lastWatered: "
+                android:text="LastWatered: "
                 android:fontFamily="@font/short_stack"
-                app:layout_constraintTop_toBottomOf="@+id/height"
+                app:layout_constraintTop_toBottomOf="@+id/birthday"
                 android:layout_marginLeft="20dp"
                 app:layout_constraintStart_toStartOf="parent" />
             <TextView
@@ -108,17 +120,20 @@
                 android:fontFamily="@font/short_stack"
                 app:layout_constraintTop_toBottomOf="@+id/lastWatered"
                 android:layout_marginLeft="20dp"
+                android:layout_marginBottom="20dp"
+                app:layout_constraintBottom_toTopOf="@id/pineappleAvatar"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <ImageView
                 android:id="@+id/pineappleAvatar"
                 android:layout_width="195dp"
                 android:layout_height="241dp"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="30dp"
                 android:contentDescription="Pineapple Profile"
                 android:src="@drawable/pine_avatar"
                 app:layout_constraintBottom_toTopOf="@id/pineappleProfile"
                 app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginBottom="20dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/status" />
 

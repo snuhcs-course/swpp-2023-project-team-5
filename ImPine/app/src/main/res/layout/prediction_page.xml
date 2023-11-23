@@ -74,7 +74,18 @@
             android:layout_height="wrap_content"
             android:background="@drawable/edittext_background"
             android:padding="20dp"
-            android:hint="Enter Rain"
+            android:hint="Enter Rain(mm)"
+            android:fontFamily="@font/short_stack"
+            android:layout_marginTop="15dp"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/editWind"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edittext_background"
+            android:padding="20dp"
+            android:hint="Enter Wind Speed(km/h)"
             android:fontFamily="@font/short_stack"
             android:layout_marginTop="15dp"
             android:inputType="numberDecimal" />
@@ -86,7 +97,7 @@
             android:layout_height="wrap_content"
             android:background="@drawable/edittext_background"
             android:padding="20dp"
-            android:hint="Enter Humidity"
+            android:hint="Enter Humidity(%)"
             android:fontFamily="@font/short_stack"
             android:layout_marginTop="15dp"
             android:inputType="numberDecimal" />
@@ -98,7 +109,7 @@
             android:background="@drawable/edittext_background"
             android:padding="20dp"
             android:layout_marginTop="15dp"
-            android:hint="Enter Cloud"
+            android:hint="Enter Cloud(%)"
             android:fontFamily="@font/short_stack"
             android:inputType="numberDecimal"
             android:layout_marginBottom="50dp"/>
