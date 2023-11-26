@@ -2,7 +2,9 @@ package com.example.imPine;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Html;
 import android.widget.Button;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -10,9 +12,24 @@ public class TutorialActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.tutorial_page); // Replace with your actual layout resource ID
+        setContentView(R.layout.tutorial_page);
 
-        Button getStartedButton = findViewById(R.id.btn_get_started); // Replace with your actual button ID
+        TextView textViewTutorialContent = findViewById(R.id.textViewTutorialContent);
+        String htmlText = "<div style='text-align:center;'><b style='font-size:20px;'>Welcome to I'm Pine Thank You!</b></div><br>"
+                + "<b>1. Choosing a Plant:</b> Start with a healthy, mature pineapple. You can use a store-bought pineapple or buy a pineapple seedling online.<br><br>"
+                + "<b>2. Preparing the Crown:</b> Cut off the top of the pineapple, including some of the fruit. Remove the lower leaves to expose the stem.<br><br>"
+                + "<b>3. Drying the Crown:</b> Let the crown dry for a few days to allow the cut end to heal. This prevents rotting.<br><br>"
+                + "<b>4. Planting:</b> Plant the crown in a well-draining potting mix. Ensure the soil is moist but not waterlogged.<br><br>"
+                + "<b>5. Location:</b> Place your pineapple plant in a warm, sunny spot. Pineapples love warmth and sunlight.<br><br>"
+                + "<b>6. Watering:</b> Water your plant regularly, allowing the soil to dry out slightly between waterings.<br><br>"
+                + "<b>7. Fertilizing:</b> Feed your pineapple plant with a balanced fertilizer every few months.<br><br>"
+                + "<b>8. Patience:</b> It can take up to 2-3 years for a pineapple plant to produce fruit. Be patient and enjoy the process!<br><br>"
+                + "<b>9. Harvesting:</b> When the pineapple is big, golden, and gives off a sweet aroma, it's ready to harvest.<br><br>"
+                + "Remember, growing a pineapple can be a fun and rewarding experience. Enjoy your gardening journey!";
+
+        textViewTutorialContent.setText(Html.fromHtml(htmlText));
+
+        Button getStartedButton = findViewById(R.id.btn_get_started);
         getStartedButton.setOnClickListener(v -> navigateToMakePlantActivity());
     }
 

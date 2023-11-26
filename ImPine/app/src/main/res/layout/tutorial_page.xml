@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/yellow"
-    android:padding="16dp">
+    android:padding="10dp">
 
     <ScrollView
         android:id="@+id/scrollViewTutorial"
@@ -16,11 +16,12 @@
             android:id="@+id/textViewTutorialContent"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Information about growing pineapples...\n\n"
             android:fontFamily="@font/short_stack"
+            android:lineSpacingExtra="8dp"
             android:textSize="16sp"
             android:padding="16dp" />
-        <!-- Add more TextViews or other components with information as needed -->
+
+
     </ScrollView>
 
     <Button

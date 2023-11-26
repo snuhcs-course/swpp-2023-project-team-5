@@ -56,39 +56,65 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/headerBar">
 
-
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Temperature(°C)"
+            android:fontFamily="@font/short_stack"
+            android:textSize="20dp" />
         <EditText
             android:id="@+id/editTemperature"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/edittext_background"
-            android:padding="20dp"
-            android:hint="Enter Temperature"
+            android:padding="10dp"
+            android:hint="Enter Temperature(°C)"
             android:fontFamily="@font/short_stack"
-            android:layout_marginTop="15dp"
-            android:inputType="numberDecimal" />
+            android:inputType="numberDecimal"
+            android:layout_marginBottom="15dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Rain(mm)"
+            android:fontFamily="@font/short_stack"
+            android:textSize="20dp" />
 
         <EditText
             android:id="@+id/editRain"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/edittext_background"
-            android:padding="20dp"
+            android:padding="10dp"
             android:hint="Enter Rain(mm)"
+            android:layout_marginBottom="15dp"
             android:fontFamily="@font/short_stack"
-            android:layout_marginTop="15dp"
             android:inputType="numberDecimal" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Wind Speed (km/h)"
+            android:fontFamily="@font/short_stack"
+            android:textSize="20dp" />
 
         <EditText
             android:id="@+id/editWind"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/edittext_background"
-            android:padding="20dp"
+            android:padding="10dp"
             android:hint="Enter Wind Speed(km/h)"
+            android:layout_marginBottom="15dp"
             android:fontFamily="@font/short_stack"
-            android:layout_marginTop="15dp"
             android:inputType="numberDecimal" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Humidity(%)"
+            android:fontFamily="@font/short_stack"
+            android:textSize="20dp" />
 
 
         <EditText
@@ -96,19 +122,25 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/edittext_background"
-            android:padding="20dp"
+            android:padding="10dp"
             android:hint="Enter Humidity(%)"
+            android:layout_marginBottom="15dp"
             android:fontFamily="@font/short_stack"
-            android:layout_marginTop="15dp"
             android:inputType="numberDecimal" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cloudiness(%)"
+            android:fontFamily="@font/short_stack"
+            android:textSize="20dp" />
 
         <EditText
             android:id="@+id/editCloud"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@drawable/edittext_background"
-            android:padding="20dp"
-            android:layout_marginTop="15dp"
+            android:padding="10dp"
             android:hint="Enter Cloud(%)"
             android:fontFamily="@font/short_stack"
             android:inputType="numberDecimal"
