@@ -16,6 +16,18 @@ class UserGet(APIView):
             return Response(status=status.HTTP_404_NOT_FOUND, data={"message": "User not found."})
         serializer = UserSerializer(user)
         return Response({"user": serializer.data})
+    
+class UserSearch(APIView):
+    def get(self, request):
+        username = request.GET.get('username', None)
+        if username == None:
+            return Response(status=status.HTTP_400_BAD_REQUEST, data={"message": "Username not provided."})
+        try:
+            user = User.objects.filter(first_name__icontains=username)
+        except:
+            return Response(status=status.HTTP_404_NOT_FOUND, data={"message": "User not found."})
+        serializer = UserSerializer(user, many=True)
+        return Response({"users": serializer.data})
 
 @authentication_classes([])
 class UserSignin(APIView):
