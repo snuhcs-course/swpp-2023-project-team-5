@@ -1,5 +1,6 @@
 package com.example.imPine;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.icu.text.SimpleDateFormat;
@@ -9,6 +10,7 @@ import android.text.SpannableString;
 import android.text.style.StyleSpan;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +35,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -256,8 +259,45 @@ public class FriendsDetailActivity extends AppCompatActivity {
         // Start the animation
         pineappleAvatar.startAnimation(swayRight);
 
+        // Setup delete (unfollow) button
+        Button deleteButton = findViewById(R.id.deleteButton);
+        deleteButton.setOnClickListener(v -> {
+            if (intent != null && intent.hasExtra("ID")) {
+                int friendUserId = intent.getIntExtra("ID", 0);
+                confirmUnfollow(friendUserId);
+            }
+        });
+
     }
 
+    private void confirmUnfollow(int friendUserId) {
+        new AlertDialog.Builder(this)
+                .setTitle("Unfollow Friend")
+                .setMessage("Are you sure you want to unfollow this friend?")
+                .setPositiveButton(android.R.string.yes, (dialog, which) -> unfollowFriend(friendUserId))
+                .setNegativeButton(android.R.string.no, null)
+                .show();
+    }
+
+    private void unfollowFriend(int friendUserId) {
+        String authToken = AuthLoginActivity.getAuthToken(this);
+        apiService.unfollowUser("Bearer " + authToken, friendUserId).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(FriendsDetailActivity.this, "Unfollowed successfully", Toast.LENGTH_SHORT).show();
+                    finish(); // Close the activity after unfollowing
+                } else {
+                    Toast.makeText(FriendsDetailActivity.this, "Failed to unfollow", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(FriendsDetailActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
     private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }

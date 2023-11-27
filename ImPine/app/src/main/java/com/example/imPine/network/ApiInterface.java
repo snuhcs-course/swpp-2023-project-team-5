@@ -135,4 +135,6 @@ public interface ApiInterface {
             @Header("Authorization") String authToken,
             @Path("diary_id") String diaryId);
 
+    @DELETE("/api/follow/{user_id}")
+    Call<ResponseBody> unfollowUser(@Header("Authorization") String authToken, @Path("user_id") int userId);
 }
