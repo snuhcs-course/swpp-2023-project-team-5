@@ -22,4 +22,5 @@ urlpatterns = [
     path('api/plant/', include('plant.urls')),
     path('api/user/', include('myAuth.urls')),
     path('api/follow/', include('follow.urls')),
+    path('api/diary/', include('diary.urls')),
 ]
