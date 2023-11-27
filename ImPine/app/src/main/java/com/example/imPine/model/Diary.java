@@ -1,15 +1,32 @@
 package com.example.imPine.model;
 
 public class Diary {
+    private int id;
     private String title;
     private String content;
-    private boolean isPrivate;
+    private boolean is_private;
+
+    private String category;
+    private String image_src;
 
     // Private constructor to be used by the Builder
     private Diary(Builder builder) {
         this.title = builder.title;
         this.content = builder.content;
-        this.isPrivate = builder.isPrivate;
+        this.is_private = builder.is_private;
+        this.category = builder.category;
+    }
+
+    public String getImage_src() {
+        return image_src;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getContent() {
@@ -21,7 +38,7 @@ public class Diary {
     }
 
     public boolean getIsPrivate() {
-        return isPrivate;
+        return is_private;
     }
 
 
@@ -29,7 +46,10 @@ public class Diary {
     public static class Builder {
         private String title;
         private String content;
-        private boolean isPrivate;
+        private boolean is_private;
+        private String image_src;
+
+        private String category;
 
         public Builder setTitle(String title) {
             this.title = title;
@@ -42,10 +62,18 @@ public class Diary {
         }
 
         public Builder setIsPrivate(boolean isPrivate) {
-            this.isPrivate = isPrivate;
+            this.is_private = isPrivate;
             return this;
         }
 
+        public void setCategory(String category) {
+            this.category = category;
+        }
+
+        public Builder setImageSrc(String imageSrc) {
+            this.image_src = imageSrc;
+            return this;
+        }
         public Diary build() {
             return new Diary(this);
         }

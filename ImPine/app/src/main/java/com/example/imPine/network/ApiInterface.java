@@ -70,8 +70,30 @@ public interface ApiInterface {
     @GET("/api/diary")
     Call<DiaryResponse> getDiaries(@Header("Authorization") String authToken);
 
+    @Multipart
     @POST("/api/diary/")
-    Call<Diary> createDiary(@Header("Authorization") String authToken, @Body Diary diary);
+    Call<ResponseBody> createDiary(
+            @Header("Authorization") String authToken,
+            @Part("title") RequestBody title,
+            @Part("content") RequestBody content,
+            @Part("is_private") RequestBody isPrivate,
+            @Part MultipartBody.Part image
+    );
+
+    @POST("/api/diary/")
+    Call<ResponseBody> createDiaryWithoutImage(
+            @Header("Authorization") String authToken,
+            @Body Diary diary);
+
+
+
+//    @Multipart
+//    @POST("/api/diary/")
+//    Call<ResponseBody> createDiary(
+//            @Header("Authorization") String authToken,
+//            @Part("diary") RequestBody diary,  // Serialized Diary object
+//            @Part MultipartBody.Part image     // Image file
+//    );
 
     @POST("/predict_fcr/")
     Call<ResponseBody> predictFcrStatus(@Body RequestBody params);

@@ -2,8 +2,10 @@ package com.example.imPine;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
@@ -12,9 +14,11 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -255,9 +259,28 @@ public class FriendsPageActivity extends AppCompatActivity {
         });
     }
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.friends_page);
+
+        SearchView searchView = findViewById(R.id.friendSearchView);
+
+        // Make the query hint always visible
+        searchView.setIconifiedByDefault(false);
+        searchView.setIconified(false);
+        searchView.clearFocus();
+
+        // Accessing the TextView inside SearchView
+        int id = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
+        TextView textView = (TextView) searchView.findViewById(id);
+
+        // Set custom font
+        Typeface customFont = ResourcesCompat.getFont(this, R.font.short_stack);
+        textView.setTypeface(customFont);
+
+        // Optional: Adjust text size and padding as needed
+         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+         textView.setPadding(0, 0, 0, 0);
 
         setupUI();
     }

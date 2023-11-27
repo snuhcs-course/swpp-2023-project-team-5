@@ -153,8 +153,8 @@
 
         <ImageView
             android:id="@+id/imageView"
-            android:layout_width="match_parent"
-            android:layout_height="339dp"
+            android:layout_width="365dp"
+            android:layout_height="458dp"
             android:background="@drawable/edittext_background"
             android:contentDescription="@string/pineapple_image"
             android:scaleType="centerCrop" />
@@ -225,4 +225,5 @@
             android:layout_marginTop="16dp"
             android:textAlignment="center" />
     </RelativeLayout>
+
 </RelativeLayout>

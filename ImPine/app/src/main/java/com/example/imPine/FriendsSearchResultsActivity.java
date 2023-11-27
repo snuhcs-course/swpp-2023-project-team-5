@@ -1,10 +1,17 @@
 package com.example.imPine;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.imPine.model.User;
@@ -64,6 +71,14 @@ public class FriendsSearchResultsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.friends_search_results);
+
+        ImageView backButton = findViewById(R.id.backButton); // Get the "Back" button by ID
+
+        backButton.setOnClickListener(v -> {
+            Intent intent = new Intent(FriendsSearchResultsActivity.this, FriendsPageActivity.class);
+            startActivity(intent);
+            finish();
+        });
 
         searchResultsRecyclerView = findViewById(R.id.searchResultRecyclerView);
 

@@ -7,6 +7,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -102,6 +103,15 @@ public class PredictionResultActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.prediction_result_page);
+
+        ImageView backButton = findViewById(R.id.backButton); // Get the "Back" button by ID
+
+        backButton.setOnClickListener(v -> {
+            Intent intent = new Intent(PredictionResultActivity.this, PredictionPageActivity.class);
+            startActivity(intent);
+            finish();
+        });
+
         Intent intent = getIntent();
         // Retrieve the weather values
         double temperature = intent.getDoubleExtra("temperatureValue", 0.0); // Default to 0.0
