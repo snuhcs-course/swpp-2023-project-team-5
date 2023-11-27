@@ -2,6 +2,7 @@ package com.example.imPine;
 
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -21,8 +22,12 @@ import com.bumptech.glide.Glide;
 import com.example.imPine.model.PlantResponse;
 import com.example.imPine.network.ApiInterface;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -33,9 +38,37 @@ public class FriendsDetailActivity extends AppCompatActivity {
 
     private TextView friendDetailName;
     private List<Diary> samplePineDiaries = new ArrayList<>();
-    private void setAvatarImage(int avatarValue) {
+
+    private int calculateDaysOld(String createdDateStr) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        try {
+            Date createdDate = dateFormat.parse(createdDateStr);
+            Date currentDate = new Date(); // Current date
+
+            // Calculate the difference in milliseconds
+            long diffInMillies = currentDate.getTime() - createdDate.getTime();
+
+            // Convert milliseconds to days
+            return (int) TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return -1; // Return -1 or some error code if parsing fails
+        }
+    }
+    private void setAvatarImage(int avatarValue, int daysOld) {
+        if (daysOld > 60) {
+            daysOld = 60;
+        }
         int drawableResourceId = getAvatarDrawableId(avatarValue);
         ImageView pineappleAvatar = findViewById(R.id.pineappleAvatar);
+
+        // Calculate the scale factor. For example, start at 0.3 times the size and increase by 0.1 every 3 days.
+        // The scale will be 1 (full size) after 30 days.
+        float scaleFactor = 0.3f + ((float) Math.min(daysOld / 3, 30) * (0.7f / 10));
+
+        // Now set the scale of the ImageView
+        pineappleAvatar.setScaleX(scaleFactor); // Scale in X
+        pineappleAvatar.setScaleY(scaleFactor); // Scale in Y
 
         Glide.with(this)
                 .load(drawableResourceId)
@@ -95,12 +128,15 @@ public class FriendsDetailActivity extends AppCompatActivity {
                         String status = plantResponse.getPlants().get(0).getStatus();
                         int avatar = plantResponse.getPlants().get(0).getAvatar();
                         String src = plantResponse.getPlants().get(0).getImage();
+                        String createdAt = plantResponse.getPlants().get(0).getFormattedCreatedAt();
+                        int daysOld = calculateDaysOld(createdAt);
 
                         // Update UI elements
                         TextView friendDetailNameTextView = findViewById(R.id.friendDetailName);
                         TextView pineNameTextView = findViewById(R.id.pineName);
                         TextView statusView = findViewById(R.id.status);
                         ImageView pineappleProfileImageView = findViewById(R.id.pineappleProfile);
+                        TextView daysOldView = findViewById(R.id.old);
 
                         friendDetailNameTextView.setText(friendName);
                         pineNameTextView.setText(pineName);
@@ -108,6 +144,7 @@ public class FriendsDetailActivity extends AppCompatActivity {
                         setBoldLabel(friendDetailNameTextView, "Username: ", friendName);
                         setBoldLabel(pineNameTextView, "Pineapple Name: ", pineName);
                         setBoldLabel(statusView, "Status: ", status);
+                        setBoldLabel(daysOldView, "", daysOld + " days old");
 
                         // Load the image
                         Glide.with(getApplicationContext())
@@ -115,7 +152,7 @@ public class FriendsDetailActivity extends AppCompatActivity {
                                 .into(pineappleProfileImageView);
 
 
-                        setAvatarImage(avatar);
+                        setAvatarImage(avatar, daysOld);
 
                     } else {
                         // Handle error response

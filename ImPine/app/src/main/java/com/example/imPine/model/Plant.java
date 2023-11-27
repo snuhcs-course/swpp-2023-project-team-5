@@ -1,10 +1,15 @@
 package com.example.imPine.model;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class Plant {
     private String name;
     private int height;
 
     private String last_watered;
+    private String created_at;
     private String status;
 
     private String image_src;
@@ -77,4 +82,26 @@ public class Plant {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    // Method to format the created_at date string to "yyyy-MM-dd"
+    public String getFormattedCreatedAt() {
+        // The current format of your date string
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+
+        // The desired format for the date string
+        SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+        try {
+            // Parse the input date string into a Date object
+            Date date = inputFormat.parse(this.created_at);
+
+            // Format the Date object into the desired date string format
+            return outputFormat.format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null; // Return null or some default value if parsing fails
+        }
+    }
+
+
 }
