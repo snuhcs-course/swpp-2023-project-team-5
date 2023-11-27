@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'plant',
     'myAuth',
     'follow',
+    'diary',
 ]
 
 MIDDLEWARE = [
