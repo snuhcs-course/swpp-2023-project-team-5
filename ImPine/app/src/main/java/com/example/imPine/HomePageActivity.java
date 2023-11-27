@@ -26,6 +26,7 @@ import com.example.imPine.model.Plant;
 import com.example.imPine.model.PlantResponse;
 import com.example.imPine.model.UserResponse;
 import com.example.imPine.network.ApiInterface;
+import com.example.imPine.network.RetrofitClient;
 
 import retrofit2.Call;
 import retrofit2.Callback;

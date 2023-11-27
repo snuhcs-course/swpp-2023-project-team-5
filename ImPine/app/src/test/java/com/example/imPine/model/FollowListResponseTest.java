@@ -1,6 +1,5 @@
 package com.example.imPine.model;
 
-import com.example.imPine.Friends;
 import org.junit.Before;
 import org.junit.Test;
 

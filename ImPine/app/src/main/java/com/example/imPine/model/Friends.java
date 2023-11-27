@@ -1,9 +1,8 @@
-package com.example.imPine;
+package com.example.imPine.model;
 
 public class Friends {
     private int id;
     private String name;
-
     private String email;
 
 

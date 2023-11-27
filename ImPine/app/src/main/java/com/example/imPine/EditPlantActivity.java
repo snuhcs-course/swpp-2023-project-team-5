@@ -4,16 +4,12 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.graphics.Matrix;
-import android.graphics.Typeface;
 import android.icu.text.SimpleDateFormat;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.res.ResourcesCompat;
-import androidx.exifinterface.media.ExifInterface;
+
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -22,16 +18,13 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -52,8 +45,7 @@ import com.example.imPine.model.Plant;
 import com.example.imPine.model.PlantResponse;
 import com.example.imPine.model.UserResponse;
 import com.example.imPine.network.ApiInterface;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.example.imPine.network.RetrofitClient;
 
 import org.json.JSONObject;
 
@@ -121,6 +113,21 @@ public class EditPlantActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.edit_plant_page);
+
+
+        ScrollView mainLayout = findViewById(R.id.mainLayout);
+
+        mainLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (getCurrentFocus() != null) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                    getCurrentFocus().clearFocus(); // Optional: Clear focus from the current EditText
+                }
+                return false;
+            }
+        });
         // Initialize the loadingPanel
         loadingPanel = findViewById(R.id.loadingPanel);
 

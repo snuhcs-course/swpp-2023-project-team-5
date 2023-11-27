@@ -1,10 +1,14 @@
 package com.example.imPine.network;
+import com.example.imPine.model.Diary;
+import com.example.imPine.model.DiaryAdapter;
+import com.example.imPine.model.DiaryResponse;
 import com.example.imPine.model.FollowListResponse;
 import com.example.imPine.model.Plant;
 import com.example.imPine.model.PlantResponse;
 import com.example.imPine.model.SignUpRequest;
 import com.example.imPine.model.SignUpResponse;
 import com.example.imPine.model.UserID;
+import com.example.imPine.model.UserListResponse;
 import com.example.imPine.model.UserResponse;
 
 import java.util.List;
@@ -21,6 +25,7 @@ import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ApiInterface {
     @POST("/api/user/signin")
@@ -62,6 +67,16 @@ public interface ApiInterface {
     @POST("/api/follow/{user_id}")
     Call<ResponseBody> followUser(@Header("Authorization") String authToken, @Path("user_id") int userId);
 
+    @GET("/api/diary")
+    Call<DiaryResponse> getDiaries(@Header("Authorization") String authToken);
+
+    @POST("/api/diary/")
+    Call<Diary> createDiary(@Header("Authorization") String authToken, @Body Diary diary);
+
     @POST("/predict_fcr/")
     Call<ResponseBody> predictFcrStatus(@Body RequestBody params);
+
+    @GET("/api/user/search")
+    Call<UserListResponse> searchUsers(@Header("Authorization") String authToken, @Query("username") String username);
+
 }

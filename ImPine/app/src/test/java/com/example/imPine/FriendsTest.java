@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
+import com.example.imPine.model.Friends;
+
 public class FriendsTest {
 
     private Friends friend;

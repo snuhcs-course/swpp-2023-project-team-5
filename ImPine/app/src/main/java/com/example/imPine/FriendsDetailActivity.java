@@ -19,8 +19,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.imPine.model.Diary;
+import com.example.imPine.model.DiaryAdapter;
 import com.example.imPine.model.PlantResponse;
 import com.example.imPine.network.ApiInterface;
+import com.example.imPine.network.RetrofitClient;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -173,10 +176,10 @@ public class FriendsDetailActivity extends AppCompatActivity {
 
         RecyclerView diariesRecyclerView = findViewById(R.id.diariesRecyclerView);
 
-        // Populate with some sample PineDiaries for demo purposes
-        samplePineDiaries.add(new Diary("1", "Sample Title 1", "Sample Description 1", false));
-        samplePineDiaries.add(new Diary("2", "Sample Title 2", "Sample Description 2", false));
-        samplePineDiaries.add(new Diary("3", "Sample Title 3", "Sample Description 3", false));
+//        // Populate with some sample PineDiaries for demo purposes
+//        samplePineDiaries.add(new Diary("1", "Sample Title 1", "Sample Description 1", false));
+//        samplePineDiaries.add(new Diary("2", "Sample Title 2", "Sample Description 2", false));
+//        samplePineDiaries.add(new Diary("3", "Sample Title 3", "Sample Description 3", false));
 
         DiaryAdapter diariesAdapter = new DiaryAdapter(samplePineDiaries);
         diariesRecyclerView.setAdapter(diariesAdapter);

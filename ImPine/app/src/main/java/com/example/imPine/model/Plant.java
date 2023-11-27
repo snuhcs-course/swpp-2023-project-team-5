@@ -85,7 +85,7 @@ public class Plant {
 
     // Method to format the created_at date string to "yyyy-MM-dd"
     public String getFormattedCreatedAt() {
-        // The current format of your date string
+        // The current format of date string
         SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
 
         // The desired format for the date string

@@ -20,6 +20,7 @@ import com.example.imPine.model.Plant;
 import com.example.imPine.model.PlantResponse;
 import com.example.imPine.model.UserResponse;
 import com.example.imPine.network.ApiInterface;
+import com.example.imPine.network.RetrofitClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
@@ -198,5 +199,6 @@ public class AuthLoginActivity extends AppCompatActivity {
         SharedPreferences sharedPreferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         return sharedPreferences.getString(context.getString(R.string.saved_auth_token), null);
     }
+
 
 }

@@ -1,4 +1,4 @@
-package com.example.imPine;
+package com.example.imPine.network;
 
 import com.example.imPine.network.WeatherService;
 

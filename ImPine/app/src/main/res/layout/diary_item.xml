@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
     android:background="@drawable/diary_item"
     android:padding="25dp"
     android:layout_marginBottom="15dp">
@@ -14,15 +13,28 @@
         android:layout_height="wrap_content"
         android:fontFamily="@font/short_stack"
         android:text="Title"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/lockStatus"/>
 
     <TextView
-        android:id="@+id/diary_description"
+        android:id="@+id/diary_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="@font/short_stack"
-        android:text="Description"
-        android:textAppearance="?android:attr/textAppearanceSmall" />
+        android:text="Content"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_below="@id/diary_title"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/lockStatus"
+        android:layout_marginTop="5dp"/>
 
+    <ImageView
+        android:id="@+id/lockStatus"
+        android:layout_width="40dp"
+        android:layout_height="47dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/unlock" />
 
-</LinearLayout>
+</RelativeLayout>

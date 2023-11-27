@@ -1,7 +1,7 @@
 package com.example.imPine.model;
 
 public class UserResponse {
-    private UserID user; // This should match the key "user" in your JSON
+    private UserID user;
 
     // Getter
     public UserID getUser() {

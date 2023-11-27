@@ -21,6 +21,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.bumptech.glide.Glide;
 import com.example.imPine.model.WeatherResponse;
+import com.example.imPine.network.RetrofitClient;
 import com.example.imPine.network.WeatherService;
 
 import java.util.Locale;

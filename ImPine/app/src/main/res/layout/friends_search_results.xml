@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:backgroundTint="@color/yellow">
+    android:background="@android:color/white">
 
 
     <androidx.recyclerview.widget.RecyclerView
@@ -16,8 +15,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:paddingLeft="15dp"
-        android:paddingRight="15dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         tools:listitem="@layout/friends_item"

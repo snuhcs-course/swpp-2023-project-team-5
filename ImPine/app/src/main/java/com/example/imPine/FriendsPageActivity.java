@@ -13,22 +13,24 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SearchView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.imPine.model.FollowListResponse;
+import com.example.imPine.model.FriendAdapter;
+import com.example.imPine.model.Friends;
 import com.example.imPine.network.ApiInterface;
+import com.example.imPine.network.RetrofitClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -40,6 +42,9 @@ public class FriendsPageActivity extends AppCompatActivity {
     RecyclerView friendsRecyclerView;
     FriendAdapter friendAdapter;
     List<Friends> friends = new ArrayList<>();
+    private Set<Integer> followedUserIds = new HashSet<>();
+
+
 
     private void setPineyImage(int avatarValue) {
         int drawableResourceId = getAvatarDrawableId(avatarValue);
@@ -79,11 +84,6 @@ public class FriendsPageActivity extends AppCompatActivity {
         } else {
             authTokenCallback.onTokenError(new Exception("User not logged in."));
         }
-    }
-
-    public interface AuthTokenCallback {
-        void onTokenReceived(String authToken);
-        void onTokenError(Exception e);
     }
 
     private void setupUI() {
@@ -137,47 +137,14 @@ public class FriendsPageActivity extends AppCompatActivity {
 
         friendsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         friendsRecyclerView.setAdapter(friendAdapter);
-
-        // Sample data:
-//        friends.add(new Friends("1", "Alice"));
-//        friends.add(new Friends("2","Bob"));
-//        friends.add(new Friends("3","Friend3"));
-//        friends.add(new Friends("4","Friend4"));
-//        friends.add(new Friends("5","Friend5"));
-//        friends.add(new Friends("6","Friend6"));
-//        //... add more friends
-//        friendAdapter.notifyDataSetChanged();
-
-//        ItemTouchHelper touchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
-//            @Override
-//            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-//                int fromPosition = viewHolder.getAdapterPosition();
-//                int toPosition = target.getAdapterPosition();
-//                Collections.swap(friends, fromPosition, toPosition);
-//                friendAdapter.notifyItemMoved(fromPosition, toPosition);
-//                Log.d("friendsPageActivity", "Moved!!");
-//                return true;
-//            }
-//
-//            @Override
-//            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-//                // Do nothing as we don't want swipe functionality
-//            }
-//        });
-//        touchHelper.attachToRecyclerView(friendsRecyclerView);
-
-
-        // Set up the SearchView listener:
         friendSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                // Navigate to FriendsSearchResultsActivity with the search query
                 Intent intent = new Intent(FriendsPageActivity.this, FriendsSearchResultsActivity.class);
                 intent.putExtra("SEARCH_QUERY", query);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                intent.putExtra("FOLLOWED_IDS", new ArrayList<>(followedUserIds)); // Passing the list of followed IDs
                 startActivity(intent);
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                return true; // Handled
+                return true;
             }
 
             @Override
@@ -275,8 +242,7 @@ public class FriendsPageActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Friends> newFriends = response.body().getFollows();
                     for (Friends friend : newFriends) {
-                        Log.d("FriendsPageActivity", "Friend: " + friend.getName() + ", ID: " + friend.getId() + ", Email: " + friend.getEmail());
-                        Log.d("FriendsPageActivityID", "Friend: " + friend.getName() + ", ID: " + friend.getId() + ", Email: " + friend.getEmail());
+                        followedUserIds.add(friend.getId());
                     }
                     friendAdapter.updateFriendList(newFriends);
                 }
