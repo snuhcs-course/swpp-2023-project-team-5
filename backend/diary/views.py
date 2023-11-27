@@ -8,6 +8,12 @@ from .serializers import DiarySerializer
 from s3uploader.uploader import S3ImageUploader
 
 class DiaryBasic(APIView):
+    def get(self, request):
+        user = request.user
+        diaries = Diary.objects.filter(user_id=user.id)
+        serializer = DiarySerializer(diaries, many=True)
+        return Response({"diaries": serializer.data})
+
     def post(self, request):
         user = request.user
 
