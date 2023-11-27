@@ -18,6 +18,7 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
@@ -69,6 +70,9 @@ public interface ApiInterface {
 
     @GET("/api/diary")
     Call<DiaryResponse> getDiaries(@Header("Authorization") String authToken);
+    @GET("/api/diary/user/{user_id}")
+    Call<DiaryResponse> getDiariesByUserId(@Header("Authorization") String authToken, @Path("user_id") String userId);
+
 
     @Multipart
     @POST("/api/diary/")
@@ -100,5 +104,35 @@ public interface ApiInterface {
 
     @GET("/api/user/search")
     Call<UserListResponse> searchUsers(@Header("Authorization") String authToken, @Query("username") String username);
+
+    // Fetch a diary entry
+    @GET("/api/diary/{diary_id}")
+    Call<Diary> getDiary(
+            @Header("Authorization") String authToken,
+            @Path("diary_id") String diaryId);
+
+    // Update a diary entry without image
+    @PUT("/api/diary/{diary_id}")
+    Call<ResponseBody> updateDiary(
+            @Header("Authorization") String authToken,
+            @Path("diary_id") String diaryId,
+            @Body RequestBody diary);
+
+    // Update a diary entry with image
+    @Multipart
+    @PUT("/api/diary/{diary_id}")
+    Call<ResponseBody> updateDiaryWithImage(
+            @Header("Authorization") String authToken,
+            @Path("diary_id") String diaryId,
+            @Part("title") RequestBody title,
+            @Part("content") RequestBody content,
+            @Part("isPrivate") RequestBody isPrivate,
+            @Part MultipartBody.Part image);
+
+    // Delete a diary entry
+    @DELETE("/api/diary/{diary_id}")
+    Call<ResponseBody> deleteDiary(
+            @Header("Authorization") String authToken,
+            @Path("diary_id") String diaryId);
 
 }

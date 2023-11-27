@@ -3,6 +3,7 @@ package com.example.imPine.model;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -15,6 +16,14 @@ import java.util.List;
 public class DiaryAdapter extends RecyclerView.Adapter<DiaryAdapter.DiaryViewHolder> implements DiaryObserver {
 
     private List<Diary> diaries;
+    private OnItemClickListener listener;
+    public interface OnItemClickListener {
+        void onItemClick(Diary diary);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener =  listener;
+    }
 
     public DiaryAdapter(List<Diary> diaries) {
         this.diaries = diaries;
@@ -56,6 +65,16 @@ public class DiaryAdapter extends RecyclerView.Adapter<DiaryAdapter.DiaryViewHol
         } else {
             holder.lockStatusImageView.setImageResource(R.drawable.unlock);
         }
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int adapterPosition = holder.getAdapterPosition();
+                if (listener != null && adapterPosition != RecyclerView.NO_POSITION) {
+                    listener.onItemClick(diaries.get(adapterPosition));
+                }
+            }
+        });
     }
 
 

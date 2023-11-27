@@ -49,6 +49,17 @@ public class DiaryPageActivity extends AppCompatActivity {
         // Initialize the apiService variable
         apiService = RetrofitClient.getClient().create(ApiInterface.class);
 
+        adapter.setOnItemClickListener(new DiaryAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Diary diary) {
+                Intent intent = new Intent(DiaryPageActivity.this, DiaryDetailActivity.class);
+                Log.d("DiaryID", "DiaryID: " + diary.getId());
+                intent.putExtra("DIARY_ID", diary.getId());
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
+        });
+
         fabAddDiary = findViewById(R.id.fab_add_item);
         fabAddDiary.setOnClickListener(view -> {
             // Start DiaryNewActivity for result

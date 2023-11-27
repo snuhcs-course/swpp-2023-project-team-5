@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.imPine.model.Diary;
 import com.example.imPine.model.DiaryAdapter;
+import com.example.imPine.model.DiaryResponse;
 import com.example.imPine.model.PlantResponse;
 import com.example.imPine.network.ApiInterface;
 import com.example.imPine.network.RetrofitClient;
@@ -41,6 +42,34 @@ public class FriendsDetailActivity extends AppCompatActivity {
 
     private TextView friendDetailName;
     private List<Diary> samplePineDiaries = new ArrayList<>();
+    private ApiInterface apiService;
+
+    private void fetchAndDisplayDiaries(String userId) {
+        String authToken = AuthLoginActivity.getAuthToken(this);
+        apiService.getDiariesByUserId(authToken, userId).enqueue(new Callback<DiaryResponse>() {
+            @Override
+            public void onResponse(Call<DiaryResponse> call, Response<DiaryResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Diary> diaries = response.body().getDiaries();
+                    updateDiariesRecyclerView(diaries);
+                } else {
+                    Toast.makeText(FriendsDetailActivity.this, "Failed to load diaries.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DiaryResponse> call, Throwable t) {
+                Toast.makeText(FriendsDetailActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void updateDiariesRecyclerView(List<Diary> diaries) {
+        RecyclerView diariesRecyclerView = findViewById(R.id.diariesRecyclerView);
+        DiaryAdapter diariesAdapter = new DiaryAdapter(diaries);
+        diariesRecyclerView.setAdapter(diariesAdapter);
+        diariesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+    }
 
     private int calculateDaysOld(String createdDateStr) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -102,6 +131,8 @@ public class FriendsDetailActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.friends_detail);
+        // Initialize the apiService here
+        apiService = RetrofitClient.getClient().create(ApiInterface.class);
 
 
         friendDetailName = findViewById(R.id.friendDetailName);
@@ -110,6 +141,9 @@ public class FriendsDetailActivity extends AppCompatActivity {
         if (intent != null && intent.hasExtra("ID")) {
             int id = intent.getIntExtra("ID", 0);
             String friendName = intent.getStringExtra("friendName");
+
+            fetchAndDisplayDiaries(Integer.toString(id));
+
             // Get Retrofit instance
             Retrofit retrofit = RetrofitClient.getClient();
 
