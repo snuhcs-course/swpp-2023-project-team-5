@@ -7,6 +7,7 @@ class Diary(models.Model):
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     content = models.TextField()
+    category = models.CharField(max_length=100, default="happy")
     image_src = models.CharField(max_length=500, null=True)
     is_private = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
