@@ -30,18 +30,18 @@
         android:layout_alignParentStart="true"
         android:layout_toStartOf="@+id/lockStatus"
         android:layout_marginTop="5dp"/>
-<!--    <TextView-->
-<!--        android:id="@+id/diary_category"-->
-<!--        android:paddingStart="10dp"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:fontFamily="@font/short_stack"-->
-<!--        android:text="Category"-->
-<!--        android:textAppearance="?android:attr/textAppearanceSmall"-->
-<!--        android:layout_below="@id/diary_content"-->
-<!--        android:layout_alignParentStart="true"-->
-<!--        android:layout_toStartOf="@+id/lockStatus"-->
-<!--        android:layout_marginTop="5dp"/>-->
+    <TextView
+        android:id="@+id/diary_category"
+        android:paddingStart="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/short_stack"
+        android:text="Category"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_below="@id/diary_content"
+        android:layout_alignParentStart="true"
+        android:layout_toStartOf="@+id/lockStatus"
+        android:layout_marginTop="5dp"/>
 
     <ImageView
         android:id="@+id/lockStatus"

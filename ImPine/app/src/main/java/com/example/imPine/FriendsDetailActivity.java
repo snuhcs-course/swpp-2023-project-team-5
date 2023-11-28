@@ -8,9 +8,11 @@ import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.imPine.model.Diary;
 import com.example.imPine.model.DiaryAdapter;
+import com.example.imPine.model.DiaryData;
 import com.example.imPine.model.DiaryResponse;
 import com.example.imPine.model.PlantResponse;
 import com.example.imPine.network.ApiInterface;
@@ -44,8 +47,13 @@ import retrofit2.Retrofit;
 public class FriendsDetailActivity extends AppCompatActivity {
 
     private TextView friendDetailName;
-    private List<Diary> samplePineDiaries = new ArrayList<>();
+
     private ApiInterface apiService;
+
+    private DiaryAdapter adapter;
+    private RecyclerView recyclerView;
+
+
 
     private void fetchAndDisplayDiaries(String userId) {
         String authToken = AuthLoginActivity.getAuthToken(this);
@@ -68,10 +76,18 @@ public class FriendsDetailActivity extends AppCompatActivity {
     }
 
     private void updateDiariesRecyclerView(List<Diary> diaries) {
-        RecyclerView diariesRecyclerView = findViewById(R.id.diariesRecyclerView);
         DiaryAdapter diariesAdapter = new DiaryAdapter(diaries);
-        diariesRecyclerView.setAdapter(diariesAdapter);
-        diariesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(diariesAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        diariesAdapter.setOnItemClickListener(new DiaryAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Diary diary) {
+                Intent intent = new Intent(FriendsDetailActivity.this, FriendDiaryDetailActivity.class);
+                intent.putExtra("DIARY_ID", diary.getId());
+                startActivity(intent);
+            }
+        });
     }
 
     private int calculateDaysOld(String createdDateStr) {
@@ -134,8 +150,26 @@ public class FriendsDetailActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.friends_detail);
-        // Initialize the apiService here
+
+        recyclerView = findViewById(R.id.diariesRecyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        adapter = new DiaryAdapter(new ArrayList<>());
+        recyclerView.setAdapter(adapter);
+
+        // Initialize the apiService variable
         apiService = RetrofitClient.getClient().create(ApiInterface.class);
+
+        adapter.setOnItemClickListener(new DiaryAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Diary diary) {
+                Intent intent = new Intent(FriendsDetailActivity.this, FriendDiaryDetailActivity.class);
+                Log.d("DiaryID", "DiaryID: " + diary.getId());
+                intent.putExtra("DIARY_ID", diary.getId());
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
+        });
 
 
         friendDetailName = findViewById(R.id.friendDetailName);
@@ -209,19 +243,6 @@ public class FriendsDetailActivity extends AppCompatActivity {
             finish();
             showToast("Friends details not available.");
         }
-
-
-        RecyclerView diariesRecyclerView = findViewById(R.id.diariesRecyclerView);
-
-//        // Populate with some sample PineDiaries for demo purposes
-//        samplePineDiaries.add(new Diary("1", "Sample Title 1", "Sample Description 1", false));
-//        samplePineDiaries.add(new Diary("2", "Sample Title 2", "Sample Description 2", false));
-//        samplePineDiaries.add(new Diary("3", "Sample Title 3", "Sample Description 3", false));
-
-        DiaryAdapter diariesAdapter = new DiaryAdapter(samplePineDiaries);
-        diariesRecyclerView.setAdapter(diariesAdapter);
-        diariesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
 
         ImageView pineappleAvatar = findViewById(R.id.pineappleAvatar);
 
