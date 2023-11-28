@@ -3,6 +3,7 @@ import com.example.imPine.model.Diary;
 import com.example.imPine.model.DiaryAdapter;
 import com.example.imPine.model.DiaryGetResponse;
 import com.example.imPine.model.DiaryResponse;
+import com.example.imPine.model.DiseaseResponse;
 import com.example.imPine.model.FollowListResponse;
 import com.example.imPine.model.Plant;
 import com.example.imPine.model.PlantResponse;
@@ -95,16 +96,7 @@ public interface ApiInterface {
             @Body Diary diary);
 
 
-
-//    @Multipart
-//    @POST("/api/diary/")
-//    Call<ResponseBody> createDiary(
-//            @Header("Authorization") String authToken,
-//            @Part("diary") RequestBody diary,  // Serialized Diary object
-//            @Part MultipartBody.Part image     // Image file
-//    );
-
-    @POST("/predict_fcr/")
+    @POST("/api/disease")
     Call<ResponseBody> predictFcrStatus(@Body RequestBody params);
 
     @GET("/api/user/search")
@@ -150,4 +142,15 @@ public interface ApiInterface {
     Call<ResponseBody> unfollowUser(
             @Header("Authorization") String authToken,
             @Path("user_id") int userId);
+
+    @FormUrlEncoded
+    @POST("/api/disease")
+    Call<DiseaseResponse> getFCR(
+            @Header("Authorization") String authToken,
+            @Field("T_mean") double temperature,
+            @Field("Wind_speed") double wind,
+            @Field("Rain") double rain,
+            @Field("Humidity") int humidity,
+            @Field("Cloud") int could
+    );
 }

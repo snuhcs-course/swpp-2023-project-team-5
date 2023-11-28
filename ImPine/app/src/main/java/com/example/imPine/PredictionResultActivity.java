@@ -7,12 +7,16 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.imPine.model.DiseaseResponse;
 import com.example.imPine.network.ApiInterface;
+import com.example.imPine.network.RetrofitClient;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,6 +31,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class PredictionResultActivity extends AppCompatActivity {
+    private double fcr;
 
     private SpannableString getFcrPreventionTips(double fcrPercentage, double temperature, double rain, int humidity, int cloud, double wind) {
         SpannableStringBuilder tips = new SpannableStringBuilder();
@@ -75,6 +80,7 @@ public class PredictionResultActivity extends AppCompatActivity {
         builder.setSpan(new StyleSpan(Typeface.BOLD), start, start + text.length(), SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
+    // !!for testing
     public static double predict(double T_mean, double Wind_speed, double Rain, int Humidity, int Cloud) {
         // Coefficients from the regression output
         double intercept = 0.038898012;
@@ -113,64 +119,68 @@ public class PredictionResultActivity extends AppCompatActivity {
         });
 
         Intent intent = getIntent();
-        // Retrieve the weather values
-        double temperature = intent.getDoubleExtra("temperatureValue", 0.0); // Default to 0.0
-        double wind = intent.getDoubleExtra("windValue", 0.0); // Default to 0.0
-        double rain = intent.getDoubleExtra("rainValue", 0.0); // Default to 0.0
-        int humidity = intent.getIntExtra("humidityValue", 0); // Default to 0
-        int cloud = intent.getIntExtra("cloudValue", 0); // Default to 0
+        double temperature = intent.getDoubleExtra("temperatureValue", 0.0);
+        double wind = intent.getDoubleExtra("windValue", 0.0);
+        double rain = intent.getDoubleExtra("rainValue", 0.0);
+        int humidity = intent.getIntExtra("humidityValue", 0);
+        int cloud = intent.getIntExtra("cloudValue", 0);
 
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("T_mean", temperature);
+            jsonObject.put("Wind_speed", wind);
+            jsonObject.put("Rain", rain);
+            jsonObject.put("Humidity", humidity);
+            jsonObject.put("Cloud", cloud);
+            Log.d("PredictionResultActivityWW", "JSON for API call: " + jsonObject.toString());
+        } catch (JSONException e) {
+            Log.e("PredictionResultActivityWW", "JSON Exception: ", e);
+        }
 
-        double fcr = predict(temperature, wind, rain, humidity, cloud) * 100;
-        SpannableString fcrTips = getFcrPreventionTips(fcr, temperature, rain, humidity, cloud, wind);
-        // Display the formatted FCR percentage and tips
-        TextView textViewTips = findViewById(R.id.tip);
-        textViewTips.setText(fcrTips);
+        RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), jsonObject.toString());
 
-        TextView textViewResult = findViewById(R.id.result);
-        String formattedFcr = String.format(Locale.getDefault(), "%.2f%%", fcr);
+        ApiInterface apiService = RetrofitClient.getClient().create(ApiInterface.class);
+        String authToken = AuthLoginActivity.getAuthToken(this);
+        Call<DiseaseResponse> call = apiService.getFCR("Bearer: " + authToken, temperature, wind, rain, humidity, cloud);
 
-        setBoldLabel(textViewResult, "Result: ", formattedFcr);
+        call.enqueue(new Callback<DiseaseResponse>() {
+            @Override
+            public void onResponse(Call<DiseaseResponse> call, Response<DiseaseResponse> response) {
+                if (response.isSuccessful()) {
+                    fcr = response.body().getResult() * 100;
+                    Log.d("PredictionResultActivityWW", "API Response: " + fcr);
 
-//        // Create a new JSONObject and put the float values into it
-//        JSONObject jsonObject = new JSONObject();
-//        try {
-//            jsonObject.put("Rain", rain);
-//            jsonObject.put("T_mean", temperature);
-//            jsonObject.put("Humidity", humidity);
-//            jsonObject.put("Cloud", cloud);
-//            jsonObject.put("Wind", wind);
-//            // Add other parameters as needed
-//        } catch (JSONException e) {
-//            e.printStackTrace();  // Handle the exception
-//        }
+                    TextView textViewResult = findViewById(R.id.result);
+                    String formattedFcr = String.format(Locale.getDefault(), "%.2f%%", fcr);
+                    setBoldLabel(textViewResult, "Result: ", formattedFcr);
+
+                    SpannableString fcrTips = getFcrPreventionTips(fcr, temperature, rain, humidity, cloud, wind);
+                    TextView textViewTips = findViewById(R.id.tip);
+                    textViewTips.setText(fcrTips);
+
+                } else {
+                    Log.e("PredictionResultActivityWW", "API call not successful. Response code: " + response.code());
+                    Toast.makeText(PredictionResultActivity.this, "Failed to get prediction", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DiseaseResponse> call, Throwable t) {
+                Log.e("PredictionResultActivityWW", "API call failed: ", t);
+                Toast.makeText(PredictionResultActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+
+//        SpannableString fcrTips = getFcrPreventionTips(fcr, temperature, rain, humidity, cloud, wind);
 //
-//        RequestBody body = RequestBody.create(jsonObject.toString(), okhttp3.MediaType.parse("application/json; charset=utf-8"));
-//        ApiInterface apiInterface = RetrofitClient.getClient().create(ApiInterface.class);
+//        // Display the formatted FCR percentage and tips
+//        TextView textViewTips = findViewById(R.id.tip);
+//        textViewTips.setText(fcrTips);
 //
-//        Call<ResponseBody> call = apiInterface.predictFcrStatus(body);
-//        call.enqueue(new Callback<ResponseBody>() {
-//            @Override
-//            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-//                if (response.isSuccessful()) {
-//                    // Handle response
-//                    String fcrStatus = null;
-//                    try {
-//                        fcrStatus = response.body().string();
-//                        TextView textViewResult = findViewById(R.id.result);
-//                        textViewResult.setText(fcrStatus);
-//                        // Parse fcrStatus as needed
-//                    } catch (IOException e) {
-//                        throw new RuntimeException(e);
-//                    }
-//                }
-//            }
+//        TextView textViewResult = findViewById(R.id.result);
+//        String formattedFcr = String.format(Locale.getDefault(), "%.2f%%", fcr);
 //
-//            @Override
-//            public void onFailure(Call<ResponseBody> call, Throwable t) {
-//                // Handle failure
-//            }
-//        });
+//        setBoldLabel(textViewResult, "Result: ", formattedFcr);
 
     }
 

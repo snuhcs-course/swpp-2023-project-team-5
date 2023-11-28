@@ -12,4 +12,5 @@ public class PlantResponse {
     public void setPlants(List<Plant> plants) {
         this.plants = plants;
     }
+
 }
