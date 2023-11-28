@@ -25,7 +25,9 @@ public class TutorialActivity extends AppCompatActivity {
                 + "<b>7. Fertilizing:</b> Feed your pineapple plant with a balanced fertilizer every few months.<br><br>"
                 + "<b>8. Patience:</b> It can take up to 2-3 years for a pineapple plant to produce fruit. Be patient and enjoy the process!<br><br>"
                 + "<b>9. Harvesting:</b> When the pineapple is big, golden, and gives off a sweet aroma, it's ready to harvest.<br><br>"
-                + "Remember, growing a pineapple can be a fun and rewarding experience. Enjoy your gardening journey!";
+                + "<b>Watch Out for FCR:</b> Be aware of Fusarium Crown Rot (FCR), a common disease in pineapples. It can cause the fruit's core to rot, affecting the health and yield of your plant. Our app includes a prediction model that assesses the likelihood of your pineapple getting FCR, helping you take preventative measures. Stay informed and proactive for a healthy pineapple harvest!<br><br>"
+                + "Remember, growing a pineapple can be a fun and rewarding experience. Enjoy your journey with your friends!";
+
 
         textViewTutorialContent.setText(Html.fromHtml(htmlText));
 

@@ -210,7 +210,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/short_stack"
-            android:text="Saving your pineapple!\n\n This process will take about 10 seconds..."
+            android:text="Creating your diary!\n\n This process will take about 10 seconds..."
             android:textAlignment="center"
             android:textSize="25dp"
             android:textStyle="bold" />

@@ -62,4 +62,43 @@
         android:src="@drawable/back"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:background="@color/yellow"
+        android:visibility="gone"
+        android:id="@+id/loadingPanel">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true" />
+
+        <ImageView
+            android:id="@+id/pineappleImage"
+            android:layout_width="182dp"
+            android:layout_height="181dp"
+            android:layout_above="@+id/loadingText"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="66dp"
+
+            android:src="@drawable/pine" />
+
+        <TextView
+            android:id="@+id/loadingText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Predicting FCR disease percentage!\n\n This process will take about 10 seconds..."
+            android:textSize="25dp"
+            android:fontFamily="@font/short_stack"
+            android:textStyle="bold"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/progressBar"
+            android:layout_marginTop="16dp"
+            android:textAlignment="center" />
+    </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

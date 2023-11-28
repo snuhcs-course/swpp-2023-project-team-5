@@ -8,7 +8,9 @@ import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.style.StyleSpan;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +34,15 @@ import retrofit2.Response;
 
 public class PredictionResultActivity extends AppCompatActivity {
     private double fcr;
+    private RelativeLayout loadingPanel;
+
+    private void showProgressBar() {
+        loadingPanel.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressBar() {
+        loadingPanel.setVisibility(View.GONE);
+    }
 
     private SpannableString getFcrPreventionTips(double fcrPercentage, double temperature, double rain, int humidity, int cloud, double wind) {
         SpannableStringBuilder tips = new SpannableStringBuilder();
@@ -109,7 +120,8 @@ public class PredictionResultActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.prediction_result_page);
-
+        loadingPanel = findViewById(R.id.loadingPanel);
+        showProgressBar();
         ImageView backButton = findViewById(R.id.backButton); // Get the "Back" button by ID
 
         backButton.setOnClickListener(v -> {
@@ -137,8 +149,6 @@ public class PredictionResultActivity extends AppCompatActivity {
             Log.e("PredictionResultActivityWW", "JSON Exception: ", e);
         }
 
-        RequestBody requestBody = RequestBody.create(okhttp3.MediaType.parse("application/json; charset=utf-8"), jsonObject.toString());
-
         ApiInterface apiService = RetrofitClient.getClient().create(ApiInterface.class);
         String authToken = AuthLoginActivity.getAuthToken(this);
         Call<DiseaseResponse> call = apiService.getFCR("Bearer: " + authToken, temperature, wind, rain, humidity, cloud);
@@ -147,6 +157,7 @@ public class PredictionResultActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<DiseaseResponse> call, Response<DiseaseResponse> response) {
                 if (response.isSuccessful()) {
+                    hideProgressBar();
                     fcr = response.body().getResult() * 100;
                     Log.d("PredictionResultActivityWW", "API Response: " + fcr);
 
@@ -159,6 +170,7 @@ public class PredictionResultActivity extends AppCompatActivity {
                     textViewTips.setText(fcrTips);
 
                 } else {
+                    hideProgressBar();
                     Log.e("PredictionResultActivityWW", "API call not successful. Response code: " + response.code());
                     Toast.makeText(PredictionResultActivity.this, "Failed to get prediction", Toast.LENGTH_SHORT).show();
                 }
@@ -166,22 +178,11 @@ public class PredictionResultActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<DiseaseResponse> call, Throwable t) {
+                hideProgressBar();
                 Log.e("PredictionResultActivityWW", "API call failed: ", t);
                 Toast.makeText(PredictionResultActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
-//        SpannableString fcrTips = getFcrPreventionTips(fcr, temperature, rain, humidity, cloud, wind);
-//
-//        // Display the formatted FCR percentage and tips
-//        TextView textViewTips = findViewById(R.id.tip);
-//        textViewTips.setText(fcrTips);
-//
-//        TextView textViewResult = findViewById(R.id.result);
-//        String formattedFcr = String.format(Locale.getDefault(), "%.2f%%", fcr);
-//
-//        setBoldLabel(textViewResult, "Result: ", formattedFcr);
-
     }
 
 

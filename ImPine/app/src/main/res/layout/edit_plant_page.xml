@@ -216,7 +216,7 @@
             android:id="@+id/loadingText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Saving your pineapple!\n\n This process will take about 10 seconds..."
+            android:text="Editing your pineapple!\n\n This process will take about 10 seconds..."
             android:textSize="25dp"
             android:fontFamily="@font/short_stack"
             android:textStyle="bold"
