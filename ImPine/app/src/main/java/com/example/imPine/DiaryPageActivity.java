@@ -1,8 +1,10 @@
 package com.example.imPine;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
@@ -72,7 +74,24 @@ public class DiaryPageActivity extends AppCompatActivity {
         homeButton = findViewById(R.id.home);
         predictionButton = findViewById(R.id.prediction);
         friendButton = findViewById(R.id.friend);
-        outButton = findViewById(R.id.logOut);
+        // Logout button click
+        ImageButton outButton = findViewById(R.id.logOut);
+        outButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new AlertDialog.Builder(DiaryPageActivity.this)
+                        .setTitle("Logout Confirmation")
+                        .setMessage("Do you really want to logout?")
+                        .setPositiveButton(android.R.string.yes, (dialog, whichButton) -> {
+                            // Handle the logout logic here
+                            Intent intent = new Intent(DiaryPageActivity.this, AuthLoginActivity.class);
+                            startActivity(intent);
+                            finish();
+                        })
+                        .setNegativeButton(android.R.string.no, null).show();
+            }
+        });
+
 
         setPineyImage(HomePageActivity.avatarFromHome);
 
@@ -120,10 +139,6 @@ public class DiaryPageActivity extends AppCompatActivity {
         homeButton.setOnClickListener(view -> navigateTo(HomePageActivity.class));
         predictionButton.setOnClickListener(view -> navigateTo(PredictionPageActivity.class));
         friendButton.setOnClickListener(view -> navigateTo(FriendsPageActivity.class));
-        outButton.setOnClickListener(view -> {
-            navigateTo(AuthLoginActivity.class);
-            finish();
-        });
     }
 
     private void navigateTo(Class<?> destination) {

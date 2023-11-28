@@ -66,8 +66,9 @@ public class Diary {
             return this;
         }
 
-        public void setCategory(String category) {
+        public Builder setCategory(String category) {
             this.category = category;
+            return this;
         }
 
         public Builder setImageSrc(String imageSrc) {

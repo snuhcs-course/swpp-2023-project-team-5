@@ -189,6 +189,7 @@ public class DiaryNewActivity extends AppCompatActivity {
             RequestBody titlePart = RequestBody.create(MediaType.parse("multipart/form-data"), title);
             RequestBody contentPart = RequestBody.create(MediaType.parse("multipart/form-data"), content);
             RequestBody isPrivatePart = RequestBody.create(MediaType.parse("multipart/form-data"), String.valueOf(isPrivate));
+            RequestBody categoryPart = RequestBody.create(MediaType.parse("multipart/form-data"), category);
 
             // Check if an image was captured
             MultipartBody.Part body = null;
@@ -202,6 +203,7 @@ public class DiaryNewActivity extends AppCompatActivity {
                 .setTitle(title)
                 .setContent(content)
                 .setIsPrivate(isPrivate)
+                .setCategory(category)
                 .build();
 
 
@@ -210,7 +212,7 @@ public class DiaryNewActivity extends AppCompatActivity {
             if (body != null) {
                 // Show loading panel
                 showProgressBar();
-                call = apiService.createDiary(authToken, titlePart, contentPart, isPrivatePart, body);
+                call = apiService.createDiary(authToken, titlePart, contentPart, isPrivatePart, categoryPart, body);
             } else {
                 // Show loading panel
                 showProgressBar();

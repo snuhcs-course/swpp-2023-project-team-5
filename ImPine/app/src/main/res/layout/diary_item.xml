@@ -4,51 +4,55 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/diary_item"
-    android:padding="25dp"
     android:layout_marginBottom="15dp">
 
     <TextView
-        android:id="@+id/diary_title"
-        android:paddingStart="10dp"
+        android:id="@+id/diary_category"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="15dp"
+        android:padding="4dp"
+        android:background="@drawable/rectangle_background"
+        android:backgroundTint="@color/darkblue"
         android:fontFamily="@font/short_stack"
-        android:text="Title"
-        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Category"
+        android:textColor="@color/black"
+        android:textSize="8dp" />
+
+    <TextView
+        android:id="@+id/diary_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/diary_category"
         android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/lockStatus"/>
+        android:layout_marginLeft="20dp"
+        android:fontFamily="@font/short_stack"
+        android:paddingStart="10dp"
+        android:text="Title"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
         android:id="@+id/diary_content"
-        android:paddingStart="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:fontFamily="@font/short_stack"
-        android:text="Content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
         android:layout_below="@id/diary_title"
         android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/lockStatus"
-        android:layout_marginTop="5dp"/>
-    <TextView
-        android:id="@+id/diary_category"
-        android:paddingStart="10dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="15dp"
         android:fontFamily="@font/short_stack"
-        android:text="Category"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:layout_below="@id/diary_content"
-        android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/lockStatus"
-        android:layout_marginTop="5dp"/>
+        android:paddingStart="10dp"
+        android:text="Content"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
     <ImageView
         android:id="@+id/lockStatus"
-        android:layout_width="40dp"
-        android:layout_height="47dp"
+        android:layout_width="60dp"
+        android:layout_height="58dp"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
+        android:layout_marginRight="30dp"
         android:src="@drawable/unlock" />
 
 </RelativeLayout>

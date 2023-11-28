@@ -82,7 +82,6 @@ public class EditPlantActivity extends AppCompatActivity {
     private void hideProgressBar() {
         loadingPanel.setVisibility(View.GONE);
     }
-
     private ActivityResultCallback<ActivityResult> cameraResultCallback = new ActivityResultCallback<ActivityResult>() {
         @Override
         public void onActivityResult(ActivityResult result) {

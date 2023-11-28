@@ -20,6 +20,8 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.HTTP;
 import retrofit2.http.Header;
@@ -83,6 +85,7 @@ public interface ApiInterface {
             @Part("title") RequestBody title,
             @Part("content") RequestBody content,
             @Part("is_private") RequestBody isPrivate,
+            @Part("category") RequestBody category,
             @Part MultipartBody.Part image
     );
 
@@ -114,25 +117,30 @@ public interface ApiInterface {
             @Path("diary_id") String diaryId);
 
     // Update a diary entry without image
-    @PUT("/api/diary/{diary_id}")
-    Call<ResponseBody> updateDiary(
+    @FormUrlEncoded
+    @PUT("/api/diary/")
+    Call<ResponseBody> updateDiaryWithoutImage(
             @Header("Authorization") String authToken,
-            @Path("diary_id") String diaryId,
-            @Body RequestBody diary);
+            @Field("title") String title,
+            @Field("content") String content,
+            @Field("is_private") boolean isPrivate,
+            @Field("category") String category,
+            @Field("diary_id") int diaryId
+    );
 
     // Update a diary entry with image
     @Multipart
-    @PUT("/api/diary/{diary_id}")
+    @PUT("/api/diary/")
     Call<ResponseBody> updateDiaryWithImage(
             @Header("Authorization") String authToken,
-            @Path("diary_id") String diaryId,
+            @Part("diary_id") RequestBody diaryId,
             @Part("title") RequestBody title,
             @Part("content") RequestBody content,
-            @Part("isPrivate") RequestBody isPrivate,
+            @Part("is_private") RequestBody isPrivate,
+            @Part("category") RequestBody category,
             @Part MultipartBody.Part image);
 
     // Delete a diary entry
-    // Custom method to handle DELETE request with a body
     @HTTP(method = "DELETE", path = "/api/diary/", hasBody = true)
     Call<ResponseBody> deleteDiaryWithBody(
             @Header("Authorization") String authToken,

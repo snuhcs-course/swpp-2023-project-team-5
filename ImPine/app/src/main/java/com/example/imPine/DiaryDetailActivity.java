@@ -1,20 +1,39 @@
 package com.example.imPine;
 
+import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.icu.text.SimpleDateFormat;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import com.bumptech.glide.Glide;
 import com.example.imPine.model.Diary;
@@ -23,9 +42,17 @@ import com.example.imPine.network.ApiInterface;
 import com.example.imPine.network.RetrofitClient;
 import com.google.gson.Gson;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Date;
+import java.util.Locale;
 
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -33,41 +60,76 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class DiaryDetailActivity extends AppCompatActivity {
-
+    private ActivityResultLauncher<Intent> cameraLauncher;
     private EditText titleEditText, contentEditText;
     private Button editButton, deleteButton;
     private ImageView imageView;
     private Spinner categorySpinner;
-
+    private boolean imageChanged = false;
+    private String currentPhotoPath;
+    private RelativeLayout loadingPanel;
+    private Uri imageUri;
+    private boolean newPrivate;
+    private boolean priv;
+    private String category;
+    private String newCategory;
+    private String title;
+    private String newTitle;
+    private String content;
+    private String newContent;
+    private String src;
+    private String newSrc;
     private ApiInterface apiService;
     private int diaryId;
-    private Diary originalDiary;
     private Button publicButton, privateButton;
-    private String category;
+    private void showProgressBar() {
+        loadingPanel.setVisibility(View.VISIBLE);
+    }
+
+    private void hideProgressBar() {
+        loadingPanel.setVisibility(View.GONE);
+    }
+
+    private ActivityResultCallback<ActivityResult> cameraResultCallback = new ActivityResultCallback<ActivityResult>() {
+        @Override
+        public void onActivityResult(ActivityResult result) {
+            if (result.getResultCode() == RESULT_OK) {
+                // Image captured successfully
+                Glide.with(DiaryDetailActivity.this).load(imageUri).into(imageView);
+                imageChanged = true; // Set the flag to true as the image has changed
+            } else {
+                Log.e("DiaryDetailActivity", "Image capture failed or cancelled");
+            }
+        }
+    };
+
 
     private void initializeCategorySpinner(String selectedCategory) {
         String[] categories = {"Happy", "Sad", "Angry", "Loving", "Grateful"};
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, R.id.spinner_item_text, categories);
         categorySpinner.setAdapter(adapter);
-        // Set the spinner to the selected category
+
         int spinnerPosition = adapter.getPosition(selectedCategory);
         categorySpinner.setSelection(spinnerPosition);
+        this.newCategory = selectedCategory; // Initialize newCategory with the current category
 
         categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                category = categories[position];
+                newCategory = categories[position];
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                category = "Happy";
+                newCategory = category;
             }
         });
     }
 
     private void initializePrivacyButton(boolean isPrivate) {
         ImageView lockImage = findViewById(R.id.lock);
+        this.newPrivate = isPrivate; // Initialize newPrivate with the current privacy status
+
         if (isPrivate) {
             privateButton.setBackgroundColor(getResources().getColor(R.color.darkblue));
             publicButton.setBackgroundColor(getResources().getColor(android.R.color.transparent));
@@ -77,11 +139,45 @@ public class DiaryDetailActivity extends AppCompatActivity {
             privateButton.setBackgroundColor(getResources().getColor(android.R.color.transparent));
             lockImage.setImageResource(R.drawable.unlock);
         }
+
+        privateButton.setOnClickListener(v -> {
+            newPrivate = true;
+            lockImage.setImageResource(R.drawable.lock);
+            privateButton.setBackgroundColor(getResources().getColor(R.color.darkblue));
+            publicButton.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        });
+
+        publicButton.setOnClickListener(v -> {
+            newPrivate = false;
+            lockImage.setImageResource(R.drawable.unlock);
+            publicButton.setBackgroundColor(getResources().getColor(R.color.darkblue));
+            privateButton.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        });
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.diary_detail);
+        ScrollView mainLayout = findViewById(R.id.mainLayout);
+
+        mainLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (getCurrentFocus() != null) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                    getCurrentFocus().clearFocus(); // Optional: Clear focus from the current EditText
+                }
+                return false;
+            }
+        });
+
+        cameraLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(), cameraResultCallback);
+        findViewById(R.id.btn_take_picture).setOnClickListener(v -> takePicture());
+        // Initialize the loadingPanel
+        loadingPanel = findViewById(R.id.loadingPanel);
 
         // Initialize UI components
         titleEditText = findViewById(R.id.titleEditText);
@@ -90,6 +186,8 @@ public class DiaryDetailActivity extends AppCompatActivity {
         deleteButton = findViewById(R.id.deleteButton);
         imageView = findViewById(R.id.imageView);
         categorySpinner = findViewById(R.id.categorySpinner);
+        publicButton = findViewById(R.id.publicButton);
+        privateButton = findViewById(R.id.privateButton);
 
         // API Service Initialization
         apiService = RetrofitClient.getClient().create(ApiInterface.class);
@@ -112,7 +210,6 @@ public class DiaryDetailActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     Log.e("DiaryDetailActivity", "Success");
                     Diary diary = response.body().getDiary();
-                    originalDiary = diary;
 
                     // Logging the diary details
                     Log.d("DiaryDetailActivity", "Title: " + diary.getTitle());
@@ -120,17 +217,24 @@ public class DiaryDetailActivity extends AppCompatActivity {
                     Log.d("DiaryDetailActivity", "Private: " + diary.getIsPrivate());
                     Log.d("DiaryDetailActivity", "Category: " + diary.getCategory());
                     Log.d("DiaryDetailActivity", "SRC: " + diary.getImage_src());
-                    if (diary.getImage_src() != null) {
-                        Log.d("DiaryDetailActivity", "Image URL: " + diary.getImage_src());
-                        loadImage(imageView, diary.getImage_src());
+                    src = diary.getImage_src();
+                    if (src!= null) {
+                        Log.d("DiaryDetailActivity", "Image URL: " + src);
+                        loadImage(imageView, src);
                     }
 
                     // Set the UI components with the diary details
-                    titleEditText.setText(diary.getTitle());
-                    contentEditText.setText(diary.getContent());
-//
-//                 initializeCategorySpinner(diary.getCategory());
-//                 initializePrivacyButton(diary.getIsPrivate());
+                    title = diary.getTitle();
+                    content = diary.getContent();
+
+                    titleEditText.setText(title);
+                    contentEditText.setText(content);
+
+                    category = diary.getCategory();
+                    priv = diary.getIsPrivate();
+
+                 initializeCategorySpinner(category);
+                 initializePrivacyButton(priv);
 
                 } else {
                     Log.e("DiaryDetailActivity", "Failed to load diary. Response code: " + response.code());
@@ -160,24 +264,131 @@ public class DiaryDetailActivity extends AppCompatActivity {
     private void setupEditButton() {
         editButton.setOnClickListener(v -> {
             if (hasChanges()) {
-                updateDiary();
+                if (imageChanged) {
+                    updateDiaryWithImage(imageUri);
+                }
+                else updateDiaryWithoutImage();
             } else {
                 Toast.makeText(this, "No changes to be made", Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
     }
 
     private boolean hasChanges() {
-        if (!originalDiary.getTitle().equals(titleEditText.getText().toString())) return true;
-        if (!originalDiary.getContent().equals(contentEditText.getText().toString())) return true;
+        newTitle = titleEditText.getText().toString();
+        newContent = contentEditText.getText().toString();
+        // Compare strings properly using .equals() instead of !=
+        boolean titleChanged = !newTitle.equals(title);
+        boolean contentChanged = !newContent.equals(content);
+        boolean categoryChanged = !newCategory.equals(category);
+        boolean privacyChanged = (newPrivate != priv);
 
-        return false;
+        return titleChanged || contentChanged || categoryChanged || privacyChanged || imageChanged;
     }
 
-    private void updateDiary() {
-        // Implement the logic to update the diary
-        // Check if the image has changed and call either updateDiary or updateDiaryWithImage
+    private void updateDiaryWithoutImage() {
+        String authToken = AuthLoginActivity.getAuthToken(this);
+        Diary updatedDiary = new Diary.Builder()
+                .setTitle(newTitle)
+                .setContent(newContent)
+                .setIsPrivate(newPrivate)
+                .setCategory(newCategory)
+                .build();
+
+        apiService.updateDiaryWithoutImage(
+                "Bearer " + authToken,
+                updatedDiary.getTitle(),
+                updatedDiary.getContent(),
+                updatedDiary.getIsPrivate(),
+                updatedDiary.getCategory(),
+                diaryId
+        ).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(DiaryDetailActivity.this, "Diary updated successfully", Toast.LENGTH_SHORT).show();
+                    // Handle successful update here
+                    finish();
+                } else {
+                    Toast.makeText(DiaryDetailActivity.this, "Failed to update diary", Toast.LENGTH_SHORT).show();
+                    finish();
+                    // Log error details
+                    Log.e("UpdateError", "Response Code: " + response.code());
+                    try {
+                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "Error body is null";
+                        Log.e("UpdateError", "Response Error Body: " + errorBody +"Diaryid: " + diaryId);
+                    } catch (IOException e) {
+                        Log.e("UpdateError", "Error while reading error body", e);
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(DiaryDetailActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                // Log network or other errors
+                finish();
+                Log.e("UpdateFailure", "Error: ", t);
+            }
+        });
     }
+
+
+    private void updateDiaryWithImage(Uri imageUri) {
+        String authToken = AuthLoginActivity.getAuthToken(this);
+
+        // Create RequestBody instances for each part
+        RequestBody diaryIdPart = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(diaryId));
+        RequestBody titlePart = RequestBody.create(MediaType.parse("text/plain"), newTitle);
+        RequestBody contentPart = RequestBody.create(MediaType.parse("text/plain"), newContent);
+        RequestBody isPrivatePart = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(newPrivate));
+        RequestBody categoryPart = RequestBody.create(MediaType.parse("text/plain"), newCategory);
+
+        MultipartBody.Part body = null;
+        if (imageUri != null) {
+            try {
+                InputStream inputStream = getContentResolver().openInputStream(imageUri);
+                byte[] fileBytes = getBytesFromInputStream(inputStream);
+                RequestBody requestFile = RequestBody.create(MediaType.parse(getContentResolver().getType(imageUri)), fileBytes);
+                body = MultipartBody.Part.createFormData("image", "image.jpg", requestFile);
+            } catch (IOException e) {
+                Log.e("EditPlantActivity", "Error reading image file", e);
+            }
+        }
+        showProgressBar();
+
+        // Execute the Retrofit call
+        apiService.updateDiaryWithImage("Bearer " + authToken, diaryIdPart, titlePart, contentPart, isPrivatePart, categoryPart, body)
+                .enqueue(new Callback<ResponseBody>() {
+                    @Override
+                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                        if (response.isSuccessful()) {
+                            Toast.makeText(DiaryDetailActivity.this, "Diary updated successfully with image", Toast.LENGTH_SHORT).show();
+                            finish(); // Close the activity
+                        } else {
+                            Toast.makeText(DiaryDetailActivity.this, "Failed to update diary with image", Toast.LENGTH_SHORT).show();
+                            // Log error details
+                            Log.e("UpdateError", "Response Code: " + response.code());
+                            try {
+                                String errorBody = response.errorBody() != null ? response.errorBody().string() : "Error body is null";
+                                Log.e("UpdateError", "Response Error Body: " + errorBody);
+                            } catch (IOException e) {
+                                Log.e("UpdateError", "Error while reading error body", e);
+                            }
+                        }
+                        hideProgressBar();
+                    }
+
+                    @Override
+                    public void onFailure(Call<ResponseBody> call, Throwable t) {
+                        Toast.makeText(DiaryDetailActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                        Log.e("UpdateFailure", "Error: ", t);
+                        hideProgressBar();
+                    }
+                });
+    }
+
 
     private void setupDeleteButton() {
         deleteButton.setOnClickListener(v -> {
@@ -216,5 +427,69 @@ public class DiaryDetailActivity extends AppCompatActivity {
                 Log.e("DiaryDelete", "Error deleting diary: " + t.getMessage(), t);
             }
         });
+    }
+
+
+    private void takePicture() {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 100);
+        } else {
+            dispatchTakePictureIntent();
+        }
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            File photoFile = createImageFile();
+            if (photoFile != null) {
+                imageUri = FileProvider.getUriForFile(this,
+                        "com.example.imPine.fileprovider", photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
+                cameraLauncher.launch(takePictureIntent);
+            }
+        }
+    }
+
+    private File createImageFile() {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = null;
+        try {
+            image = File.createTempFile(imageFileName, ".jpg", storageDir);
+            currentPhotoPath = image.getAbsolutePath();
+        } catch (IOException ex) {
+            Log.e("EditPlantActivity", "Error occurred while creating the image file", ex);
+        }
+        return image;
+    }
+
+    private Uri saveImage(Bitmap bitmap) {
+        File imageDir = new File(getCacheDir(), "images");
+        if (!imageDir.exists()) {
+            imageDir.mkdir();
+        }
+        File image = new File(imageDir, "updated_plant_image.png");
+        try (OutputStream out = new FileOutputStream(image)) {
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+            out.flush();
+            return Uri.fromFile(image);
+        } catch (IOException e) {
+            Log.e("EditPlantActivity", "Error saving image", e);
+            return null;
+        }
+    }
+
+    public static byte[] getBytesFromInputStream(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+        int bufferSize = 1024;
+        byte[] buffer = new byte[bufferSize];
+
+        int len;
+        while ((len = inputStream.read(buffer)) != -1) {
+            byteBuffer.write(buffer, 0, len);
+        }
+        return byteBuffer.toByteArray();
     }
 }

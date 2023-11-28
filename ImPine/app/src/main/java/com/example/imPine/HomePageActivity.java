@@ -1,5 +1,6 @@
 package com.example.imPine;
 
+import android.app.AlertDialog;
 import android.graphics.Typeface;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
@@ -329,16 +330,24 @@ public class HomePageActivity extends AppCompatActivity {
             }
         });
 
-        // logout button click
+        // Logout button click
         ImageButton outButton = findViewById(R.id.logOut);
         outButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(HomePageActivity.this, AuthLoginActivity.class);
-                startActivity(intent);
-                finish();
+                new AlertDialog.Builder(HomePageActivity.this)
+                        .setTitle("Logout Confirmation")
+                        .setMessage("Do you really want to logout?")
+                        .setPositiveButton(android.R.string.yes, (dialog, whichButton) -> {
+                            // Handle the logout logic here
+                            Intent intent = new Intent(HomePageActivity.this, AuthLoginActivity.class);
+                            startActivity(intent);
+                            finish();
+                        })
+                        .setNegativeButton(android.R.string.no, null).show();
             }
         });
+
 
         ImageView pineappleAvatar = findViewById(R.id.pineappleAvatar);
 
