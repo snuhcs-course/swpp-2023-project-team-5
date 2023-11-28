@@ -1,6 +1,7 @@
 package com.example.imPine.network;
 import com.example.imPine.model.Diary;
 import com.example.imPine.model.DiaryAdapter;
+import com.example.imPine.model.DiaryGetResponse;
 import com.example.imPine.model.DiaryResponse;
 import com.example.imPine.model.FollowListResponse;
 import com.example.imPine.model.Plant;
@@ -20,6 +21,7 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -107,7 +109,7 @@ public interface ApiInterface {
 
     // Fetch a diary entry
     @GET("/api/diary/{diary_id}")
-    Call<Diary> getDiary(
+    Call<DiaryGetResponse> getDiary(
             @Header("Authorization") String authToken,
             @Path("diary_id") String diaryId);
 
@@ -130,11 +132,14 @@ public interface ApiInterface {
             @Part MultipartBody.Part image);
 
     // Delete a diary entry
-    @DELETE("/api/diary/{diary_id}")
-    Call<ResponseBody> deleteDiary(
+    // Custom method to handle DELETE request with a body
+    @HTTP(method = "DELETE", path = "/api/diary/", hasBody = true)
+    Call<ResponseBody> deleteDiaryWithBody(
             @Header("Authorization") String authToken,
-            @Path("diary_id") String diaryId);
+            @Body RequestBody diaryIdBody);
 
     @DELETE("/api/follow/{user_id}")
-    Call<ResponseBody> unfollowUser(@Header("Authorization") String authToken, @Path("user_id") int userId);
+    Call<ResponseBody> unfollowUser(
+            @Header("Authorization") String authToken,
+            @Path("user_id") int userId);
 }

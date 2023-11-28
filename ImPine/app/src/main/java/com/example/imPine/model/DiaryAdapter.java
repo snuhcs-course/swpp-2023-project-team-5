@@ -40,6 +40,7 @@ public class DiaryAdapter extends RecyclerView.Adapter<DiaryAdapter.DiaryViewHol
     public void onBindViewHolder(@NonNull DiaryViewHolder holder, int position) {
         Diary diary = diaries.get(position);
         holder.titleTextView.setText(diary.getTitle());
+//        holder.categoryTextView.setText(diary.getCategory());
 
         // Define a character limit and find the index of the first newline
         String content = diary.getContent();
@@ -94,11 +95,14 @@ public class DiaryAdapter extends RecyclerView.Adapter<DiaryAdapter.DiaryViewHol
         TextView contentTextView;
         ImageView lockStatusImageView; // Add this for the lock status image
 
+//        TextView categoryTextView;
+
         public DiaryViewHolder(View view) {
             super(view);
             titleTextView = view.findViewById(R.id.diary_title);
             contentTextView = view.findViewById(R.id.diary_content);
             lockStatusImageView = view.findViewById(R.id.lockStatus);
+//            categoryTextView = view.findViewById(R.id.diary_category);
         }
     }
 
