@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,50 +33,12 @@ import retrofit2.Response;
 
 public class FriendDiaryDetailActivity extends AppCompatActivity {
 
-    private EditText titleEditText, contentEditText;
-    private Button editButton, deleteButton;
+    private TextView titleEditText, contentEditText, category;
     private ImageView imageView;
-    private Spinner categorySpinner;
 
     private ApiInterface apiService;
     private int diaryId;
-    private Diary originalDiary;
-    private Button publicButton, privateButton;
-    private String category;
 
-    private void initializeCategorySpinner(String selectedCategory) {
-        String[] categories = {"Happy", "Sad", "Angry", "Loving", "Grateful"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, R.layout.spinner_item, R.id.spinner_item_text, categories);
-        categorySpinner.setAdapter(adapter);
-        // Set the spinner to the selected category
-        int spinnerPosition = adapter.getPosition(selectedCategory);
-        categorySpinner.setSelection(spinnerPosition);
-
-        categorySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                category = categories[position];
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                category = "Happy";
-            }
-        });
-    }
-
-    private void initializePrivacyButton(boolean isPrivate) {
-        ImageView lockImage = findViewById(R.id.lock);
-        if (isPrivate) {
-            privateButton.setBackgroundColor(getResources().getColor(R.color.darkblue));
-            publicButton.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-            lockImage.setImageResource(R.drawable.lock);
-        } else {
-            publicButton.setBackgroundColor(getResources().getColor(R.color.darkblue));
-            privateButton.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-            lockImage.setImageResource(R.drawable.unlock);
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +49,8 @@ public class FriendDiaryDetailActivity extends AppCompatActivity {
         titleEditText = findViewById(R.id.titleEditText);
         contentEditText = findViewById(R.id.contentEditText);
         imageView = findViewById(R.id.imageView);
-        categorySpinner = findViewById(R.id.categorySpinner);
+        category = findViewById(R.id.category);
+//        categorySpinner = findViewById(R.id.categorySpinner);
 
         // API Service Initialization
         apiService = RetrofitClient.getClient().create(ApiInterface.class);
@@ -107,7 +71,6 @@ public class FriendDiaryDetailActivity extends AppCompatActivity {
                 if (response.isSuccessful() && response.body() != null) {
                     Log.e("FriendDiaryDetailActivity", "Success");
                     Diary diary = response.body().getDiary();
-                    originalDiary = diary;
 
                     // Logging the diary details
                     Log.d("FriendDiaryDetailActivity", "Title: " + diary.getTitle());
@@ -123,6 +86,7 @@ public class FriendDiaryDetailActivity extends AppCompatActivity {
                     // Set the UI components with the diary details
                     titleEditText.setText(diary.getTitle());
                     contentEditText.setText(diary.getContent());
+                    category.setText(diary.getCategory());
 //
 //                 initializeCategorySpinner(diary.getCategory());
 //                 initializePrivacyButton(diary.getIsPrivate());
