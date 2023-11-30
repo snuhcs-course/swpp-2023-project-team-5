@@ -166,7 +166,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="top|center_horizontal"
             android:backgroundTint="@color/grayLight"
-            android:text="Take a Picture of Your Pineapple"
+            android:text="Picture for Your Pineapple"
             android:fontFamily="@font/short_stack"
             android:textColor="@color/black" />
 

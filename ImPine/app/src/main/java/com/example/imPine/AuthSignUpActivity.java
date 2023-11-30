@@ -6,6 +6,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Patterns;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -17,6 +18,9 @@ import com.example.imPine.model.SignUpResponse;
 import com.example.imPine.network.ApiInterface;
 import com.example.imPine.network.RetrofitClient;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.auth.FirebaseUser;
 
 import retrofit2.Call;
@@ -68,6 +72,20 @@ public class AuthSignUpActivity extends AppCompatActivity {
             return;
         }
 
+        // Validate email format
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            editTextEmail.setError("Please enter a valid email address");
+            editTextEmail.requestFocus();
+            return;
+        }
+
+        // Check password length
+        if (password.length() < 6) {
+            editTextPassword.setError("Password should be at least 6 characters");
+            editTextPassword.requestFocus();
+            return;
+        }
+
         // Check if passwords match
         if (!password.equals(passwordConfirm)) {
             editTextPasswordConfirm.setError("Passwords do not match");
@@ -96,8 +114,15 @@ public class AuthSignUpActivity extends AppCompatActivity {
                         }
                     } else {
                         // Firebase sign up failed
-                        Toast.makeText(AuthSignUpActivity.this, "Firebase Authentication failed: " + task.getException().getMessage(),
-                                Toast.LENGTH_LONG).show();
+                        if (task.getException() instanceof FirebaseAuthWeakPasswordException) {
+                            Toast.makeText(AuthSignUpActivity.this, "The password is too weak", Toast.LENGTH_LONG).show();
+                        } else if (task.getException() instanceof FirebaseAuthUserCollisionException) {
+                            Toast.makeText(AuthSignUpActivity.this, "An account already exists with this email address", Toast.LENGTH_LONG).show();
+                        } else if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
+                            Toast.makeText(AuthSignUpActivity.this, "Invalid email format", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(AuthSignUpActivity.this, "Firebase Authentication failed: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        }
                     }
                 });
     }

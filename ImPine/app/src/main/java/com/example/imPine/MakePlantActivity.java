@@ -1,5 +1,6 @@
 package com.example.imPine;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -206,11 +207,7 @@ public class MakePlantActivity extends AppCompatActivity {
                 });
 
         findViewById(R.id.btn_take_picture).setOnClickListener(v -> {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 100);
-            } else {
-                dispatchTakePictureIntent();
-            }
+            showImageSourceDialog();
         });
 
         findViewById(R.id.btn_save).setOnClickListener(v -> {
@@ -292,7 +289,11 @@ public class MakePlantActivity extends AppCompatActivity {
         try {
             InputStream inputStream = getContentResolver().openInputStream(imageUri);
             byte[] fileBytes = getBytesFromInputStream(inputStream);
-            RequestBody requestFile = RequestBody.create(MediaType.parse(getContentResolver().getType(imageUri)), fileBytes);
+            String mimeType = getContentResolver().getType(imageUri);
+            if (mimeType == null) {
+                mimeType = "image/jpeg";  // Default MIME type
+            }
+            RequestBody requestFile = RequestBody.create(MediaType.parse(mimeType), fileBytes);
             MultipartBody.Part body = MultipartBody.Part.createFormData("image", "image.jpg", requestFile);
 
             ApiInterface apiService = RetrofitClient.getClient().create(ApiInterface.class);
@@ -439,14 +440,6 @@ public class MakePlantActivity extends AppCompatActivity {
     }
 
     private void navigateToHomePage() {
-//        if (imageUri != null) {
-//            Intent intent = new Intent(this, HomePageActivity.class);
-//            intent.putExtra("profile_image_path", imageUri.toString());
-//            startActivity(intent);
-//            finish();
-//        } else {
-//            Toast.makeText(this, "Error: Image not saved", Toast.LENGTH_SHORT).show();
-//        }
         Intent intent = new Intent(this, HomePageActivity.class);
         startActivity(intent);
         finish();
@@ -475,4 +468,61 @@ public class MakePlantActivity extends AppCompatActivity {
         Toast.makeText(MakePlantActivity.this, message, Toast.LENGTH_SHORT).show();
     }
 
+    private final ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    Uri selectedImage = result.getData().getData();
+                    try {
+                        Bitmap bitmap = getCorrectlyOrientedBitmap(selectedImage);
+                        imageView.setImageBitmap(bitmap);
+                        imageUri = saveImage(bitmap);
+                    } catch (IOException e) {
+                        Log.e("MakePlantActivity", "Error selecting image from gallery", e);
+                    }
+                }
+            }
+    );
+
+    private void dispatchChoosePictureIntent() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            galleryLauncher.launch(intent);
+        }
+    }
+
+    private void showImageSourceDialog() {
+        String[] options = {"Take Picture", "Choose from Gallery"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select Image");
+        builder.setItems(options, (dialog, which) -> {
+            if (which == 0) {
+                dispatchTakePictureIntent();
+            } else {
+                dispatchChoosePictureIntent();
+            }
+        });
+        builder.show();
+    }
+
+    private Bitmap getCorrectlyOrientedBitmap(Uri imageUri) throws IOException {
+        InputStream inputStream = getContentResolver().openInputStream(imageUri);
+        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+
+        // Getting EXIF data from the Uri
+        ExifInterface ei = new ExifInterface(getRealPathFromURI(imageUri));
+        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                return rotateImage(bitmap, 90);
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                return rotateImage(bitmap, 180);
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                return rotateImage(bitmap, 270);
+            default:
+                return bitmap;
+        }
+    }
 }

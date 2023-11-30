@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Bundle;
@@ -34,6 +36,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+import androidx.exifinterface.media.ExifInterface;
 
 import com.bumptech.glide.Glide;
 import com.example.imPine.model.Diary;
@@ -175,7 +178,7 @@ public class DiaryDetailActivity extends AppCompatActivity {
 
         cameraLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(), cameraResultCallback);
-        findViewById(R.id.btn_take_picture).setOnClickListener(v -> takePicture());
+        findViewById(R.id.btn_take_picture).setOnClickListener(v -> showImageSourceDialog());
         // Initialize the loadingPanel
         loadingPanel = findViewById(R.id.loadingPanel);
 
@@ -350,7 +353,11 @@ public class DiaryDetailActivity extends AppCompatActivity {
             try {
                 InputStream inputStream = getContentResolver().openInputStream(imageUri);
                 byte[] fileBytes = getBytesFromInputStream(inputStream);
-                RequestBody requestFile = RequestBody.create(MediaType.parse(getContentResolver().getType(imageUri)), fileBytes);
+                String mimeType = getContentResolver().getType(imageUri);
+                if (mimeType == null) {
+                    mimeType = "image/jpeg";  // Default MIME type
+                }
+                RequestBody requestFile = RequestBody.create(MediaType.parse(mimeType), fileBytes);
                 body = MultipartBody.Part.createFormData("image", "image.jpg", requestFile);
             } catch (IOException e) {
                 Log.e("EditPlantActivity", "Error reading image file", e);
@@ -479,6 +486,74 @@ public class DiaryDetailActivity extends AppCompatActivity {
             Log.e("EditPlantActivity", "Error saving image", e);
             return null;
         }
+    }
+
+    private Bitmap getCorrectlyOrientedBitmap(Uri imageUri) throws IOException {
+        InputStream inputStream = getContentResolver().openInputStream(imageUri);
+        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+        inputStream.close();
+        ExifInterface ei = new ExifInterface(getContentResolver().openInputStream(imageUri));
+        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+        return rotateImageIfRequired(bitmap, orientation);
+    }
+
+    private Bitmap rotateImageIfRequired(Bitmap img, int orientation) throws IOException {
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                return rotateImage(img, 90);
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                return rotateImage(img, 180);
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                return rotateImage(img, 270);
+            default:
+                return img;
+        }
+    }
+
+    private static Bitmap rotateImage(Bitmap img, int degree) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degree);
+        Bitmap rotatedImg = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
+        img.recycle();
+        return rotatedImg;
+    }
+
+    private final ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    Uri selectedImageUri = result.getData().getData();
+                    try {
+                        Bitmap bitmap = getCorrectlyOrientedBitmap(selectedImageUri);
+                        imageView.setImageBitmap(bitmap);
+                        imageUri = saveImage(bitmap); // Save the image and update the URI
+                        imageChanged = true; // Set the flag to true as the image has changed
+                    } catch (IOException e) {
+                        Log.e("DiaryNewActivity", "Error selecting image from gallery", e);
+                    }
+                }
+            }
+    );
+
+    private void dispatchChoosePictureIntent() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            galleryLauncher.launch(intent);
+        }
+    }
+    private void showImageSourceDialog() {
+        String[] options = {"Take Picture", "Choose from Gallery"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select Image Source");
+        builder.setItems(options, (dialog, which) -> {
+            if (which == 0) {
+                dispatchTakePictureIntent();
+            } else {
+                dispatchChoosePictureIntent();
+            }
+        });
+        builder.show();
     }
 
     public static byte[] getBytesFromInputStream(InputStream inputStream) throws IOException {
