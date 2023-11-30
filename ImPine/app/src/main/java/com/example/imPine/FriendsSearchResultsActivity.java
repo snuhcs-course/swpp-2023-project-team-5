@@ -1,120 +1,120 @@
 package com.example.imPine;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.IOException;
+import com.example.imPine.model.User;
+import com.example.imPine.model.UserAdapter;
+import com.example.imPine.model.UserListResponse;
+import com.example.imPine.network.ApiInterface;
+import com.example.imPine.network.RetrofitClient;
+import okhttp3.ResponseBody;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class FriendsSearchResultsActivity extends AppCompatActivity {
 
     private RecyclerView searchResultsRecyclerView;
-    private OkHttpClient client;
-    private FriendAdapter friendAdapter;  // Adapter to display search results
+    private UserAdapter userAdapter;
+    private Set<Integer> followedUserIds = new HashSet<>();
+    private static final String TAG = "SearchResultsActivity";
+    private void followUser(final int userId) {
+        if (followedUserIds.contains(userId)) {
+            Toast.makeText(this, "You are already following this user.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-    private List<Friends> getDemoSearchResults() {
-        List<Friends> mockList = new ArrayList<>();
+        String authToken = AuthLoginActivity.getAuthToken(this);
+        ApiInterface apiService = RetrofitClient.getClient().create(ApiInterface.class);
+        Call<ResponseBody> call = apiService.followUser("Bearer " + authToken, userId);
 
-        // Add some mock friends to the list
-//        mockList.add(new Friends("1", "Alice"));
-//        mockList.add(new Friends("2", "Bob"));
-//        mockList.add(new Friends("3", "Charlie"));
-//        mockList.add(new Friends("4", "David"));
-//        mockList.add(new Friends("5", "AAA"));
-//        mockList.add(new Friends("6", "BBB"));
-//        mockList.add(new Friends("7", "CCC"));
-//        mockList.add(new Friends("8", "DDD"));
-//        mockList.add(new Friends("9", "EEE"));
-//        mockList.add(new Friends("10", "FFF"));
-//        mockList.add(new Friends("11", "GGG"));
-//        mockList.add(new Friends("12", "HHH"));
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    followedUserIds.add(userId); // Mark this user as followed
+                    Log.d(TAG, "Followed user successfully");
+                    userAdapter.setFollowedStatus(userId, true);
+                    Toast.makeText(FriendsSearchResultsActivity.this, "Followed successfully!", Toast.LENGTH_SHORT).show();
+                    userAdapter.notifyItemChanged(userId); // If you have position, use it here
+                } else {
+                    Log.e(TAG, "Failed to follow user with code: " + response.code());
+                    Toast.makeText(FriendsSearchResultsActivity.this, "Failed to follow user.", Toast.LENGTH_SHORT).show();
+                }
+            }
 
-
-        return mockList;
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e(TAG, "Failed to follow user", t);
+                Toast.makeText(FriendsSearchResultsActivity.this, "Error occurred while following user.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.friends_search_results);
 
+        ImageView backButton = findViewById(R.id.backButton); // Get the "Back" button by ID
+
+        backButton.setOnClickListener(v -> {
+            Intent intent = new Intent(FriendsSearchResultsActivity.this, FriendsPageActivity.class);
+            startActivity(intent);
+            finish();
+        });
+
         searchResultsRecyclerView = findViewById(R.id.searchResultRecyclerView);
-        client = new OkHttpClient();
 
-        // Initialize the adapter with empty list and null listener (modify if you have a listener)
-        friendAdapter = new FriendAdapter(new ArrayList<>(), null);
-        searchResultsRecyclerView.setAdapter(friendAdapter);
-        searchResultsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-
-        //for demo
-        boolean isDemoMode = true;
-
-        if (isDemoMode) {
-            List<Friends> demoFriends = getDemoSearchResults();
-            friendAdapter.updateFriendList(demoFriends);
-        } else {
-            String query = getIntent().getStringExtra("SEARCH_QUERY");
-            fetchSearchResults(query);
+        // Retrieve followed user IDs and setup RecyclerView
+        List<Integer> followedIds = getIntent().getIntegerArrayListExtra("FOLLOWED_IDS");
+        if (followedIds != null) {
+            followedUserIds.addAll(followedIds);
         }
 
-        friendAdapter = new FriendAdapter(new ArrayList<>(), null);
-        searchResultsRecyclerView.setAdapter(friendAdapter);
+        userAdapter = new UserAdapter(new ArrayList<>(), user -> followUser(user.getId()), followedUserIds);
+        searchResultsRecyclerView.setAdapter(userAdapter);
+        searchResultsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // For demo purposes: load mock data
-        List<Friends> demoFriends = getDemoSearchResults();
-        friendAdapter.updateFriendList(demoFriends);
+        String query = getIntent().getStringExtra("SEARCH_QUERY");
+        fetchSearchResults(query);
     }
 
     private void fetchSearchResults(String query) {
-        final String url = "http://localhost:8000/api/search/?q=" + query;
+        String authToken = AuthLoginActivity.getAuthToken(this);
+        ApiInterface apiService = RetrofitClient.getClient().create(ApiInterface.class);
+        Call<UserListResponse> call = apiService.searchUsers("Bearer " + authToken, query);
 
-        Request request = new Request.Builder()
-                .url(url)
-                .build();
-
-        client.newCall(request).enqueue(new Callback() {
+        call.enqueue(new Callback<UserListResponse>() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                // Handle the error
-                e.printStackTrace();
+            public void onResponse(Call<UserListResponse> call, Response<UserListResponse> response) {
+                if (response.isSuccessful()) {
+                    UserListResponse users = response.body();
+                    userAdapter.updateUserList(users.getUsers());
+                } else {
+                    Log.e(TAG, "Search results fetch failed with code: " + response.code());
+                }
             }
 
             @Override
-            public void onResponse(Call call, final Response response) throws IOException {
-                if (response.isSuccessful()) {
-                    String responseData = response.body().string();
-                    try {
-                        JSONArray jsonArray = new JSONArray(responseData);
-                        final List<Friends> friendList = new ArrayList<>();
-                        for (int i = 0; i < jsonArray.length(); i++) {
-                            JSONObject jsonObject = jsonArray.getJSONObject(i);
-                            Friends friend = new Friends((jsonObject.getInt("id")), jsonObject.getString("username"));
-                            friendList.add(friend);
-                        }
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                // Update your RecyclerView with the friends list
-                                friendAdapter.updateFriendList(friendList);
-                            }
-                        });
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+            public void onFailure(Call<UserListResponse> call, Throwable t) {
+                Log.e(TAG, "Search results fetch failed", t);
             }
         });
     }

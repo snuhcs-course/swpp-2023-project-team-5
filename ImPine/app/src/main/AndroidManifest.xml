@@ -50,7 +50,8 @@
         <activity android:name=".PredictionResultActivity" />
         <activity android:name=".TutorialActivity" />
         <activity android:name=".EditPlantActivity" />
-        <activity android:name=".MakePlantActivity">
+        <activity android:name=".MakePlantActivity"/>
+        <activity android:name=".FriendDiaryDetailActivity">
 
 
         </activity>

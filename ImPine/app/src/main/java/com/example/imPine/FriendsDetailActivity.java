@@ -1,5 +1,6 @@
 package com.example.imPine;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.icu.text.SimpleDateFormat;
@@ -7,8 +8,11 @@ import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.StyleSpan;
+import android.util.Log;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
+import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,8 +23,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.imPine.model.Diary;
+import com.example.imPine.model.DiaryAdapter;
+import com.example.imPine.model.DiaryData;
+import com.example.imPine.model.DiaryResponse;
 import com.example.imPine.model.PlantResponse;
 import com.example.imPine.network.ApiInterface;
+import com.example.imPine.network.RetrofitClient;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -29,6 +38,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -37,7 +47,48 @@ import retrofit2.Retrofit;
 public class FriendsDetailActivity extends AppCompatActivity {
 
     private TextView friendDetailName;
-    private List<Diary> samplePineDiaries = new ArrayList<>();
+
+    private ApiInterface apiService;
+
+    private DiaryAdapter adapter;
+    private RecyclerView recyclerView;
+
+
+
+    private void fetchAndDisplayDiaries(String userId) {
+        String authToken = AuthLoginActivity.getAuthToken(this);
+        apiService.getDiariesByUserId(authToken, userId).enqueue(new Callback<DiaryResponse>() {
+            @Override
+            public void onResponse(Call<DiaryResponse> call, Response<DiaryResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    List<Diary> diaries = response.body().getDiaries();
+                    updateDiariesRecyclerView(diaries);
+                } else {
+                    Toast.makeText(FriendsDetailActivity.this, "Failed to load diaries.", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<DiaryResponse> call, Throwable t) {
+                Toast.makeText(FriendsDetailActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void updateDiariesRecyclerView(List<Diary> diaries) {
+        DiaryAdapter diariesAdapter = new DiaryAdapter(diaries);
+        recyclerView.setAdapter(diariesAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        diariesAdapter.setOnItemClickListener(new DiaryAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Diary diary) {
+                Intent intent = new Intent(FriendsDetailActivity.this, FriendDiaryDetailActivity.class);
+                intent.putExtra("DIARY_ID", diary.getId());
+                startActivity(intent);
+            }
+        });
+    }
 
     private int calculateDaysOld(String createdDateStr) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -100,6 +151,26 @@ public class FriendsDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.friends_detail);
 
+        recyclerView = findViewById(R.id.diariesRecyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        adapter = new DiaryAdapter(new ArrayList<>());
+        recyclerView.setAdapter(adapter);
+
+        // Initialize the apiService variable
+        apiService = RetrofitClient.getClient().create(ApiInterface.class);
+
+        adapter.setOnItemClickListener(new DiaryAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Diary diary) {
+                Intent intent = new Intent(FriendsDetailActivity.this, FriendDiaryDetailActivity.class);
+                Log.d("DiaryID", "DiaryID: " + diary.getId());
+                intent.putExtra("DIARY_ID", diary.getId());
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                startActivity(intent);
+            }
+        });
+
 
         friendDetailName = findViewById(R.id.friendDetailName);
 
@@ -107,6 +178,9 @@ public class FriendsDetailActivity extends AppCompatActivity {
         if (intent != null && intent.hasExtra("ID")) {
             int id = intent.getIntExtra("ID", 0);
             String friendName = intent.getStringExtra("friendName");
+
+            fetchAndDisplayDiaries(Integer.toString(id));
+
             // Get Retrofit instance
             Retrofit retrofit = RetrofitClient.getClient();
 
@@ -170,19 +244,6 @@ public class FriendsDetailActivity extends AppCompatActivity {
             showToast("Friends details not available.");
         }
 
-
-        RecyclerView diariesRecyclerView = findViewById(R.id.diariesRecyclerView);
-
-        // Populate with some sample PineDiaries for demo purposes
-        samplePineDiaries.add(new Diary("1", "Sample Title 1", "Sample Description 1", false));
-        samplePineDiaries.add(new Diary("2", "Sample Title 2", "Sample Description 2", false));
-        samplePineDiaries.add(new Diary("3", "Sample Title 3", "Sample Description 3", false));
-
-        DiaryAdapter diariesAdapter = new DiaryAdapter(samplePineDiaries);
-        diariesRecyclerView.setAdapter(diariesAdapter);
-        diariesRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-
         ImageView pineappleAvatar = findViewById(R.id.pineappleAvatar);
 
         // Load the animations
@@ -219,8 +280,45 @@ public class FriendsDetailActivity extends AppCompatActivity {
         // Start the animation
         pineappleAvatar.startAnimation(swayRight);
 
+        // Setup delete (unfollow) button
+        Button deleteButton = findViewById(R.id.deleteButton);
+        deleteButton.setOnClickListener(v -> {
+            if (intent != null && intent.hasExtra("ID")) {
+                int friendUserId = intent.getIntExtra("ID", 0);
+                confirmUnfollow(friendUserId);
+            }
+        });
+
     }
 
+    private void confirmUnfollow(int friendUserId) {
+        new AlertDialog.Builder(this)
+                .setTitle("Unfollow Friend")
+                .setMessage("Are you sure you want to unfollow this friend?")
+                .setPositiveButton(android.R.string.yes, (dialog, which) -> unfollowFriend(friendUserId))
+                .setNegativeButton(android.R.string.no, null)
+                .show();
+    }
+
+    private void unfollowFriend(int friendUserId) {
+        String authToken = AuthLoginActivity.getAuthToken(this);
+        apiService.unfollowUser("Bearer " + authToken, friendUserId).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(FriendsDetailActivity.this, "Unfollowed successfully", Toast.LENGTH_SHORT).show();
+                    finish(); // Close the activity after unfollowing
+                } else {
+                    Toast.makeText(FriendsDetailActivity.this, "Failed to unfollow", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(FriendsDetailActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
     private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }

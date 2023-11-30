@@ -8,6 +8,7 @@
     <color name="grayLight">#989898</color>
     <color name="photobtn">#028013</color>
     <color name="darkgreen">#007105</color>
-<!--    <color name="accent">#F40000</color>-->
-
+    <color name="blue">#03E0F4</color>
+    <color name="darkblue">#036FF4</color>
+    <color name="red">#F40303</color>
 </resources>

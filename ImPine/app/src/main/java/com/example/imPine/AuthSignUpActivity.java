@@ -6,7 +6,6 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -16,6 +15,7 @@ import android.widget.Toast;
 import com.example.imPine.model.SignUpRequest;
 import com.example.imPine.model.SignUpResponse;
 import com.example.imPine.network.ApiInterface;
+import com.example.imPine.network.RetrofitClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 

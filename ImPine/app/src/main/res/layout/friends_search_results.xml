@@ -4,8 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:backgroundTint="@color/yellow">
+    android:backgroundTint="#FFFBB3"
+    android:id="@+id/rootLayout"
+    android:background="@android:color/white">
+
 
 
     <androidx.recyclerview.widget.RecyclerView
@@ -16,11 +18,22 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:paddingLeft="15dp"
-        android:paddingRight="15dp"
         android:layout_marginLeft="15dp"
         android:layout_marginRight="15dp"
         tools:listitem="@layout/friends_item"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:layout_width="105dp"
+        android:layout_height="81dp"
+        android:layout_marginRight="10dp"
+        android:id="@+id/backButton"
+        android:layout_marginBottom="15dp"
+        app:layout_goneMarginRight="15dp"
+        android:src="@drawable/back"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

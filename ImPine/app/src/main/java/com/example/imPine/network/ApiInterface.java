@@ -1,10 +1,16 @@
 package com.example.imPine.network;
+import com.example.imPine.model.Diary;
+import com.example.imPine.model.DiaryAdapter;
+import com.example.imPine.model.DiaryGetResponse;
+import com.example.imPine.model.DiaryResponse;
+import com.example.imPine.model.DiseaseResponse;
 import com.example.imPine.model.FollowListResponse;
 import com.example.imPine.model.Plant;
 import com.example.imPine.model.PlantResponse;
 import com.example.imPine.model.SignUpRequest;
 import com.example.imPine.model.SignUpResponse;
 import com.example.imPine.model.UserID;
+import com.example.imPine.model.UserListResponse;
 import com.example.imPine.model.UserResponse;
 
 import java.util.List;
@@ -14,13 +20,18 @@ import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
 import retrofit2.http.Header;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 public interface ApiInterface {
     @POST("/api/user/signin")
@@ -62,6 +73,84 @@ public interface ApiInterface {
     @POST("/api/follow/{user_id}")
     Call<ResponseBody> followUser(@Header("Authorization") String authToken, @Path("user_id") int userId);
 
-    @POST("/predict_fcr/")
+    @GET("/api/diary")
+    Call<DiaryResponse> getDiaries(@Header("Authorization") String authToken);
+    @GET("/api/diary/user/{user_id}")
+    Call<DiaryResponse> getDiariesByUserId(@Header("Authorization") String authToken, @Path("user_id") String userId);
+
+
+    @Multipart
+    @POST("/api/diary/")
+    Call<ResponseBody> createDiary(
+            @Header("Authorization") String authToken,
+            @Part("title") RequestBody title,
+            @Part("content") RequestBody content,
+            @Part("is_private") RequestBody isPrivate,
+            @Part("category") RequestBody category,
+            @Part MultipartBody.Part image
+    );
+
+    @POST("/api/diary/")
+    Call<ResponseBody> createDiaryWithoutImage(
+            @Header("Authorization") String authToken,
+            @Body Diary diary);
+
+
+    @POST("/api/disease")
     Call<ResponseBody> predictFcrStatus(@Body RequestBody params);
+
+    @GET("/api/user/search")
+    Call<UserListResponse> searchUsers(@Header("Authorization") String authToken, @Query("username") String username);
+
+    // Fetch a diary entry
+    @GET("/api/diary/{diary_id}")
+    Call<DiaryGetResponse> getDiary(
+            @Header("Authorization") String authToken,
+            @Path("diary_id") String diaryId);
+
+    // Update a diary entry without image
+    @FormUrlEncoded
+    @PUT("/api/diary/")
+    Call<ResponseBody> updateDiaryWithoutImage(
+            @Header("Authorization") String authToken,
+            @Field("title") String title,
+            @Field("content") String content,
+            @Field("is_private") boolean isPrivate,
+            @Field("category") String category,
+            @Field("diary_id") int diaryId
+    );
+
+    // Update a diary entry with image
+    @Multipart
+    @PUT("/api/diary/")
+    Call<ResponseBody> updateDiaryWithImage(
+            @Header("Authorization") String authToken,
+            @Part("diary_id") RequestBody diaryId,
+            @Part("title") RequestBody title,
+            @Part("content") RequestBody content,
+            @Part("is_private") RequestBody isPrivate,
+            @Part("category") RequestBody category,
+            @Part MultipartBody.Part image);
+
+    // Delete a diary entry
+    @HTTP(method = "DELETE", path = "/api/diary/", hasBody = true)
+    Call<ResponseBody> deleteDiaryWithBody(
+            @Header("Authorization") String authToken,
+            @Body RequestBody diaryIdBody);
+
+    @DELETE("/api/follow/{user_id}")
+    Call<ResponseBody> unfollowUser(
+            @Header("Authorization") String authToken,
+            @Path("user_id") int userId);
+
+    @FormUrlEncoded
+    @POST("/api/disease")
+    Call<DiseaseResponse> getFCR(
+            @Header("Authorization") String authToken,
+            @Field("T_mean") double temperature,
+            @Field("Wind_speed") double wind,
+            @Field("Rain") double rain,
+            @Field("Humidity") int humidity,
+            @Field("Cloud") int could
+    );
 }

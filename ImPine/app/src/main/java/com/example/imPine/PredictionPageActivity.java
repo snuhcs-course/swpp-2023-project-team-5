@@ -1,5 +1,6 @@
 package com.example.imPine;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.bumptech.glide.Glide;
 import com.example.imPine.model.WeatherResponse;
+import com.example.imPine.network.RetrofitClient;
 import com.example.imPine.network.WeatherService;
 
 import java.util.Locale;
@@ -298,16 +300,24 @@ public class PredictionPageActivity extends AppCompatActivity {
             }
         });
 
-        // logout button click
+        // Logout button click
         ImageButton outButton = findViewById(R.id.logOut);
         outButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(PredictionPageActivity.this, AuthLoginActivity.class);
-                startActivity(intent);
-                finish();
+                new AlertDialog.Builder(PredictionPageActivity.this)
+                        .setTitle("Logout Confirmation")
+                        .setMessage("Do you really want to logout?")
+                        .setPositiveButton(android.R.string.yes, (dialog, whichButton) -> {
+                            // Handle the logout logic here
+                            Intent intent = new Intent(PredictionPageActivity.this, AuthLoginActivity.class);
+                            startActivity(intent);
+                            finish();
+                        })
+                        .setNegativeButton(android.R.string.no, null).show();
             }
         });
+
         ConstraintLayout mainLayout = findViewById(R.id.mainLayout);
 
         mainLayout.setOnTouchListener(new View.OnTouchListener() {
