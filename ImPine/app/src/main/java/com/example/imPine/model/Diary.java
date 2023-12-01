@@ -1,5 +1,10 @@
 package com.example.imPine.model;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class Diary {
     private int id;
     private String title;
@@ -8,6 +13,26 @@ public class Diary {
 
     private String category;
     private String image_src;
+
+    private String created_at;
+    public String getFormattedCreatedAt() {
+        // The current format of date string
+        SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault());
+
+        // The desired format for the date string
+        SimpleDateFormat outputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+
+        try {
+            // Parse the input date string into a Date object
+            Date date = inputFormat.parse(this.created_at);
+
+            // Format the Date object into the desired date string format
+            return outputFormat.format(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null; // Return null or some default value if parsing fails
+        }
+    }
 
     // Private constructor to be used by the Builder
     private Diary(Builder builder) {

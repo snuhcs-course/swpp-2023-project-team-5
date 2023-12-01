@@ -77,6 +77,8 @@ public class EditPlantActivity extends AppCompatActivity {
     private String currentPhotoPath;
     private Uri imageUri;
     private RelativeLayout loadingPanel;
+    private boolean imageChanged = false;
+
     private EditText nameEditText, heightEditText, lastWateredEditText;
     private Spinner statusSpinner;
 
@@ -92,13 +94,15 @@ public class EditPlantActivity extends AppCompatActivity {
         public void onActivityResult(ActivityResult result) {
             if (result.getResultCode() == RESULT_OK) {
                 // Image captured successfully
-                // Update ImageView with the image stored at `imageUri`
                 Glide.with(EditPlantActivity.this).load(imageUri).into(imageView);
+                imageChanged = true; // Set flag to true as image has changed
             } else {
-                Log.e("EditPlantActivity", "Image capture failed or cancelled");
+                // Image capture failed or was cancelled by the user
+                Log.e("EditPlantActivity", "No photo captured or operation cancelled.");
+                // Reset or handle as required
+                imageChanged = false;
             }
         }
-
     };
 
 
@@ -371,7 +375,8 @@ public class EditPlantActivity extends AppCompatActivity {
         boolean hasStatusChanged = !existingPlant.getStatus().equals(newStatus);
         boolean hasLastWateredChanged = !existingPlant.getLast_watered().equals(newLastWatered);
         boolean hasAvatarChanged = existingPlant.getAvatar() != currentAvatar;
-        boolean hasImageChanged = imageUri != null && !existingPlant.getImage().equals(imageUri.toString());
+        boolean hasImageChanged = imageChanged; // Use the flag instead of comparing URIs
+
 
         if (hasNameChanged || hasHeightChanged || hasStatusChanged || hasLastWateredChanged || hasAvatarChanged || hasImageChanged) {
             Log.d("EditPlantActivity", "Changes detected. Updating plant information.");
@@ -507,8 +512,10 @@ public class EditPlantActivity extends AppCompatActivity {
                         Bitmap bitmap = getCorrectlyOrientedBitmap(selectedImage);
                         imageView.setImageBitmap(bitmap);
                         imageUri = saveImage(bitmap); // Save the image and update the URI
+                        imageChanged = true; // Set flag to true as image has changed
                     } catch (IOException e) {
                         Log.e("EditPlantActivity", "Error selecting image from gallery", e);
+                        imageChanged = false;
                     }
                 }
             }

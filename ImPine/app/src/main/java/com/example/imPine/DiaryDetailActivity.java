@@ -65,6 +65,7 @@ import retrofit2.Response;
 public class DiaryDetailActivity extends AppCompatActivity {
     private ActivityResultLauncher<Intent> cameraLauncher;
     private EditText titleEditText, contentEditText;
+    private TextView date;
     private Button editButton, deleteButton;
     private ImageView imageView;
     private Spinner categorySpinner;
@@ -163,6 +164,7 @@ public class DiaryDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.diary_detail);
         ScrollView mainLayout = findViewById(R.id.mainLayout);
+        date = findViewById(R.id.dateLabel);
 
         mainLayout.setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -229,6 +231,7 @@ public class DiaryDetailActivity extends AppCompatActivity {
                     // Set the UI components with the diary details
                     title = diary.getTitle();
                     content = diary.getContent();
+                    date.setText(diary.getFormattedCreatedAt());
 
                     titleEditText.setText(title);
                     contentEditText.setText(content);
