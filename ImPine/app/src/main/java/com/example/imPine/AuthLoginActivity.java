@@ -57,12 +57,20 @@ public class AuthLoginActivity extends AppCompatActivity {
                     String userId = response.body().getUser().getId();
                     checkUserPlantsAndNavigate(authToken, userId);
                 } else {
+                    SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.remove(getString(R.string.saved_auth_token));
+                    editor.apply();
                     navigateToActivity(AuthLoginActivity.class); // Error, navigate back to login
                 }
             }
 
             @Override
             public void onFailure(Call<UserResponse> call, Throwable t) {
+                SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.remove(getString(R.string.saved_auth_token));
+                editor.apply();
                 navigateToActivity(AuthLoginActivity.class); // Error, navigate back to login
             }
         });
@@ -83,6 +91,10 @@ public class AuthLoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<PlantResponse> call, Throwable t) {
+                SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.remove(getString(R.string.saved_auth_token));
+                editor.apply();
                 navigateToActivity(AuthLoginActivity.class); // Error, navigate back to login
             }
         });
