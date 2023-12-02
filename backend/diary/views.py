@@ -68,7 +68,7 @@ class DiaryBasic(APIView):
         except:
             return Response({'diary_id': 'Diary does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
         
-        if user.id != diary.user_id:
+        if user.id != diary.user_id.id:
             return Response({'diary_id': 'Diary does not belong to user.'}, status=status.HTTP_400_BAD_REQUEST)
 
         diary.delete()
@@ -82,7 +82,7 @@ class DiaryUser(APIView):
         if request.user.id != user_id:
             filter_options.update({'is_private': False})
         
-        diaries = Diary.objects.filter(filter_options)
+        diaries = Diary.objects.filter(**filter_options)
         serializer = DiarySerializer(diaries, many=True)
         return Response({"diaries": serializer.data})
 

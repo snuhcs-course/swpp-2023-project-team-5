@@ -62,7 +62,7 @@ class PlantBasic(APIView):
         except:
             return Response({'plant_id': 'Plant does not exist.'}, status=status.HTTP_400_BAD_REQUEST)
         
-        if user.id != plant.user_id:
+        if user.id != plant.user_id.id:
             return Response({'plant_id': 'Plant does not belong to user.'}, status=status.HTTP_400_BAD_REQUEST)
 
         plant.delete()
