@@ -3,6 +3,7 @@ package com.example.imPine;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -309,6 +310,11 @@ public class PredictionPageActivity extends AppCompatActivity {
                         .setTitle("Logout Confirmation")
                         .setMessage("Do you really want to logout?")
                         .setPositiveButton(android.R.string.yes, (dialog, whichButton) -> {
+                            // logout
+                            SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.remove(getString(R.string.saved_auth_token));
+                            editor.apply();
                             // Handle the logout logic here
                             Intent intent = new Intent(PredictionPageActivity.this, AuthLoginActivity.class);
                             startActivity(intent);

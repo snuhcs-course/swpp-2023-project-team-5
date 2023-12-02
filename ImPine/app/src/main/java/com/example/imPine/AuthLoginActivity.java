@@ -30,16 +30,85 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.http.GET;
+import retrofit2.http.Header;
+import retrofit2.http.Path;
 
 public class AuthLoginActivity extends AppCompatActivity {
     FirebaseAuth mAuth;
     EditText editTextEmail;
     EditText editTextPassword;
 
+    private boolean isLoggedIn() {
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        String token = sharedPreferences.getString(getString(R.string.saved_auth_token), null);
+        return token != null && !token.isEmpty();
+    }
+
+    private void checkUserAndNavigate() {
+        String authToken = "Bearer " + getAuthToken(this);
+        ApiInterface apiService = RetrofitClient.getClient().create(ApiInterface.class);
+
+        Call<UserResponse> callUser = apiService.getUser(authToken);
+        callUser.enqueue(new Callback<UserResponse>() {
+            @Override
+            public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    String userId = response.body().getUser().getId();
+                    checkUserPlantsAndNavigate(authToken, userId);
+                } else {
+                    SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.remove(getString(R.string.saved_auth_token));
+                    editor.apply();
+                    navigateToActivity(AuthLoginActivity.class); // Error, navigate back to login
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UserResponse> call, Throwable t) {
+                SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.remove(getString(R.string.saved_auth_token));
+                editor.apply();
+                navigateToActivity(AuthLoginActivity.class); // Error, navigate back to login
+            }
+        });
+    }
+
+    private void checkUserPlantsAndNavigate(String authToken, String userId) {
+        ApiInterface apiService = RetrofitClient.getClient().create(ApiInterface.class);
+        Call<PlantResponse> callPlants = apiService.getUserPlants(authToken, userId);
+        callPlants.enqueue(new Callback<PlantResponse>() {
+            @Override
+            public void onResponse(Call<PlantResponse> call, Response<PlantResponse> response) {
+                if (response.isSuccessful() && response.body() != null && !response.body().getPlants().isEmpty()) {
+                    navigateToActivity(HomePageActivity.class);
+                } else {
+                    navigateToActivity(TutorialActivity.class);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PlantResponse> call, Throwable t) {
+                SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.remove(getString(R.string.saved_auth_token));
+                editor.apply();
+                navigateToActivity(AuthLoginActivity.class); // Error, navigate back to login
+            }
+        });
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login_page);
+
+        if (isLoggedIn()) {
+            checkUserAndNavigate();
+            return;
+        }
+
         Button signUpButton = findViewById(R.id.buttonSignUp);
         signUpButton.setText(Html.fromHtml(getString(R.string.sign_up_text)));
 

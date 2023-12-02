@@ -19,7 +19,7 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="103dp"
+                android:layout_height="198dp"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/rectangle_background"
                 android:padding="16dp">
@@ -30,9 +30,32 @@
                     android:orientation="horizontal" />
 
                 <TextView
+                    android:id="@+id/date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/short_stack"
+                    android:text="Date:"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/dateLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/date"
+                    android:layout_marginTop="5dp"
+                    android:background="@drawable/spinner_background"
+                    android:fontFamily="@font/short_stack"
+                    android:padding="5dp"
+                    android:text="date goes here"
+                    android:textSize="18sp" />
+
+                <TextView
                     android:id="@+id/categoryLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/dateLabel"
+                    android:layout_marginTop="20dp"
                     android:fontFamily="@font/short_stack"
                     android:text="Category:"
                     android:textSize="20sp"
@@ -43,10 +66,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/categoryLabel"
-                    android:text="Happy"
-                    android:textSize="20sp"
+                    android:layout_marginTop="5dp"
                     android:fontFamily="@font/short_stack"
-                    android:layout_marginTop="15dp" />
+                    android:background="@drawable/spinner_background"
+                    android:padding="5dp"
+                    android:text="Happy"
+                    android:textSize="18sp" />
             </RelativeLayout>
 
             <TextView

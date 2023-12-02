@@ -1,6 +1,7 @@
 package com.example.imPine;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.graphics.Typeface;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
@@ -339,7 +340,11 @@ public class HomePageActivity extends AppCompatActivity {
                         .setTitle("Logout Confirmation")
                         .setMessage("Do you really want to logout?")
                         .setPositiveButton(android.R.string.yes, (dialog, whichButton) -> {
-                            // Handle the logout logic here
+                            // logout
+                            SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.remove(getString(R.string.saved_auth_token));
+                            editor.apply();
                             Intent intent = new Intent(HomePageActivity.this, AuthLoginActivity.class);
                             startActivity(intent);
                             finish();

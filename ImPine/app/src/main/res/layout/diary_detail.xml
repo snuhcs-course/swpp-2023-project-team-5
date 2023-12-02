@@ -16,9 +16,10 @@
             android:orientation="vertical"
             android:padding="20dp">
 
+
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="288dp"
+                android:layout_height="369dp"
                 android:layout_marginBottom="20dp"
                 android:background="@drawable/rectangle_background"
                 android:padding="16dp">
@@ -61,9 +62,32 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/short_stack"
+                    android:text="Date:"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/dateLabel"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/date"
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="@font/short_stack"
+                    android:text="date goes here"
+                    android:padding="5dp"
+                    android:background="@drawable/spinner_background"
+                    android:textSize="18sp" />
+
+                <TextView
                     android:id="@+id/categoryLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_below="@id/dateLabel"
+                    android:layout_marginTop="20dp"
                     android:fontFamily="@font/short_stack"
                     android:text="Category:"
                     android:textSize="20sp"
@@ -74,12 +98,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/categoryLabel"
-                    android:layout_marginTop="10dp" />
+                    android:background="@drawable/spinner_background"
+                    android:layout_marginTop="5dp" />
 
                 <TextView
                     android:id="@+id/setVisual"
                     android:layout_width="wrap_content"
-                    android:layout_height="314dp"
+                    android:layout_height="wrap_content"
                     android:layout_below="@id/categorySpinner"
                     android:layout_marginTop="20dp"
                     android:layout_marginBottom="20dp"
@@ -88,7 +113,6 @@
                     android:textSize="20sp"
                     android:textStyle="bold" />
             </RelativeLayout>
-
 
             <EditText
                 android:id="@+id/titleEditText"
@@ -107,7 +131,7 @@
                 android:id="@+id/contentEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="25dp"
                 android:background="@drawable/edittext_background"
                 android:fontFamily="@font/short_stack"
                 android:hint="Content"
@@ -115,7 +139,16 @@
                 android:padding="70dp"
                 android:paddingStart="15dp"
                 android:paddingEnd="15dp" />
-
+            <Button
+                android:id="@+id/btn_take_picture"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:layout_gravity="top|center_horizontal"
+                android:backgroundTint="@color/grayLight"
+                android:fontFamily="@font/short_stack"
+                android:text="Attach Photo to Your Diary!\n(Optional)"
+                android:textColor="@color/black" />
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -130,18 +163,9 @@
                     android:contentDescription="@string/pineapple_image"
                     android:scaleType="centerCrop" />
 
-                <Button
-                    android:id="@+id/btn_take_picture"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="top|center_horizontal"
-                    android:layout_marginTop="10dp"
-                    android:backgroundTint="@color/grayLight"
-                    android:fontFamily="@font/short_stack"
-                    android:text="Attach Photo to Your Diary!"
-                    android:textColor="@color/black" />
-            </FrameLayout>
 
+
+            </FrameLayout>
 
             <Button
                 android:id="@+id/editButton"

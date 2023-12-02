@@ -3,6 +3,7 @@ package com.example.imPine;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,6 +17,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -27,6 +29,7 @@ import com.bumptech.glide.Glide;
 import com.example.imPine.model.FollowListResponse;
 import com.example.imPine.model.FriendAdapter;
 import com.example.imPine.model.Friends;
+import com.example.imPine.model.PlantResponse;
 import com.example.imPine.network.ApiInterface;
 import com.example.imPine.network.RetrofitClient;
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,6 +40,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -50,7 +54,27 @@ public class FriendsPageActivity extends AppCompatActivity {
     private Set<Integer> followedUserIds = new HashSet<>();
 
 
+    private void unfollowFriend(int userId) {
+        ApiInterface apiService = RetrofitClient.getClient().create(ApiInterface.class);
+        String token = "Bearer " + AuthLoginActivity.getAuthToken(this);
 
+        apiService.unfollowUser(token, userId).enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(FriendsPageActivity.this, "Successfully unfollowed the user", Toast.LENGTH_SHORT).show();
+                    // Optionally, refresh the list of friends or update the UI
+                } else {
+                    Toast.makeText(FriendsPageActivity.this, "Failed to unfollow the user", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Toast.makeText(FriendsPageActivity.this, "Network error or API is down", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
     private void setPineyImage(int avatarValue) {
         int drawableResourceId = getAvatarDrawableId(avatarValue);
         ImageView pineappleAvatar = findViewById(R.id.piney);
@@ -133,11 +157,44 @@ public class FriendsPageActivity extends AppCompatActivity {
 
         friendAdapter = new FriendAdapter(friends, friend -> {
             // Navigate to friend detail activity
-            Intent intent = new Intent(FriendsPageActivity.this, FriendsDetailActivity.class);
-            intent.putExtra("ID", friend.getId());
-            intent.putExtra("friendName", friend.getName());
-            intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-            startActivity(intent);
+            ApiInterface apiService = RetrofitClient.getClient().create(ApiInterface.class);
+            String token = "Bearer " + AuthLoginActivity.getAuthToken(this);
+
+            // Make the API call to get the friend's plants
+            apiService.getUserPlants(token, Integer.toString(friend.getId())).enqueue(new Callback<PlantResponse>() {
+                @Override
+                public void onResponse(Call<PlantResponse> call, Response<PlantResponse> response) {
+                    if (response.isSuccessful() && response.body() != null && !response.body().getPlants().isEmpty()) {
+                        // The user has plants, navigate to FriendsDetailActivity
+                        Intent intent = new Intent(FriendsPageActivity.this, FriendsDetailActivity.class);
+                        intent.putExtra("ID", friend.getId());
+                        intent.putExtra("friendName", friend.getName());
+                        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                        startActivity(intent);
+                    } else {
+                        // The user doesn't have plants, show a toast message
+//                        Toast.makeText(FriendsPageActivity.this, "User hasn't made a plant profile yet", Toast.LENGTH_SHORT).show();
+                        new AlertDialog.Builder(FriendsPageActivity.this)
+                                .setTitle("Unfollow User")
+                                .setMessage("This user doesn't have a pineapple profile! Do you want to unfollow this user?")
+                                .setPositiveButton(android.R.string.yes, (dialog, whichButton) -> {
+                                    // User chose to unfollow, make the API call
+                                    unfollowFriend(friend.getId());
+                                    Intent intent = new Intent(FriendsPageActivity.this, FriendsPageActivity.class);
+                                    startActivity(intent);
+                                    finish();
+                                })
+                                .setNegativeButton(android.R.string.no, null)
+                                .show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<PlantResponse> call, Throwable t) {
+                    // API call failed, show a toast message
+                    Toast.makeText(FriendsPageActivity.this, "Failed to retrieve friend's plants", Toast.LENGTH_SHORT).show();
+                }
+            });
         });
 
         friendsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -204,6 +261,11 @@ public class FriendsPageActivity extends AppCompatActivity {
                         .setTitle("Logout Confirmation")
                         .setMessage("Do you really want to logout?")
                         .setPositiveButton(android.R.string.yes, (dialog, whichButton) -> {
+                            // logout
+                            SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.remove(getString(R.string.saved_auth_token));
+                            editor.apply();
                             // Handle the logout logic here
                             Intent intent = new Intent(FriendsPageActivity.this, AuthLoginActivity.class);
                             startActivity(intent);

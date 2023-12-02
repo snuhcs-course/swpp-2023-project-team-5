@@ -1,15 +1,20 @@
 package com.example.imPine;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.icu.text.SimpleDateFormat;
 
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.res.ResourcesCompat;
 
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -72,6 +77,8 @@ public class EditPlantActivity extends AppCompatActivity {
     private String currentPhotoPath;
     private Uri imageUri;
     private RelativeLayout loadingPanel;
+    private boolean imageChanged = false;
+
     private EditText nameEditText, heightEditText, lastWateredEditText;
     private Spinner statusSpinner;
 
@@ -87,13 +94,15 @@ public class EditPlantActivity extends AppCompatActivity {
         public void onActivityResult(ActivityResult result) {
             if (result.getResultCode() == RESULT_OK) {
                 // Image captured successfully
-                // Update ImageView with the image stored at `imageUri`
                 Glide.with(EditPlantActivity.this).load(imageUri).into(imageView);
+                imageChanged = true; // Set flag to true as image has changed
             } else {
-                Log.e("EditPlantActivity", "Image capture failed or cancelled");
+                // Image capture failed or was cancelled by the user
+                Log.e("EditPlantActivity", "No photo captured or operation cancelled.");
+                // Reset or handle as required
+                imageChanged = false;
             }
         }
-
     };
 
 
@@ -210,7 +219,7 @@ public class EditPlantActivity extends AppCompatActivity {
         cameraLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(), cameraResultCallback);
 
-        findViewById(R.id.btn_take_picture).setOnClickListener(v -> takePicture());
+        findViewById(R.id.btn_take_picture).setOnClickListener(v -> showImageSourceDialog());
         findViewById(R.id.btn_save).setOnClickListener(v -> checkForChangesAndSave());
     }
 
@@ -366,7 +375,8 @@ public class EditPlantActivity extends AppCompatActivity {
         boolean hasStatusChanged = !existingPlant.getStatus().equals(newStatus);
         boolean hasLastWateredChanged = !existingPlant.getLast_watered().equals(newLastWatered);
         boolean hasAvatarChanged = existingPlant.getAvatar() != currentAvatar;
-        boolean hasImageChanged = imageUri != null && !existingPlant.getImage().equals(imageUri.toString());
+        boolean hasImageChanged = imageChanged; // Use the flag instead of comparing URIs
+
 
         if (hasNameChanged || hasHeightChanged || hasStatusChanged || hasLastWateredChanged || hasAvatarChanged || hasImageChanged) {
             Log.d("EditPlantActivity", "Changes detected. Updating plant information.");
@@ -409,7 +419,11 @@ public class EditPlantActivity extends AppCompatActivity {
             try {
                 InputStream inputStream = getContentResolver().openInputStream(imageUri);
                 byte[] fileBytes = getBytesFromInputStream(inputStream);
-                RequestBody requestFile = RequestBody.create(MediaType.parse(getContentResolver().getType(imageUri)), fileBytes);
+                String mimeType = getContentResolver().getType(imageUri);
+                if (mimeType == null) {
+                    mimeType = "image/jpeg";  // Default MIME type
+                }
+                RequestBody requestFile = RequestBody.create(MediaType.parse(mimeType), fileBytes);
                 body = MultipartBody.Part.createFormData("image", "image.jpg", requestFile);
             } catch (IOException e) {
                 Log.e("EditPlantActivity", "Error reading image file", e);
@@ -468,4 +482,82 @@ public class EditPlantActivity extends AppCompatActivity {
         }
         Toast.makeText(EditPlantActivity.this, message, Toast.LENGTH_SHORT).show();
     }
+    private void dispatchChoosePictureIntent() {
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            galleryLauncher.launch(intent);
+        }
+    }
+    private void showImageSourceDialog() {
+        String[] options = {"Take Picture", "Choose from Gallery"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select Image");
+        builder.setItems(options, (dialog, which) -> {
+            if (which == 0) {
+                takePicture();
+            } else {
+                dispatchChoosePictureIntent();
+            }
+        });
+        builder.show();
+    }
+
+    private final ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    Uri selectedImage = result.getData().getData();
+                    try {
+                        Bitmap bitmap = getCorrectlyOrientedBitmap(selectedImage);
+                        imageView.setImageBitmap(bitmap);
+                        imageUri = saveImage(bitmap); // Save the image and update the URI
+                        imageChanged = true; // Set flag to true as image has changed
+                    } catch (IOException e) {
+                        Log.e("EditPlantActivity", "Error selecting image from gallery", e);
+                        imageChanged = false;
+                    }
+                }
+            }
+    );
+
+    private Bitmap getCorrectlyOrientedBitmap(Uri imageUri) throws IOException {
+        InputStream inputStream = getContentResolver().openInputStream(imageUri);
+        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+
+        ExifInterface ei = new ExifInterface(getRealPathFromURI(imageUri));
+        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                return rotateImage(bitmap, 90);
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                return rotateImage(bitmap, 180);
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                return rotateImage(bitmap, 270);
+            default:
+                return bitmap;
+        }
+    }
+
+    private static Bitmap rotateImage(Bitmap img, int degree) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degree);
+        return Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
+    }
+
+    public String getRealPathFromURI(Uri contentUri) {
+        String[] proj = { MediaStore.Images.Media.DATA };
+        Cursor cursor = getContentResolver().query(contentUri, proj, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            String path = cursor.getString(column_index);
+            cursor.close();
+            return path;
+        }
+        return null;
+    }
+
+
+
 }

@@ -33,7 +33,7 @@ import retrofit2.Response;
 
 public class FriendDiaryDetailActivity extends AppCompatActivity {
 
-    private TextView titleEditText, contentEditText, category;
+    private TextView titleEditText, contentEditText, category, date;
     private ImageView imageView;
 
     private ApiInterface apiService;
@@ -50,6 +50,7 @@ public class FriendDiaryDetailActivity extends AppCompatActivity {
         contentEditText = findViewById(R.id.contentEditText);
         imageView = findViewById(R.id.imageView);
         category = findViewById(R.id.category);
+        date = findViewById(R.id.dateLabel);
 //        categorySpinner = findViewById(R.id.categorySpinner);
 
         // API Service Initialization
@@ -87,6 +88,7 @@ public class FriendDiaryDetailActivity extends AppCompatActivity {
                     titleEditText.setText(diary.getTitle());
                     contentEditText.setText(diary.getContent());
                     category.setText(diary.getCategory());
+                    date.setText(diary.getFormattedCreatedAt());
 //
 //                 initializeCategorySpinner(diary.getCategory());
 //                 initializePrivacyButton(diary.getIsPrivate());
