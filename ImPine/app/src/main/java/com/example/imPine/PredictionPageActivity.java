@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -157,12 +158,14 @@ public class PredictionPageActivity extends AppCompatActivity {
                     });
                 } else {
                     Log.d("weatherInfo", "Response not successful: " + response.code());
+                    Toast.makeText(PredictionPageActivity.this, "Error fetching current weather data", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<WeatherResponse> call, Throwable t) {
                 Log.e("weatherInfo", "API call failed: " + t.getMessage());
+                Toast.makeText(PredictionPageActivity.this, "Network Error", Toast.LENGTH_SHORT).show();
             }
         });
     }

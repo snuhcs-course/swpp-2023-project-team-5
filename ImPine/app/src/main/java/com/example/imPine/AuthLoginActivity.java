@@ -169,14 +169,14 @@ public class AuthLoginActivity extends AppCompatActivity {
                         // Login success, now check for plants
                         checkUserPlants();
                     } else {
-                        // If login fails, display a message to the user.
-                        String errorMessage = "Authentication Failed.";
-                        if (task.getException() instanceof FirebaseAuthInvalidCredentialsException) {
-                            errorMessage = "Invalid password.";
-                        } else if (task.getException() instanceof FirebaseAuthInvalidUserException) {
-                            errorMessage = "No account found with this email.";
+                        if (task.getException() instanceof FirebaseAuthInvalidCredentialsException ||
+                                task.getException() instanceof FirebaseAuthInvalidUserException) {
+                            // Specific error related to Firebase authentication
+                            Toast.makeText(AuthLoginActivity.this, "Invalid email or password", Toast.LENGTH_SHORT).show();
+                        } else {
+                            // General error, likely network related
+                            Toast.makeText(AuthLoginActivity.this, "Network error, please check your connection", Toast.LENGTH_SHORT).show();
                         }
-                        Toast.makeText(AuthLoginActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
                     }
                 });
     }

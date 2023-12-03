@@ -70,7 +70,7 @@
             android:padding="10dp"
             android:hint="Enter Temperature(°C)"
             android:fontFamily="@font/short_stack"
-            android:inputType="numberDecimal"
+            android:inputType="numberSigned|numberDecimal"
             android:layout_marginBottom="15dp"/>
 
         <TextView

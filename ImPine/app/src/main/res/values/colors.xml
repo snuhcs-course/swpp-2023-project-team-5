@@ -10,5 +10,6 @@
     <color name="darkgreen">#007105</color>
     <color name="blue">#03E0F4</color>
     <color name="darkblue">#036FF4</color>
+    <color name="midblue">#3B93FF</color>
     <color name="red">#F40303</color>
 </resources>
