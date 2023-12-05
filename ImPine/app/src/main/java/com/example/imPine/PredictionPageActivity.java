@@ -47,11 +47,26 @@ public class PredictionPageActivity extends AppCompatActivity {
     private int cloudValue;
     private String key = "ef868854e4da3eaea9540158413372dc";
 
+
+    // Validation ranges
+    private final double MIN_RAIN = 0.0;
+    private final double MAX_RAIN = 500.0; // assuming 500mm as the upper limit
+    private final double MIN_TEMP = -50.0;
+    private final double MAX_TEMP = 50.0;
+    private final int MIN_HUMIDITY = 0;
+    private final int MAX_HUMIDITY = 100;
+    private final double MIN_WIND = 0.0;
+    private final double MAX_WIND = 150.0; // assuming 150km/h as the upper limit
+    private final int MIN_CLOUD = 0;
+    private final int MAX_CLOUD = 100;
     private void addTextWatchers() {
         editRain.addTextChangedListener(new GenericTextWatcher() {
             @Override
             void updateValue(String s) {
                 rainValue = parseDouble(s);
+                if (!isRainValid(rainValue)) {
+                    showToast("Invalid: Enter a value between " + MIN_RAIN + " and " + MAX_RAIN + " mm");
+                }
             }
         });
 
@@ -59,6 +74,9 @@ public class PredictionPageActivity extends AppCompatActivity {
             @Override
             void updateValue(String s) {
                 temperatureValue = parseDouble(s);
+                if (!isTemperatureValid(temperatureValue)) {
+                    showToast("Invalid: Enter a value between " + MIN_TEMP + " and " + MAX_TEMP + " °C");
+                }
             }
         });
 
@@ -66,6 +84,9 @@ public class PredictionPageActivity extends AppCompatActivity {
             @Override
             void updateValue(String s) {
                 humidityValue = parseInt(s);
+                if (!isHumidityValid(humidityValue)) {
+                    showToast("Invalid: Enter a value between " + MIN_HUMIDITY + " and " + MAX_HUMIDITY + " %");
+                }
             }
         });
 
@@ -73,6 +94,9 @@ public class PredictionPageActivity extends AppCompatActivity {
             @Override
             void updateValue(String s) {
                 cloudValue = parseInt(s);
+                if (!isCloudinessValid(cloudValue)) {
+                    showToast("Invalid: Enter a value between " + MIN_CLOUD + " and " + MAX_CLOUD + " %");
+                }
             }
         });
 
@@ -80,8 +104,35 @@ public class PredictionPageActivity extends AppCompatActivity {
             @Override
             void updateValue(String s) {
                 windValue = parseDouble(s);
+                if (!isWindValid(windValue)) {
+                    showToast("Invalid: Enter a value between " + MIN_WIND + " and " + MAX_WIND + " km/h");
+                }
             }
         });
+    }
+
+    private boolean isRainValid(double rain) {
+        return rain >= MIN_RAIN && rain <= MAX_RAIN;
+    }
+
+    private boolean isTemperatureValid(double temperature) {
+        return temperature >= MIN_TEMP && temperature <= MAX_TEMP;
+    }
+
+    private boolean isHumidityValid(int humidity) {
+        return humidity >= MIN_HUMIDITY && humidity <= MAX_HUMIDITY;
+    }
+
+    private boolean isCloudinessValid(int cloudiness) {
+        return cloudiness >= MIN_CLOUD && cloudiness <= MAX_CLOUD;
+    }
+
+    private boolean isWindValid(double windSpeed) {
+        return windSpeed >= MIN_WIND && windSpeed <= MAX_WIND;
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(PredictionPageActivity.this, message, Toast.LENGTH_SHORT).show();
     }
 
     private abstract class GenericTextWatcher implements TextWatcher {
