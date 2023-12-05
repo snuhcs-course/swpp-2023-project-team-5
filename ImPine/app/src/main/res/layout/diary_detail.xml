@@ -98,7 +98,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_below="@id/categoryLabel"
-                    android:background="@drawable/spinner_background"
+                    android:background="@drawable/text_background"
                     android:layout_marginTop="5dp" />
 
                 <TextView
@@ -228,7 +228,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginTop="16dp"
             android:fontFamily="@font/short_stack"
-            android:text="Saving your pineapple!\n\n This process will take about 10 seconds..."
+            android:text="Saving your diary!\n\n This process will take about 10 seconds..."
             android:textAlignment="center"
             android:textSize="25dp"
             android:textStyle="bold" />

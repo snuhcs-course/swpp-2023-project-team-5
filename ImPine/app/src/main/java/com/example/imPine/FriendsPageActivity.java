@@ -276,19 +276,19 @@ public class FriendsPageActivity extends AppCompatActivity {
         });
 
 
-        ConstraintLayout mainLayout = findViewById(R.id.mainLayout);
-
-        mainLayout.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (getCurrentFocus() != null) {
-                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-                    getCurrentFocus().clearFocus(); // Optional: Clear focus from the current EditText
-                }
-                return false;
-            }
-        });
+//        ConstraintLayout mainLayout = findViewById(R.id.mainLayout);
+//
+//        mainLayout.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View view, MotionEvent motionEvent) {
+//                if (getCurrentFocus() != null) {
+//                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//                    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+//                    getCurrentFocus().clearFocus(); // Optional: Clear focus from the current EditText
+//                }
+//                return false;
+//            }
+//        });
     }
 
     @Override
@@ -296,6 +296,23 @@ public class FriendsPageActivity extends AppCompatActivity {
         super.onResume();
 
         setPineyImage(HomePageActivity.avatarFromHome);
+
+        SearchView searchView = findViewById(R.id.friendSearchView);
+
+        // Prevent automatic focus
+        searchView.setFocusable(false);
+        searchView.setIconifiedByDefault(true);
+        searchView.clearFocus();
+
+        // Explicitly manage focus
+        searchView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchView.setIconified(false);
+                searchView.setFocusable(true);
+                searchView.requestFocusFromTouch();
+            }
+        });
         // Check for new friends when the activity is resumed
         fetchFriends(this); // Fetch friends from API
 
@@ -333,13 +350,21 @@ public class FriendsPageActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.friends_page);
+        ConstraintLayout mainLayout = findViewById(R.id.mainLayout);
 
         SearchView searchView = findViewById(R.id.friendSearchView);
 
-        // Make the query hint always visible
+        // Set the SearchView to be expanded by default
         searchView.setIconifiedByDefault(false);
         searchView.setIconified(false);
         searchView.clearFocus();
+
+        // Set OnClickListener to handle focus
+        searchView.setOnClickListener(v -> {
+            searchView.setIconified(false);
+            searchView.setFocusable(true);
+            searchView.requestFocusFromTouch();
+        });
 
         // Accessing the TextView inside SearchView
         int id = searchView.getContext().getResources().getIdentifier("android:id/search_src_text", null, null);
@@ -350,9 +375,21 @@ public class FriendsPageActivity extends AppCompatActivity {
         textView.setTypeface(customFont);
 
         // Optional: Adjust text size and padding as needed
-         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 9);
          textView.setPadding(0, 0, 0, 0);
 
         setupUI();
+
+        mainLayout.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (getCurrentFocus() != null) {
+                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+                    getCurrentFocus().clearFocus(); // Optional: Clear focus from the current EditText
+                }
+                return false;
+            }
+        });
     }
 }

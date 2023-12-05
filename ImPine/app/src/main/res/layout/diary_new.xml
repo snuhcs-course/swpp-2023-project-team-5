@@ -85,6 +85,7 @@
                     android:id="@+id/categorySpinner"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@color/white"
                     android:layout_below="@id/categoryLabel"
                     android:layout_marginTop="10dp" />
             </RelativeLayout>

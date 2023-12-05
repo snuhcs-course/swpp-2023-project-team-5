@@ -16,15 +16,33 @@
     android:background="@color/yellow"
     android:padding="20dp">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Pineapple Name:"
+        android:textStyle="bold"
+        android:fontFamily="@font/short_stack"
+        android:textSize="20dp"
+        android:layout_marginBottom="7dp"/>
+
     <EditText
         android:id="@+id/editPlantName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="15dp"
         android:background="@drawable/edittext_background"
         android:hint="Enter Pineapple Name"
+        android:layout_marginBottom="25dp"
         android:fontFamily="@font/short_stack"
         android:padding="20dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Height:"
+        android:textStyle="bold"
+        android:fontFamily="@font/short_stack"
+        android:textSize="20dp"
+        android:layout_marginBottom="7dp"/>
 
     <EditText
         android:id="@+id/editHeight"
@@ -34,28 +52,56 @@
         android:padding="20dp"
         android:hint="Enter Height of Pineapple(cm)"
         android:fontFamily="@font/short_stack"
-        android:layout_marginTop="25dp"
+        android:layout_marginBottom="25dp"
         android:inputType="numberDecimal" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Pineapple Name:"
+        android:textStyle="bold"
+        android:fontFamily="@font/short_stack"
+        android:textSize="20dp"
+        android:layout_marginBottom="7dp"/>
+
 
     <Spinner
         android:id="@+id/spinnerStatus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
+        android:layout_marginBottom="25dp"
         android:background="@drawable/edittext_background"
         android:padding="20dp"
         android:entries="@array/status_options" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Last Watered Date:"
+        android:textStyle="bold"
+        android:fontFamily="@font/short_stack"
+        android:textSize="20dp"
+        android:layout_marginBottom="7dp"/>
 
     <EditText
         android:id="@+id/editLastWatered"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="25dp"
+        android:layout_marginBottom="25dp"
         android:background="@drawable/edittext_background"
         android:hint="Enter Last Watered Date"
         android:fontFamily="@font/short_stack"
         android:padding="20dp"
         android:focusable="false"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Avatar:"
+        android:textStyle="bold"
+        android:fontFamily="@font/short_stack"
+        android:textSize="20dp"
+        android:layout_marginBottom="7dp"/>
 
     <!-- First row of avatars -->
     <LinearLayout

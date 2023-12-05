@@ -54,11 +54,11 @@ public class PredictionResultActivity extends AppCompatActivity {
         tips.append("- Practice crop rotation to reduce pathogen buildup.\n\n");
 
         // Tips based on FCR percentage
-        if (fcrPercentage > 50) {
+        if (fcrPercentage > 15) {
             appendBoldText(tips, "High FCR Risk Tips:\n");
             tips.append("- Increase monitoring for early signs of disease.\n");
             tips.append("- Consider fungicide applications as a preventive measure.\n\n");
-        } else if (fcrPercentage > 20) {
+        } else if (fcrPercentage > 5) {
             appendBoldText(tips, "Moderate FCR Risk Tips:\n");
             tips.append("- Regularly inspect plants for early symptoms.\n");
             tips.append("- Improve air circulation around plants.\n\n");
@@ -70,17 +70,29 @@ public class PredictionResultActivity extends AppCompatActivity {
 
         // Weather-specific tips
         appendBoldText(tips, "Weather-Based Tips:\n");
+
+        // Temperature-specific tips
+        final double highTemperatureThreshold = 25;
+        final double lowTemperatureThreshold = 5;
+        if (temperature > highTemperatureThreshold) {
+            tips.append("- Provide shade to protect plants from excessive heat.\n");
+            tips.append("- Ensure adequate watering to prevent heat stress.\n\n");
+        } else if (temperature < lowTemperatureThreshold) {
+            tips.append("- Have to keep soil warm! Consider using mulch.\n");
+            tips.append("- Consider greenhouse cultivation to maintain optimal temperature.\n\n");
+        }
+
         if (rain > 5) {
-            tips.append("- Protect plants from heavy rains if possible.\n");
+            tips.append("- Protect plants from heavy rains if possible.\n\n");
         }
         if (humidity > 80) {
-            tips.append("- Reduce humidity around plants through ventilation.\n");
+            tips.append("- Reduce humidity around plants through ventilation.\n\n");
         }
         if (cloud > 60) {
-            tips.append("- Ensure adequate sunlight exposure.\n");
+            tips.append("- Ensure adequate sunlight exposure.\n\n");
         }
         if (wind > 20) {
-            tips.append("- Shield plants from strong winds to prevent physical damage.\n");
+            tips.append("- Shield plants from strong winds to prevent physical damage.\n\n");
         }
 
         return new SpannableString(tips);
@@ -91,26 +103,6 @@ public class PredictionResultActivity extends AppCompatActivity {
         builder.setSpan(new StyleSpan(Typeface.BOLD), start, start + text.length(), SpannableString.SPAN_EXCLUSIVE_EXCLUSIVE);
     }
 
-    // !!for testing
-    public static double predict(double T_mean, double Wind_speed, double Rain, int Humidity, int Cloud) {
-        // Coefficients from the regression output
-        double intercept = 0.038898012;
-        double coeffT_mean = 0.001091032;
-        double coeffWind_speed = 0.004473261;
-        double coeffRain = 0.001516761;
-        double coeffHumidity = -0.047280111;
-        double coeffCloud = 0.04867659;
-
-        // Calculating the predicted value
-        double predictedValue = intercept
-                + (coeffT_mean * T_mean)
-                + (coeffWind_speed * Wind_speed)
-                + (coeffRain * Rain)
-                + (coeffHumidity * Humidity/100)
-                + (coeffCloud * Cloud/100);
-
-        return predictedValue;
-    }
     private void setBoldLabel(TextView textView, String label, String value) {
         SpannableString spannable = new SpannableString(label + " " + value);
         spannable.setSpan(new StyleSpan(Typeface.BOLD), 0, label.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -173,6 +165,9 @@ public class PredictionResultActivity extends AppCompatActivity {
                     hideProgressBar();
                     Log.e("PredictionResultActivityWW", "API call not successful. Response code: " + response.code());
                     Toast.makeText(PredictionResultActivity.this, "Failed to get prediction", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(PredictionResultActivity.this, PredictionPageActivity.class);
+                    startActivity(intent);
+                    finish();
                 }
             }
 
@@ -180,7 +175,10 @@ public class PredictionResultActivity extends AppCompatActivity {
             public void onFailure(Call<DiseaseResponse> call, Throwable t) {
                 hideProgressBar();
                 Log.e("PredictionResultActivityWW", "API call failed: ", t);
-                Toast.makeText(PredictionResultActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(PredictionResultActivity.this, "Network Error", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(PredictionResultActivity.this, PredictionPageActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
     }

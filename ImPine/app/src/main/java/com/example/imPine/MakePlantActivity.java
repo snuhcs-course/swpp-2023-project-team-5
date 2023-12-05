@@ -161,6 +161,10 @@ public class MakePlantActivity extends AppCompatActivity {
 
 
         LinearLayout mainLayout = findViewById(R.id.mainLayout);
+        // Set default avatar
+        ImageView firstAvatar = findViewById(R.id.avatar1);
+        handleAvatarClick(firstAvatar, 0); // Highlight the first avatar
+
 
         // Set click listeners for the avatars
         findViewById(R.id.avatar1).setOnClickListener(v -> handleAvatarClick((ImageView) v, 0));
@@ -191,18 +195,17 @@ public class MakePlantActivity extends AppCompatActivity {
         cameraLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    if (result.getResultCode() == RESULT_OK) {
+                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                         Log.d("MakePlantActivity", "Image capture successful");
-                        // No need to get extras, image should be saved to the file
-                        try {
-                            setPic();
-                        } catch (IOException e) {
-                            throw new RuntimeException(e);
-                        }
-                    } else if (result.getResultCode() == RESULT_CANCELED) {
-                        Log.d("MakePlantActivity", "Image capture cancelled by user");
+                        Bundle extras = result.getData().getExtras();
+                        Bitmap imageBitmap = (Bitmap) extras.get("data");
+                        imageView.setImageBitmap(imageBitmap);
+                        // Save the bitmap as a file and get the path
+                        imageUri = saveImage(imageBitmap);
                     } else {
-                        Log.e("MakePlantActivity", "Image capture failed with result code: " + result.getResultCode());
+                        // User pressed back without taking a picture
+                        Toast.makeText(MakePlantActivity.this, "Take a picture or choose from gallery to proceed!", Toast.LENGTH_SHORT).show();
+                        imageUri = null;
                     }
                 });
 
@@ -223,7 +226,7 @@ public class MakePlantActivity extends AppCompatActivity {
                     message = "Please fill in all fields!";
                 }
                 else if(imageUri == null) {
-                    message = "Please take a picture of your pineapple!";
+                    message = "Please attach a picture of your pineapple!";
                 }
                 Toast.makeText(MakePlantActivity.this, message, Toast.LENGTH_SHORT).show();
             } else {
@@ -480,6 +483,10 @@ public class MakePlantActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         Log.e("MakePlantActivity", "Error selecting image from gallery", e);
                     }
+                }
+                else{
+                    Toast.makeText(MakePlantActivity.this, "Take a picture or choose from gallery to proceed!", Toast.LENGTH_SHORT).show();
+                    imageUri = null;
                 }
             }
     );
