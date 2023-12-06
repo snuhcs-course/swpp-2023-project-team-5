@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -37,6 +38,7 @@ public class DiaryPageActivity extends AppCompatActivity {
     private FloatingActionButton fabAddDiary;
     private ImageButton pineyButton, homeButton, predictionButton, friendButton, outButton;
     private ApiInterface apiService; // Declare the apiService variable
+    TextView tvEmptyDiary;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +46,8 @@ public class DiaryPageActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        tvEmptyDiary = findViewById(R.id.tv_empty_diary);
+
 
         diaryData = new DiaryData();
         adapter = new DiaryAdapter(new ArrayList<>());
@@ -192,6 +196,12 @@ public class DiaryPageActivity extends AppCompatActivity {
             public void onResponse(Call<DiaryResponse> call, Response<DiaryResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Diary> diaries = response.body().getDiaries();
+                    if (diaries.isEmpty()) {
+                        tvEmptyDiary.setVisibility(View.VISIBLE);
+                    } else {
+                        tvEmptyDiary.setVisibility(View.GONE);
+                    }
+
                     diaryData.setDiaries(diaries);
                     adapter.notifyDataSetChanged();
 

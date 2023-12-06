@@ -32,6 +32,9 @@ public class FriendAdapter extends RecyclerView.Adapter<FriendAdapter.FriendView
     private OnFriendClickListener listener;
 
 
+    public List<Friends> getFriendList() {
+        return friendList;
+    }
 
     public FriendAdapter(List<Friends> friendList, OnFriendClickListener listener) {
         this.friendList = friendList;

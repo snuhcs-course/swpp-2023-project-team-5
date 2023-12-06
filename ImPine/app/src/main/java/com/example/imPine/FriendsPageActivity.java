@@ -51,6 +51,7 @@ public class FriendsPageActivity extends AppCompatActivity {
     RecyclerView friendsRecyclerView;
     FriendAdapter friendAdapter;
     List<Friends> friends = new ArrayList<>();
+    TextView tvEmptyFriend;
     private Set<Integer> followedUserIds = new HashSet<>();
 
 
@@ -63,7 +64,6 @@ public class FriendsPageActivity extends AppCompatActivity {
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(FriendsPageActivity.this, "Successfully unfollowed the user", Toast.LENGTH_SHORT).show();
-                    // Optionally, refresh the list of friends or update the UI
                 } else {
                     Toast.makeText(FriendsPageActivity.this, "Failed to unfollow the user", Toast.LENGTH_SHORT).show();
                 }
@@ -275,20 +275,6 @@ public class FriendsPageActivity extends AppCompatActivity {
             }
         });
 
-
-//        ConstraintLayout mainLayout = findViewById(R.id.mainLayout);
-//
-//        mainLayout.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View view, MotionEvent motionEvent) {
-//                if (getCurrentFocus() != null) {
-//                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//                    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-//                    getCurrentFocus().clearFocus(); // Optional: Clear focus from the current EditText
-//                }
-//                return false;
-//            }
-//        });
     }
 
     @Override
@@ -317,6 +303,13 @@ public class FriendsPageActivity extends AppCompatActivity {
         fetchFriends(this); // Fetch friends from API
 
     }
+    private void updateEmptyFriendView(FriendAdapter fa) {
+        if (fa.getFriendList().isEmpty()) {
+            tvEmptyFriend.setVisibility(View.VISIBLE);
+        } else {
+            tvEmptyFriend.setVisibility(View.GONE);
+        }
+    }
 
     private void fetchFriends(Context context) {
         ApiInterface apiService = RetrofitClient.getClient().create(ApiInterface.class);
@@ -337,6 +330,7 @@ public class FriendsPageActivity extends AppCompatActivity {
                         followedUserIds.add(friend.getId());
                     }
                     friendAdapter.updateFriendList(newFriends);
+                    updateEmptyFriendView(friendAdapter);  // Update the visibility of the empty view
                 }
             }
 
@@ -353,6 +347,7 @@ public class FriendsPageActivity extends AppCompatActivity {
         ConstraintLayout mainLayout = findViewById(R.id.mainLayout);
 
         SearchView searchView = findViewById(R.id.friendSearchView);
+        tvEmptyFriend = findViewById(R.id.tv_empty_friend);
 
         // Set the SearchView to be expanded by default
         searchView.setIconifiedByDefault(false);
