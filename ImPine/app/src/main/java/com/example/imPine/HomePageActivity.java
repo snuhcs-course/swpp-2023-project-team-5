@@ -42,8 +42,14 @@ import java.util.concurrent.TimeUnit;
 public class HomePageActivity extends AppCompatActivity {
     private PlantResponse plantResponse;
     private RelativeLayout loadingPanel;
+    private static String myUserName;
 
     public static int avatarFromHome;
+
+    public static String getMyUserName() {
+        return myUserName;
+    }
+
     private int calculateDaysOld(String createdDateStr) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         try {
@@ -154,14 +160,6 @@ public class HomePageActivity extends AppCompatActivity {
         // Start the animation
         pineyButton.startAnimation(swayRight);
 
-        // TODO: get the pineapple profile
-//        ImageView pineappleProfile = findViewById(R.id.pineappleProfile);
-//        SharedPreferences prefs = getSharedPreferences("AppPrefs", MODE_PRIVATE);
-//        String imagePath = prefs.getString("profile_image_path", null);
-//        if (imagePath != null) {
-//            Bitmap bitmap = BitmapFactory.decodeFile(imagePath);
-//            pineappleProfile.setImageBitmap(bitmap);
-//        }
 
         // Retrieve the name of the SharedPreferences file and the key for the auth token from the resources
         String prefsFile = getString(R.string.preference_file_key);
@@ -181,6 +179,7 @@ public class HomePageActivity extends AppCompatActivity {
             public void onResponse(Call<UserResponse> call, Response<UserResponse> response) {
                 if (response.isSuccessful()) {
                     UserResponse userResponse = response.body();
+                    myUserName = userResponse.getUser().getName();
                     setBoldLabel(usernameTextView, "Username: ", userResponse.getUser().getName());
                     String userId;
                     userId = userResponse.getUser().getId();
