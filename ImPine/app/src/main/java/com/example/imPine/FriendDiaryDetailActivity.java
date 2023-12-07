@@ -89,9 +89,6 @@ public class FriendDiaryDetailActivity extends AppCompatActivity {
                     contentEditText.setText(diary.getContent());
                     category.setText(diary.getCategory());
                     date.setText(diary.getFormattedCreatedAt());
-//
-//                 initializeCategorySpinner(diary.getCategory());
-//                 initializePrivacyButton(diary.getIsPrivate());
 
                 } else {
                     Log.e("FriendDiaryDetailActivity", "Failed to load diary. Response code: " + response.code());

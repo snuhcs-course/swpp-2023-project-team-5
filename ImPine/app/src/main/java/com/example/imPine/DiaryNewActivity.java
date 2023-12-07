@@ -386,17 +386,6 @@ public class DiaryNewActivity extends AppCompatActivity {
         img.recycle();
         return rotatedImg;
     }
-
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//        if (requestCode == 1 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-//            dispatchTakePictureIntent();
-//        } else {
-//            Toast.makeText(this, "Camera permission is needed to take pictures", Toast.LENGTH_SHORT).show();
-//        }
-//    }
-
     private final ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {

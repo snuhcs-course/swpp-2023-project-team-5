@@ -92,20 +92,22 @@ public class MakePlantActivity extends AppCompatActivity {
     private ActivityResultCallback<ActivityResult> cameraResultCallback = new ActivityResultCallback<ActivityResult>() {
         @Override
         public void onActivityResult(ActivityResult result) {
-            if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                Log.d("MakePlantActivity", "Image capture successful");
-                Bundle extras = result.getData().getExtras();
-                Bitmap imageBitmap = (Bitmap) extras.get("data");
-                imageView.setImageBitmap(imageBitmap);
-                // Save the bitmap as a file and get the path
-                imageUri = saveImage(imageBitmap);
+            if (result.getResultCode() == RESULT_OK && currentPhotoPath != null) {
+                try {
+                    Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath);
+                    bitmap = rotateImageIfRequired(bitmap, currentPhotoPath);
+
+                    imageView.setImageBitmap(bitmap);
+                    imageUri = saveImage(bitmap); // Save the rotated bitmap
+                } catch (IOException e) {
+                    Log.e("MakePlantActivity", "Error setting the image", e);
+                }
             } else {
-                Log.d("MakePlantActivity", "Camera action cancelled or failed");
-                imageUri = null; // Set imageUri to null if camera action is cancelled or fails
                 Toast.makeText(MakePlantActivity.this, "Camera action cancelled", Toast.LENGTH_SHORT).show();
             }
         }
     };
+
     // Method to check and request permission
     private void requestCameraPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -399,21 +401,21 @@ public class MakePlantActivity extends AppCompatActivity {
         return image;
     }
 
-//    private Bitmap rotateImageIfRequired(Bitmap img, String selectedImage) throws IOException {
-//        ExifInterface ei = new ExifInterface(selectedImage);
-//        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-//
-//        switch (orientation) {
-//            case ExifInterface.ORIENTATION_ROTATE_90:
-//                return rotateImage(img, 90);
-//            case ExifInterface.ORIENTATION_ROTATE_180:
-//                return rotateImage(img, 180);
-//            case ExifInterface.ORIENTATION_ROTATE_270:
-//                return rotateImage(img, 270);
-//            default:
-//                return img;
-//        }
-//    }
+    private Bitmap rotateImageIfRequired(Bitmap img, String selectedImage) throws IOException {
+        ExifInterface ei = new ExifInterface(selectedImage);
+        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                return rotateImage(img, 90);
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                return rotateImage(img, 180);
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                return rotateImage(img, 270);
+            default:
+                return img;
+        }
+    }
 
     private static Bitmap rotateImage(Bitmap img, int degree) {
         Matrix matrix = new Matrix();
