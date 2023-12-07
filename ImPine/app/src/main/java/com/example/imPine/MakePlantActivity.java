@@ -89,24 +89,24 @@ public class MakePlantActivity extends AppCompatActivity {
         this.avatar = avatarValue;
     }
 
-    private ActivityResultCallback<ActivityResult> cameraResultCallback = new ActivityResultCallback<ActivityResult>() {
-        @Override
-        public void onActivityResult(ActivityResult result) {
-            if (result.getResultCode() == RESULT_OK && currentPhotoPath != null) {
-                try {
-                    Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath);
-                    bitmap = rotateImageIfRequired(bitmap, currentPhotoPath);
-
-                    imageView.setImageBitmap(bitmap);
-                    imageUri = saveImage(bitmap); // Save the rotated bitmap
-                } catch (IOException e) {
-                    Log.e("MakePlantActivity", "Error setting the image", e);
-                }
-            } else {
-                Toast.makeText(MakePlantActivity.this, "Camera action cancelled", Toast.LENGTH_SHORT).show();
-            }
-        }
-    };
+//    private ActivityResultCallback<ActivityResult> cameraResultCallback = new ActivityResultCallback<ActivityResult>() {
+//        @Override
+//        public void onActivityResult(ActivityResult result) {
+//            if (result.getResultCode() == RESULT_OK && currentPhotoPath != null) {
+//                try {
+//                    Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath);
+//                    bitmap = rotateImageIfRequired(bitmap, currentPhotoPath);
+//
+//                    imageView.setImageBitmap(bitmap);
+//                    imageUri = saveImage(bitmap); // Save the rotated bitmap
+//                } catch (IOException e) {
+//                    Log.e("MakePlantActivity", "Error setting the image", e);
+//                }
+//            } else {
+//                Toast.makeText(MakePlantActivity.this, "Camera action cancelled", Toast.LENGTH_SHORT).show();
+//            }
+//        }
+//    };
 
     // Method to check and request permission
     private void requestCameraPermission() {
@@ -215,13 +215,9 @@ public class MakePlantActivity extends AppCompatActivity {
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == RESULT_OK) {
-                        // Here, setPic() will be called to adjust the orientation
-                        setPic();
-
                         try {
-                            Bitmap imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-                            imageView.setImageBitmap(imageBitmap);
-                        } catch (IOException e) {
+                            setPic();
+                        }  catch (IOException e) {
                             e.printStackTrace();
                         }
                     } else if (result.getResultCode() == RESULT_CANCELED) {
@@ -401,10 +397,7 @@ public class MakePlantActivity extends AppCompatActivity {
         return image;
     }
 
-    private Bitmap rotateImageIfRequired(Bitmap img, String selectedImage) throws IOException {
-        ExifInterface ei = new ExifInterface(selectedImage);
-        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-
+    private Bitmap rotateImageIfRequired(Bitmap img, int orientation) throws IOException {
         switch (orientation) {
             case ExifInterface.ORIENTATION_ROTATE_90:
                 return rotateImage(img, 90);
@@ -424,36 +417,36 @@ public class MakePlantActivity extends AppCompatActivity {
         img.recycle();
         return rotatedImg;
     }
-    private void setPic() {
-        try {
-            Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath);
-            ExifInterface ei = new ExifInterface(currentPhotoPath);
+    private void setPic() throws IOException {
+        // Get the dimensions of the View
+        int targetW = imageView.getWidth();
+        int targetH = imageView.getHeight();
 
-            int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+        // Get the dimensions of the bitmap
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(currentPhotoPath, bmOptions);
+        int photoW = bmOptions.outWidth;
+        int photoH = bmOptions.outHeight;
 
-            switch(orientation) {
-                case ExifInterface.ORIENTATION_ROTATE_90:
-                    bitmap = rotateImage(bitmap, 90);
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_180:
-                    bitmap = rotateImage(bitmap, 180);
-                    break;
-                case ExifInterface.ORIENTATION_ROTATE_270:
-                    bitmap = rotateImage(bitmap, 270);
-                    break;
-                case ExifInterface.ORIENTATION_NORMAL:
-                default:
-                    // No rotation required
-                    break;
-            }
+        // Determine how much to scale down the image
+        int scaleFactor = Math.max(1, Math.min(photoW / targetW, photoH / targetH));
 
-            imageView.setImageBitmap(bitmap);
-        } catch (IOException e) {
-            Log.e("MakePlantActivity", "Error setting the image", e);
-        }
+        // Decode the image file into a Bitmap sized to fill the View
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true;
+
+        Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath, bmOptions);
+
+        // Get the orientation of the image
+        ExifInterface ei = new ExifInterface(currentPhotoPath);
+        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+        bitmap = rotateImageIfRequired(bitmap, orientation);
+
+        imageView.setImageBitmap(bitmap);
     }
-
-
 
 
     // Handling the user response
