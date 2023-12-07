@@ -21,6 +21,7 @@ import com.example.imPine.model.PlantResponse;
 import com.example.imPine.model.UserResponse;
 import com.example.imPine.network.ApiInterface;
 import com.example.imPine.network.RetrofitClient;
+import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseAuthInvalidUserException;
@@ -169,16 +170,21 @@ public class AuthLoginActivity extends AppCompatActivity {
                         // Login success, now check for plants
                         checkUserPlants();
                     } else {
-                        if (task.getException() instanceof FirebaseAuthInvalidCredentialsException ||
-                                task.getException() instanceof FirebaseAuthInvalidUserException) {
+                        Exception exception = task.getException();
+                        if (exception instanceof FirebaseAuthInvalidCredentialsException ||
+                                exception instanceof FirebaseAuthInvalidUserException) {
                             // Specific error related to Firebase authentication
                             Toast.makeText(AuthLoginActivity.this, "Invalid email or password", Toast.LENGTH_SHORT).show();
-                        } else {
-                            // General error, likely network related
+                        } else if (exception instanceof FirebaseNetworkException) {
+                            // Network error
                             Toast.makeText(AuthLoginActivity.this, "Network error, please check your connection", Toast.LENGTH_SHORT).show();
+                        } else {
+                            // Other errors
+                            Toast.makeText(AuthLoginActivity.this, "Invalid email or password", Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
+
     }
 
     private void checkUserPlants() {

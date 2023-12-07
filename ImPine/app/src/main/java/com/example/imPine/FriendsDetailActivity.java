@@ -306,6 +306,11 @@ public class FriendsDetailActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
+                    // Set result to indicate friend list may have changed
+                    Intent returnIntent = new Intent();
+                    returnIntent.putExtra("unfollowedFriendId", friendUserId);
+                    setResult(RESULT_OK, returnIntent);
+
                     Toast.makeText(FriendsDetailActivity.this, "Unfollowed successfully", Toast.LENGTH_SHORT).show();
                     finish(); // Close the activity after unfollowing
                 } else {

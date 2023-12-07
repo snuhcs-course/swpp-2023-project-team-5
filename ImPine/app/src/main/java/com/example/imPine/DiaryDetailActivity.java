@@ -526,6 +526,7 @@ public class DiaryDetailActivity extends AppCompatActivity {
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                     Uri selectedImageUri = result.getData().getData();
+                    Toast.makeText(DiaryDetailActivity.this, "Processing image, please wait...", Toast.LENGTH_SHORT).show();
                     try {
                         Bitmap bitmap = getCorrectlyOrientedBitmap(selectedImageUri);
                         imageView.setImageBitmap(bitmap);

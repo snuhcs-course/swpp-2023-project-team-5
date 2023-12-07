@@ -70,7 +70,7 @@
 
         <ImageView
             android:id="@+id/pineappleProfile"
-            android:layout_width="365dp"
+            android:layout_width="match_parent"
             android:layout_height="458dp"
             android:layout_marginTop="20dp"
             android:contentDescription="Pineapple Avatar"

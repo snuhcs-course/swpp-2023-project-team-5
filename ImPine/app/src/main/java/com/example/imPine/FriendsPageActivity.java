@@ -1,5 +1,6 @@
 package com.example.imPine;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -19,6 +20,9 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.res.ResourcesCompat;
@@ -34,6 +38,8 @@ import com.example.imPine.network.ApiInterface;
 import com.example.imPine.network.RetrofitClient;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -51,6 +57,8 @@ public class FriendsPageActivity extends AppCompatActivity {
     RecyclerView friendsRecyclerView;
     FriendAdapter friendAdapter;
     List<Friends> friends = new ArrayList<>();
+    TextView tvEmptyFriend, emptySearch;
+    private ActivityResultLauncher<Intent> activityResultLauncher;
     private Set<Integer> followedUserIds = new HashSet<>();
 
 
@@ -62,8 +70,15 @@ public class FriendsPageActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
                 if (response.isSuccessful()) {
+                    for (Integer i : followedUserIds) {
+                        Log.d("removingFriend", "FriendID: " + i);
+
+                    }
+                    followedUserIds.remove(userId); // Update the set after unfollowing
+                    for (Integer i : followedUserIds) {
+                        Log.d("removingFriend", "FriendID: " + i);
+                    }
                     Toast.makeText(FriendsPageActivity.this, "Successfully unfollowed the user", Toast.LENGTH_SHORT).show();
-                    // Optionally, refresh the list of friends or update the UI
                 } else {
                     Toast.makeText(FriendsPageActivity.this, "Failed to unfollow the user", Toast.LENGTH_SHORT).show();
                 }
@@ -95,23 +110,6 @@ public class FriendsPageActivity extends AppCompatActivity {
             case 7: return R.drawable.eightavatar;
             case 8: return R.drawable.nineavatar;
             default: return R.drawable.pine_avatar;
-        }
-    }
-
-    private void getAuthToken(MakePlantActivity.AuthTokenCallback authTokenCallback) {
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
-            user.getIdToken(true)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            String idToken = task.getResult().getToken();
-                            authTokenCallback.onTokenReceived("Bearer " + idToken);
-                        } else {
-                            authTokenCallback.onTokenError(task.getException());
-                        }
-                    });
-        } else {
-            authTokenCallback.onTokenError(new Exception("User not logged in."));
         }
     }
 
@@ -169,20 +167,17 @@ public class FriendsPageActivity extends AppCompatActivity {
                         Intent intent = new Intent(FriendsPageActivity.this, FriendsDetailActivity.class);
                         intent.putExtra("ID", friend.getId());
                         intent.putExtra("friendName", friend.getName());
-                        intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                        startActivity(intent);
+                        // Launch the activity
+                        activityResultLauncher.launch(intent);
                     } else {
-                        // The user doesn't have plants, show a toast message
-//                        Toast.makeText(FriendsPageActivity.this, "User hasn't made a plant profile yet", Toast.LENGTH_SHORT).show();
                         new AlertDialog.Builder(FriendsPageActivity.this)
                                 .setTitle("Unfollow User")
                                 .setMessage("This user doesn't have a pineapple profile! Do you want to unfollow this user?")
                                 .setPositiveButton(android.R.string.yes, (dialog, whichButton) -> {
                                     // User chose to unfollow, make the API call
                                     unfollowFriend(friend.getId());
-                                    Intent intent = new Intent(FriendsPageActivity.this, FriendsPageActivity.class);
-                                    startActivity(intent);
-                                    finish();
+                                    // Refresh or update the necessary data or views here
+                                    fetchFriends(FriendsPageActivity.this); // Assuming this fetches and updates the list
                                 })
                                 .setNegativeButton(android.R.string.no, null)
                                 .show();
@@ -204,7 +199,9 @@ public class FriendsPageActivity extends AppCompatActivity {
             public boolean onQueryTextSubmit(String query) {
                 Intent intent = new Intent(FriendsPageActivity.this, FriendsSearchResultsActivity.class);
                 intent.putExtra("SEARCH_QUERY", query);
+                intent.putExtra("MYUSERNAME", HomePageActivity.getMyUserName());
                 intent.putExtra("FOLLOWED_IDS", new ArrayList<>(followedUserIds)); // Passing the list of followed IDs
+                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                 startActivity(intent);
                 return true;
             }
@@ -275,20 +272,6 @@ public class FriendsPageActivity extends AppCompatActivity {
             }
         });
 
-
-//        ConstraintLayout mainLayout = findViewById(R.id.mainLayout);
-//
-//        mainLayout.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View view, MotionEvent motionEvent) {
-//                if (getCurrentFocus() != null) {
-//                    InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//                    imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-//                    getCurrentFocus().clearFocus(); // Optional: Clear focus from the current EditText
-//                }
-//                return false;
-//            }
-//        });
     }
 
     @Override
@@ -317,6 +300,13 @@ public class FriendsPageActivity extends AppCompatActivity {
         fetchFriends(this); // Fetch friends from API
 
     }
+    private void updateEmptyFriendView(FriendAdapter fa) {
+        if (fa.getFriendList().isEmpty()) {
+            tvEmptyFriend.setVisibility(View.VISIBLE);
+        } else {
+            tvEmptyFriend.setVisibility(View.GONE);
+        }
+    }
 
     private void fetchFriends(Context context) {
         ApiInterface apiService = RetrofitClient.getClient().create(ApiInterface.class);
@@ -337,6 +327,7 @@ public class FriendsPageActivity extends AppCompatActivity {
                         followedUserIds.add(friend.getId());
                     }
                     friendAdapter.updateFriendList(newFriends);
+                    updateEmptyFriendView(friendAdapter);  // Update the visibility of the empty view
                 }
             }
 
@@ -350,9 +341,26 @@ public class FriendsPageActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.friends_page);
+        // Initialize the ActivityResultLauncher
+        activityResultLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        // Get data from the result
+                        Intent data = result.getData();
+                        if (data != null) {
+                            int unfollowedFriendId = data.getIntExtra("unfollowedFriendId", -1);
+                            if (unfollowedFriendId != -1) {
+                                followedUserIds.remove(unfollowedFriendId);
+                                fetchFriends(this);
+                            }
+                        }
+                    }
+                });
         ConstraintLayout mainLayout = findViewById(R.id.mainLayout);
 
         SearchView searchView = findViewById(R.id.friendSearchView);
+        tvEmptyFriend = findViewById(R.id.tv_empty_friend);
 
         // Set the SearchView to be expanded by default
         searchView.setIconifiedByDefault(false);

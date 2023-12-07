@@ -22,6 +22,7 @@ import com.example.imPine.network.RetrofitClient;
 import okhttp3.ResponseBody;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -34,6 +35,7 @@ public class FriendsSearchResultsActivity extends AppCompatActivity {
     private RecyclerView searchResultsRecyclerView;
     private UserAdapter userAdapter;
     private Set<Integer> followedUserIds = new HashSet<>();
+    String myUserName;
     private static final String TAG = "SearchResultsActivity";
     private void followUser(final int userId) {
         if (followedUserIds.contains(userId)) {
@@ -75,16 +77,18 @@ public class FriendsSearchResultsActivity extends AppCompatActivity {
         ImageView backButton = findViewById(R.id.backButton); // Get the "Back" button by ID
 
         backButton.setOnClickListener(v -> {
-            Intent intent = new Intent(FriendsSearchResultsActivity.this, FriendsPageActivity.class);
-            startActivity(intent);
+//            Intent intent = new Intent(FriendsSearchResultsActivity.this, FriendsPageActivity.class);
+//            startActivity(intent);
             finish();
         });
 
         searchResultsRecyclerView = findViewById(R.id.searchResultRecyclerView);
 
         // Retrieve followed user IDs and setup RecyclerView
+        myUserName = getIntent().getStringExtra("MYUSERNAME");
         List<Integer> followedIds = getIntent().getIntegerArrayListExtra("FOLLOWED_IDS");
         if (followedIds != null) {
+            followedUserIds.clear();
             followedUserIds.addAll(followedIds);
         }
 
@@ -104,13 +108,34 @@ public class FriendsSearchResultsActivity extends AppCompatActivity {
         call.enqueue(new Callback<UserListResponse>() {
             @Override
             public void onResponse(Call<UserListResponse> call, Response<UserListResponse> response) {
-                if (response.isSuccessful()) {
+                if (response.isSuccessful() && response.body() != null) {
                     UserListResponse users = response.body();
-                    userAdapter.updateUserList(users.getUsers());
+                    List<User> userList = users.getUsers();
+
+                    // Remove the current user from the list if present
+                    Iterator<User> iterator = userList.iterator();
+                    while (iterator.hasNext()) {
+                        User user = iterator.next();
+                        if (user.getName().equals(myUserName)) {
+                            iterator.remove();
+                        }
+                    }
+
+                    if (userList.isEmpty()) {
+                        // No users found, show the empty search message
+                        findViewById(R.id.tv_empty_search).setVisibility(View.VISIBLE);
+                    } else {
+                        // Users found, hide the empty search message
+                        findViewById(R.id.tv_empty_search).setVisibility(View.GONE);
+                        userAdapter.updateUserList(userList);
+                    }
                 } else {
                     Log.e(TAG, "Search results fetch failed with code: " + response.code());
+                    // In case of failure, consider showing the empty search message or another error message
+                    findViewById(R.id.tv_empty_search).setVisibility(View.VISIBLE);
                 }
             }
+
 
             @Override
             public void onFailure(Call<UserListResponse> call, Throwable t) {

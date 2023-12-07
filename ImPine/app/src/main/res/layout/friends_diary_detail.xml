@@ -131,7 +131,7 @@
 
                 <ImageView
                     android:id="@+id/imageView"
-                    android:layout_width="365dp"
+                    android:layout_width="match_parent"
                     android:layout_height="458dp"
 
                     android:contentDescription="@string/pineapple_image"

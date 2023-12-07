@@ -94,6 +94,22 @@
             android:src="@drawable/friend" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/tv_empty_diary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Add your first pineapple diary!"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@+id/headerBar"
+        app:layout_constraintBottom_toTopOf="@+id/footerBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/short_stack"
+        android:textColor="@color/gray"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"/>
+
+
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerView"

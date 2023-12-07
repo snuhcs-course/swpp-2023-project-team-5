@@ -476,6 +476,7 @@ public class MakePlantActivity extends AppCompatActivity {
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
                     Uri selectedImage = result.getData().getData();
+                    Toast.makeText(MakePlantActivity.this, "Processing image, please wait...", Toast.LENGTH_SHORT).show();
                     try {
                         Bitmap bitmap = getCorrectlyOrientedBitmap(selectedImage);
                         imageView.setImageBitmap(bitmap);
