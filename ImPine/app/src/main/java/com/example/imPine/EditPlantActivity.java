@@ -89,18 +89,37 @@ public class EditPlantActivity extends AppCompatActivity {
     private void hideProgressBar() {
         loadingPanel.setVisibility(View.GONE);
     }
+//    private ActivityResultCallback<ActivityResult> cameraResultCallback = new ActivityResultCallback<ActivityResult>() {
+//        @Override
+//        public void onActivityResult(ActivityResult result) {
+//            if (result.getResultCode() == RESULT_OK) {
+//                // Image captured successfully
+//                Glide.with(EditPlantActivity.this).load(imageUri).into(imageView);
+//                imageChanged = true; // Set flag to true as image has changed
+//            } else {
+//                // Image capture failed or was cancelled by the user
+//                Log.e("EditPlantActivity", "No photo captured or operation cancelled.");
+//                // Reset or handle as required
+//
+//                imageChanged = false;
+//            }
+//        }
+//    };
+
     private ActivityResultCallback<ActivityResult> cameraResultCallback = new ActivityResultCallback<ActivityResult>() {
         @Override
         public void onActivityResult(ActivityResult result) {
-            if (result.getResultCode() == RESULT_OK) {
-                // Image captured successfully
-                Glide.with(EditPlantActivity.this).load(imageUri).into(imageView);
-                imageChanged = true; // Set flag to true as image has changed
+            if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                Log.d("MakePlantActivity", "Image capture successful");
+                Bundle extras = result.getData().getExtras();
+                Bitmap imageBitmap = (Bitmap) extras.get("data");
+                imageView.setImageBitmap(imageBitmap);
+                // Save the bitmap as a file and get the path
+                imageUri = saveImage(imageBitmap);
             } else {
-                // Image capture failed or was cancelled by the user
-                Log.e("EditPlantActivity", "No photo captured or operation cancelled.");
-                // Reset or handle as required
-                imageChanged = false;
+                Log.d("MakePlantActivity", "Camera action cancelled or failed");
+//                imageUri = null; // Set imageUri to null if camera action is cancelled or fails
+                Toast.makeText(EditPlantActivity.this, "Cancelled taking picture", Toast.LENGTH_SHORT).show();
             }
         }
     };
@@ -507,10 +526,10 @@ public class EditPlantActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    Uri selectedImage = result.getData().getData();
+                    Uri selectedImageUri = result.getData().getData();
                     Toast.makeText(EditPlantActivity.this, "Processing image, please wait...", Toast.LENGTH_SHORT).show();
                     try {
-                        Bitmap bitmap = getCorrectlyOrientedBitmap(selectedImage);
+                        Bitmap bitmap = getCorrectlyOrientedBitmap(selectedImageUri);
                         imageView.setImageBitmap(bitmap);
                         imageUri = saveImage(bitmap); // Save the image and update the URI
                         imageChanged = true; // Set flag to true as image has changed
@@ -518,9 +537,13 @@ public class EditPlantActivity extends AppCompatActivity {
                         Log.e("EditPlantActivity", "Error selecting image from gallery", e);
                         imageChanged = false;
                     }
+                } else {
+                    Toast.makeText(EditPlantActivity.this, "Image selection cancelled", Toast.LENGTH_SHORT).show();
+                    imageChanged = false;
                 }
             }
     );
+
 
     private Bitmap getCorrectlyOrientedBitmap(Uri imageUri) throws IOException {
         InputStream inputStream = getContentResolver().openInputStream(imageUri);

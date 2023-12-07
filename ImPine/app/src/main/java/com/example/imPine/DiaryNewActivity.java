@@ -72,6 +72,8 @@ public class DiaryNewActivity extends AppCompatActivity {
     private Uri imageUri;
     private String currentPhotoPath;
     private ActivityResultLauncher<Intent> cameraLauncher;
+    private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
+
     private RelativeLayout loadingPanel;
 
     private void showProgressBar() {
@@ -130,17 +132,23 @@ public class DiaryNewActivity extends AppCompatActivity {
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == RESULT_OK) {
+                        // Proceed only if the result is OK
                         try {
                             setPic();
                         } catch (IOException e) {
-                            throw new RuntimeException(e);
+                            Log.e("DiaryNewActivity", "Error setting picture: " + e.getMessage());
+                            e.printStackTrace();
                         }
+                    } else {
+                        // Handle the case where the user cancels the camera action
+                        Log.d("DiaryNewActivity", "Camera action was cancelled or failed.");
+                        Toast.makeText(DiaryNewActivity.this, "Picture taking cancelled", Toast.LENGTH_SHORT).show();
+                        // Here, do not modify imageView or imageUri
                     }
                 });
 
         Button takePictureButton = findViewById(R.id.btn_take_picture);
         takePictureButton.setOnClickListener(v -> showImageSourceDialog());
-
     }
 
     private void setupButtonListeners(ImageView lockImage) {
@@ -177,30 +185,31 @@ public class DiaryNewActivity extends AppCompatActivity {
     }
 
     private void postNewDiary() {
-            String title = titleEditText.getText().toString().trim();
-            String content = contentEditText.getText().toString().trim();
+        String title = titleEditText.getText().toString().trim();
+        String content = contentEditText.getText().toString().trim();
 
-            if (title.isEmpty() || content.isEmpty()) {
-                Toast.makeText(this, "Title and content cannot be empty.", Toast.LENGTH_SHORT).show();
-                return;
-            }
+        // Check if title or content is empty
+        if (title.isEmpty() || content.isEmpty()) {
+            Toast.makeText(this, "Title and content cannot be empty.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-            RequestBody titlePart = RequestBody.create(MediaType.parse("multipart/form-data"), title);
-            RequestBody contentPart = RequestBody.create(MediaType.parse("multipart/form-data"), content);
-            RequestBody isPrivatePart = RequestBody.create(MediaType.parse("multipart/form-data"), String.valueOf(isPrivate));
-            RequestBody categoryPart = RequestBody.create(MediaType.parse("multipart/form-data"), category);
+        RequestBody titlePart = RequestBody.create(MediaType.parse("multipart/form-data"), title);
+        RequestBody contentPart = RequestBody.create(MediaType.parse("multipart/form-data"), content);
+        RequestBody isPrivatePart = RequestBody.create(MediaType.parse("multipart/form-data"), String.valueOf(isPrivate));
+        RequestBody categoryPart = RequestBody.create(MediaType.parse("multipart/form-data"), category);
 
-            // Check if an image was captured
-            MultipartBody.Part body = null;
-        if (imageUri != null) {
-            File file = new File(imageUri.getPath());
+        MultipartBody.Part body = null;
+        if (imageUri != null && currentPhotoPath != null && new File(currentPhotoPath).exists()) {
+            File file = new File(currentPhotoPath);
             String mimeType = getContentResolver().getType(imageUri);
             if (mimeType == null) {
                 mimeType = "image/jpeg"; // Default MIME type
             }
             RequestBody requestFile = RequestBody.create(MediaType.parse(mimeType), file);
             body = MultipartBody.Part.createFormData("image", file.getName(), requestFile);
-
+        } else {
+            Log.e("DiaryNewActivitypic", "Image file path is null or does not exist");
         }
 
         Diary diary = new Diary.Builder()
@@ -210,24 +219,24 @@ public class DiaryNewActivity extends AppCompatActivity {
                 .setCategory(category)
                 .build();
 
-
         String authToken = AuthLoginActivity.getAuthToken(this);
-            Call<ResponseBody> call;
-            if (body != null) {
-                // Show loading panel
-                showProgressBar();
-                call = apiService.createDiary(authToken, titlePart, contentPart, isPrivatePart, categoryPart, body);
-            } else {
-                // Show loading panel
-                showProgressBar();
-                call = apiService.createDiaryWithoutImage(authToken, diary);
-            }
-            call.enqueue(new DiaryNewActivity.DiaryCallback());
+        Call<ResponseBody> call;
+        if (body != null) {
+            // Show loading panel
+            showProgressBar();
+            call = apiService.createDiary(authToken, titlePart, contentPart, isPrivatePart, categoryPart, body);
+        } else {
+            // Show loading panel
+            showProgressBar();
+            call = apiService.createDiaryWithoutImage(authToken, diary);
         }
+        call.enqueue(new DiaryNewActivity.DiaryCallback());
+    }
 
 
-        private class DiaryCallback implements Callback<ResponseBody> {
-            @Override
+
+    private class DiaryCallback implements Callback<ResponseBody> {
+        @Override
         public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
             if (response.isSuccessful()) {
                 // Hide loading panel
@@ -235,10 +244,10 @@ public class DiaryNewActivity extends AppCompatActivity {
                 Toast.makeText(DiaryNewActivity.this, "Diary saved successfully.", Toast.LENGTH_SHORT).show();
                 finish();
             } else {
-                Log.e("DiaryNewActivity", "Failed to save diary: " + response.code() + " " + response.message());
+                Log.e("DiaryNewActivitypic", "Failed to save diary: " + response.code() + " " + response.message());
                 try {
                     // Log detailed error message if available
-                    Log.e("DiaryNewActivity", "Error body: " + response.errorBody().string());
+                    Log.e("DiaryNewActivitypic", "Error body: " + response.errorBody().string());
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -250,14 +259,21 @@ public class DiaryNewActivity extends AppCompatActivity {
         public void onFailure(Call<ResponseBody> call, Throwable t) {
             // Hide loading panel
             hideProgressBar();
-            Log.e("DiaryNewActivity", "Error: " + t.getMessage(), t);
-            Toast.makeText(DiaryNewActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+            Log.e("DiaryNewActivitypic", "Error: " + t.getMessage(), t);
+//            Toast.makeText(DiaryNewActivity.this, "Error: " + t.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 
 
 
     private void dispatchTakePictureIntent() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+        } else {
+            launchCamera();
+        }
+    }
+    private void launchCamera() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
             File photoFile = null;
@@ -270,6 +286,17 @@ public class DiaryNewActivity extends AppCompatActivity {
                 imageUri = FileProvider.getUriForFile(this, "com.example.imPine.fileprovider", photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                 cameraLauncher.launch(takePictureIntent);
+            }
+        }
+    }
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                launchCamera();
+            } else {
+                Toast.makeText(this, "Camera permission is needed to take pictures", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -360,15 +387,15 @@ public class DiaryNewActivity extends AppCompatActivity {
         return rotatedImg;
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 1 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            dispatchTakePictureIntent();
-        } else {
-            Toast.makeText(this, "Camera permission is needed to take pictures", Toast.LENGTH_SHORT).show();
-        }
-    }
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        if (requestCode == 1 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//            dispatchTakePictureIntent();
+//        } else {
+//            Toast.makeText(this, "Camera permission is needed to take pictures", Toast.LENGTH_SHORT).show();
+//        }
+//    }
 
     private final ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -420,19 +447,22 @@ public class DiaryNewActivity extends AppCompatActivity {
 
     private Uri saveImage(Bitmap bitmap) {
         File imageDir = new File(getCacheDir(), "images");
-        if (!imageDir.exists()) {
-            imageDir.mkdirs();
+        if (!imageDir.exists() && !imageDir.mkdirs()) {
+            Log.e("DiaryNewActivity", "Failed to create directory");
+            return null;
         }
         String fileName = "image_" + System.currentTimeMillis() + ".jpg";
         File imageFile = new File(imageDir, fileName);
         try (OutputStream out = new FileOutputStream(imageFile)) {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.flush();
+            currentPhotoPath = imageFile.getAbsolutePath(); // Update the currentPhotoPath
             return Uri.fromFile(imageFile);
         } catch (IOException e) {
             Log.e("DiaryNewActivity", "Error saving image", e);
             return null;
         }
     }
+
 
 }

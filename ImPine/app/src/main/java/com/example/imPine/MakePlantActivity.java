@@ -9,6 +9,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.icu.text.SimpleDateFormat;
+
+import androidx.annotation.NonNull;
 import androidx.exifinterface.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -62,6 +64,9 @@ import retrofit2.Response;
 
 public class MakePlantActivity extends AppCompatActivity {
     private ActivityResultLauncher<Intent> cameraLauncher;
+    // Constants for permission request codes
+    private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
+    private static final int GALLERY_PERMISSION_REQUEST_CODE = 101;
     private ImageView imageView;
     private String currentPhotoPath;
     private Uri imageUri;
@@ -95,10 +100,22 @@ public class MakePlantActivity extends AppCompatActivity {
                 // Save the bitmap as a file and get the path
                 imageUri = saveImage(imageBitmap);
             } else {
-                // Handle other cases...
+                Log.d("MakePlantActivity", "Camera action cancelled or failed");
+                imageUri = null; // Set imageUri to null if camera action is cancelled or fails
+                Toast.makeText(MakePlantActivity.this, "Camera action cancelled", Toast.LENGTH_SHORT).show();
             }
         }
     };
+    // Method to check and request permission
+    private void requestCameraPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted, request it
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+        } else {
+            // Permission is already granted, perform your operation
+            dispatchTakePictureIntent();
+        }
+    }
 
     private Uri saveImage(Bitmap bitmap) {
         // Use the application's cache directory for saving the image
@@ -195,19 +212,23 @@ public class MakePlantActivity extends AppCompatActivity {
         cameraLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                        Log.d("MakePlantActivity", "Image capture successful");
-                        Bundle extras = result.getData().getExtras();
-                        Bitmap imageBitmap = (Bitmap) extras.get("data");
-                        imageView.setImageBitmap(imageBitmap);
-                        // Save the bitmap as a file and get the path
-                        imageUri = saveImage(imageBitmap);
+                    if (result.getResultCode() == RESULT_OK) {
+                        // Here, setPic() will be called to adjust the orientation
+                        setPic();
+
+                        try {
+                            Bitmap imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+                            imageView.setImageBitmap(imageBitmap);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else if (result.getResultCode() == RESULT_CANCELED) {
+                        Toast.makeText(this, "Take a picture or choose from gallery to proceed!", Toast.LENGTH_SHORT).show();
                     } else {
-                        // User pressed back without taking a picture
-                        Toast.makeText(MakePlantActivity.this, "Take a picture or choose from gallery to proceed!", Toast.LENGTH_SHORT).show();
-                        imageUri = null;
+                        Toast.makeText(this, "Image capture failed", Toast.LENGTH_SHORT).show();
                     }
                 });
+
 
         findViewById(R.id.btn_take_picture).setOnClickListener(v -> {
             showImageSourceDialog();
@@ -337,33 +358,30 @@ public class MakePlantActivity extends AppCompatActivity {
 
 
     private void dispatchTakePictureIntent() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+        } else {
+            launchCamera();
+        }
+    }
+    private void launchCamera() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
             File photoFile = null;
             try {
                 photoFile = createImageFile();
-                Log.d("MakePlantActivityPic", "File created at path: " + photoFile.getAbsolutePath());
-                if(photoFile.exists()){
-                    Log.d("MakePlantActivityPic", "The file exists!");
-                } else {
-                    Log.d("MakePlantActivityPic", "The file does not exist.");
-                }
             } catch (IOException ex) {
-                // Error occurred while creating the File
-                Log.e("MakePlantActivityPic", "Error occurred while creating the image file", ex);
+                Log.e("DiaryNewActivity", "Error occurred while creating the file", ex);
             }
-            // Continue only if the File was successfully created
             if (photoFile != null) {
-                imageUri = FileProvider.getUriForFile(this,
-                        "com.example.imPine.fileprovider",
-                        photoFile);
-                Log.d("MakePlantActivityPic", "Uri obtained for file: " + imageUri.toString());
+                imageUri = FileProvider.getUriForFile(this, "com.example.imPine.fileprovider", photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                 cameraLauncher.launch(takePictureIntent);
             }
         }
     }
+
+
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
@@ -381,21 +399,21 @@ public class MakePlantActivity extends AppCompatActivity {
         return image;
     }
 
-    private Bitmap rotateImageIfRequired(Bitmap img, String selectedImage) throws IOException {
-        ExifInterface ei = new ExifInterface(selectedImage);
-        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-
-        switch (orientation) {
-            case ExifInterface.ORIENTATION_ROTATE_90:
-                return rotateImage(img, 90);
-            case ExifInterface.ORIENTATION_ROTATE_180:
-                return rotateImage(img, 180);
-            case ExifInterface.ORIENTATION_ROTATE_270:
-                return rotateImage(img, 270);
-            default:
-                return img;
-        }
-    }
+//    private Bitmap rotateImageIfRequired(Bitmap img, String selectedImage) throws IOException {
+//        ExifInterface ei = new ExifInterface(selectedImage);
+//        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+//
+//        switch (orientation) {
+//            case ExifInterface.ORIENTATION_ROTATE_90:
+//                return rotateImage(img, 90);
+//            case ExifInterface.ORIENTATION_ROTATE_180:
+//                return rotateImage(img, 180);
+//            case ExifInterface.ORIENTATION_ROTATE_270:
+//                return rotateImage(img, 270);
+//            default:
+//                return img;
+//        }
+//    }
 
     private static Bitmap rotateImage(Bitmap img, int degree) {
         Matrix matrix = new Matrix();
@@ -404,43 +422,51 @@ public class MakePlantActivity extends AppCompatActivity {
         img.recycle();
         return rotatedImg;
     }
-    private void setPic() throws IOException {
-        // Get the dimensions of the View
-        int targetW = imageView.getWidth();
-        int targetH = imageView.getHeight();
+    private void setPic() {
+        try {
+            Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath);
+            ExifInterface ei = new ExifInterface(currentPhotoPath);
 
-        // Get the dimensions of the bitmap
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(currentPhotoPath, bmOptions);
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
+            int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
 
-        // Determine how much to scale down the image
-        int scaleFactor = Math.max(1, Math.min(photoW / targetW, photoH / targetH));
+            switch(orientation) {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    bitmap = rotateImage(bitmap, 90);
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    bitmap = rotateImage(bitmap, 180);
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    bitmap = rotateImage(bitmap, 270);
+                    break;
+                case ExifInterface.ORIENTATION_NORMAL:
+                default:
+                    // No rotation required
+                    break;
+            }
 
-        // Decode the image file into a Bitmap sized to fill the View
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-        bmOptions.inPurgeable = true;
-
-        Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath, bmOptions);
-        bitmap = rotateImageIfRequired(bitmap, currentPhotoPath);
-
-        imageView.setImageBitmap(bitmap);
-    }
-
-
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 100 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            dispatchTakePictureIntent();
-        } else {
-            Toast.makeText(this, "Camera permission is required to use this feature", Toast.LENGTH_SHORT).show();
+            imageView.setImageBitmap(bitmap);
+        } catch (IOException e) {
+            Log.e("MakePlantActivity", "Error setting the image", e);
         }
     }
+
+
+
+
+    // Handling the user response
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                launchCamera();
+            } else {
+                Toast.makeText(this, "Camera permission is needed to take pictures", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
 
     private void navigateToHomePage() {
         Intent intent = new Intent(this, HomePageActivity.class);
@@ -506,13 +532,14 @@ public class MakePlantActivity extends AppCompatActivity {
         builder.setTitle("Select Image");
         builder.setItems(options, (dialog, which) -> {
             if (which == 0) {
-                dispatchTakePictureIntent();
+                requestCameraPermission();
             } else {
-                dispatchChoosePictureIntent();
+                dispatchChoosePictureIntent(); // Directly launch gallery intent
             }
         });
         builder.show();
     }
+
 
     private Bitmap getCorrectlyOrientedBitmap(Uri imageUri) throws IOException {
         InputStream inputStream = getContentResolver().openInputStream(imageUri);
