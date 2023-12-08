@@ -9,6 +9,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.icu.text.SimpleDateFormat;
+
+import androidx.annotation.NonNull;
 import androidx.exifinterface.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
@@ -62,6 +64,9 @@ import retrofit2.Response;
 
 public class MakePlantActivity extends AppCompatActivity {
     private ActivityResultLauncher<Intent> cameraLauncher;
+    // Constants for permission request codes
+    private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
+    private static final int GALLERY_PERMISSION_REQUEST_CODE = 101;
     private ImageView imageView;
     private String currentPhotoPath;
     private Uri imageUri;
@@ -69,6 +74,7 @@ public class MakePlantActivity extends AppCompatActivity {
 
     private int avatar = 0;
     private ImageView lastSelectedAvatar = null;
+    private int isPressed = 0;
 
     private void handleAvatarClick(ImageView clickedAvatar, int avatarValue) {
         if (lastSelectedAvatar != null) {
@@ -84,21 +90,16 @@ public class MakePlantActivity extends AppCompatActivity {
         this.avatar = avatarValue;
     }
 
-    private ActivityResultCallback<ActivityResult> cameraResultCallback = new ActivityResultCallback<ActivityResult>() {
-        @Override
-        public void onActivityResult(ActivityResult result) {
-            if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                Log.d("MakePlantActivity", "Image capture successful");
-                Bundle extras = result.getData().getExtras();
-                Bitmap imageBitmap = (Bitmap) extras.get("data");
-                imageView.setImageBitmap(imageBitmap);
-                // Save the bitmap as a file and get the path
-                imageUri = saveImage(imageBitmap);
-            } else {
-                // Handle other cases...
-            }
+    // Method to check and request permission
+    private void requestCameraPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted, request it
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+        } else {
+            // Permission is already granted, perform your operation
+            dispatchTakePictureIntent();
         }
-    };
+    }
 
     private Uri saveImage(Bitmap bitmap) {
         // Use the application's cache directory for saving the image
@@ -195,19 +196,22 @@ public class MakePlantActivity extends AppCompatActivity {
         cameraLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
-                    if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                        Log.d("MakePlantActivity", "Image capture successful");
-                        Bundle extras = result.getData().getExtras();
-                        Bitmap imageBitmap = (Bitmap) extras.get("data");
-                        imageView.setImageBitmap(imageBitmap);
-                        // Save the bitmap as a file and get the path
-                        imageUri = saveImage(imageBitmap);
+                    if (result.getResultCode() == RESULT_OK) {
+                        isPressed = 1;
+                        try {
+                            setPic();
+                        }  catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else if (result.getResultCode() == RESULT_CANCELED) {
+                        Toast.makeText(this, "Take a picture or choose from gallery to proceed!", Toast.LENGTH_SHORT).show();
+                        isPressed = 0;
                     } else {
-                        // User pressed back without taking a picture
-                        Toast.makeText(MakePlantActivity.this, "Take a picture or choose from gallery to proceed!", Toast.LENGTH_SHORT).show();
-                        imageUri = null;
+                        Toast.makeText(this, "Image capture failed", Toast.LENGTH_SHORT).show();
+                        isPressed = 0;
                     }
                 });
+
 
         findViewById(R.id.btn_take_picture).setOnClickListener(v -> {
             showImageSourceDialog();
@@ -220,13 +224,18 @@ public class MakePlantActivity extends AppCompatActivity {
             String heightString = heightEditText.getText().toString().trim();
 
             // Check if any of the fields are empty or if the imageUri is null
-            if (plantName.isEmpty() || heightString.isEmpty() || imageUri == null) {
-                String message = "Please fill in all fields and take a picture.";
-                if (plantName.isEmpty() || heightString.isEmpty()) {
-                    message = "Please fill in all fields!";
+            if (plantName.isEmpty() || heightString.isEmpty() || imageUri == null || isPressed == 0) {
+                String message;
+                if (isPressed == 0) {
+                    message = "Try attaching a picture again!";
                 }
-                else if(imageUri == null) {
-                    message = "Please attach a picture of your pineapple!";
+                else {
+                    message = "Please fill in all fields and attach a picture.";
+                    if (plantName.isEmpty() || heightString.isEmpty()) {
+                        message = "Please fill in all fields!";
+                    } else if (imageUri == null) {
+                        message = "Please attach a picture of your pineapple!";
+                    }
                 }
                 Toast.makeText(MakePlantActivity.this, message, Toast.LENGTH_SHORT).show();
             } else {
@@ -337,33 +346,30 @@ public class MakePlantActivity extends AppCompatActivity {
 
 
     private void dispatchTakePictureIntent() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST_CODE);
+        } else {
+            launchCamera();
+        }
+    }
+    private void launchCamera() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // Create the File where the photo should go
             File photoFile = null;
             try {
                 photoFile = createImageFile();
-                Log.d("MakePlantActivityPic", "File created at path: " + photoFile.getAbsolutePath());
-                if(photoFile.exists()){
-                    Log.d("MakePlantActivityPic", "The file exists!");
-                } else {
-                    Log.d("MakePlantActivityPic", "The file does not exist.");
-                }
             } catch (IOException ex) {
-                // Error occurred while creating the File
-                Log.e("MakePlantActivityPic", "Error occurred while creating the image file", ex);
+                Log.e("DiaryNewActivity", "Error occurred while creating the file", ex);
             }
-            // Continue only if the File was successfully created
             if (photoFile != null) {
-                imageUri = FileProvider.getUriForFile(this,
-                        "com.example.imPine.fileprovider",
-                        photoFile);
-                Log.d("MakePlantActivityPic", "Uri obtained for file: " + imageUri.toString());
+                imageUri = FileProvider.getUriForFile(this, "com.example.imPine.fileprovider", photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                 cameraLauncher.launch(takePictureIntent);
             }
         }
     }
+
+
     private File createImageFile() throws IOException {
         // Create an image file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
@@ -381,10 +387,7 @@ public class MakePlantActivity extends AppCompatActivity {
         return image;
     }
 
-    private Bitmap rotateImageIfRequired(Bitmap img, String selectedImage) throws IOException {
-        ExifInterface ei = new ExifInterface(selectedImage);
-        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-
+    private Bitmap rotateImageIfRequired(Bitmap img, int orientation) throws IOException {
         switch (orientation) {
             case ExifInterface.ORIENTATION_ROTATE_90:
                 return rotateImage(img, 90);
@@ -425,22 +428,30 @@ public class MakePlantActivity extends AppCompatActivity {
         bmOptions.inPurgeable = true;
 
         Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath, bmOptions);
-        bitmap = rotateImageIfRequired(bitmap, currentPhotoPath);
+
+        // Get the orientation of the image
+        ExifInterface ei = new ExifInterface(currentPhotoPath);
+        int orientation = ei.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+
+        bitmap = rotateImageIfRequired(bitmap, orientation);
 
         imageView.setImageBitmap(bitmap);
     }
 
 
-
+    // Handling the user response
     @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 100 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            dispatchTakePictureIntent();
-        } else {
-            Toast.makeText(this, "Camera permission is required to use this feature", Toast.LENGTH_SHORT).show();
+        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                launchCamera();
+            } else {
+                Toast.makeText(this, "Camera permission is needed to take pictures", Toast.LENGTH_SHORT).show();
+            }
         }
     }
+
 
     private void navigateToHomePage() {
         Intent intent = new Intent(this, HomePageActivity.class);
@@ -475,6 +486,7 @@ public class MakePlantActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    isPressed = 1;
                     Uri selectedImage = result.getData().getData();
                     Toast.makeText(MakePlantActivity.this, "Processing image, please wait...", Toast.LENGTH_SHORT).show();
                     try {
@@ -486,6 +498,7 @@ public class MakePlantActivity extends AppCompatActivity {
                     }
                 }
                 else{
+                    isPressed = 0;
                     Toast.makeText(MakePlantActivity.this, "Take a picture or choose from gallery to proceed!", Toast.LENGTH_SHORT).show();
                     imageUri = null;
                 }
@@ -506,13 +519,14 @@ public class MakePlantActivity extends AppCompatActivity {
         builder.setTitle("Select Image");
         builder.setItems(options, (dialog, which) -> {
             if (which == 0) {
-                dispatchTakePictureIntent();
+                requestCameraPermission();
             } else {
-                dispatchChoosePictureIntent();
+                dispatchChoosePictureIntent(); // Directly launch gallery intent
             }
         });
         builder.show();
     }
+
 
     private Bitmap getCorrectlyOrientedBitmap(Uri imageUri) throws IOException {
         InputStream inputStream = getContentResolver().openInputStream(imageUri);

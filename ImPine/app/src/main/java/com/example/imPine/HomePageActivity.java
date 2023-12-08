@@ -209,7 +209,7 @@ public class HomePageActivity extends AppCompatActivity {
                                 String createdDate = plantResponse.getPlants().get(0).getFormattedCreatedAt();
                                 int daysOld = calculateDaysOld(createdDate);
                                 setBoldLabel(birthdayTextView, "Has been with me since: \n", createdDate + "\n("+ daysOld + " days old)");
-                                setBoldLabel(lastWateredTextView, "Last Watered Date: ", plantResponse.getPlants().get(0).getLast_watered());
+                                setBoldLabel(lastWateredTextView, "Last Watered Date:\n", plantResponse.getPlants().get(0).getLast_watered());
                                 String imagePath = plantResponse.getPlants().get(0).getImage();
                                 int avatar = plantResponse.getPlants().get(0).getAvatar();
                                 setAvatarImage(avatar, daysOld);

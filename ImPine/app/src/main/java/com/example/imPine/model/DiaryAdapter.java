@@ -39,7 +39,13 @@ public class DiaryAdapter extends RecyclerView.Adapter<DiaryAdapter.DiaryViewHol
     @Override
     public void onBindViewHolder(@NonNull DiaryViewHolder holder, int position) {
         Diary diary = diaries.get(position);
-        holder.titleTextView.setText(diary.getTitle());
+        // Truncate the title if it's longer than 17 characters and append "..."
+        String title = diary.getTitle();
+        if (title.length() > 15) {
+            title = title.substring(0, 15) + "...";
+        }
+        holder.titleTextView.setText(title);
+        holder.categoryTextView.setText(diary.getCategory());
         holder.categoryTextView.setText(diary.getCategory());
 
         // Define a character limit and find the index of the first newline

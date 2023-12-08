@@ -89,18 +89,25 @@ public class EditPlantActivity extends AppCompatActivity {
     private void hideProgressBar() {
         loadingPanel.setVisibility(View.GONE);
     }
+
+    private int isPressed = 1;
+
+
     private ActivityResultCallback<ActivityResult> cameraResultCallback = new ActivityResultCallback<ActivityResult>() {
         @Override
         public void onActivityResult(ActivityResult result) {
-            if (result.getResultCode() == RESULT_OK) {
-                // Image captured successfully
-                Glide.with(EditPlantActivity.this).load(imageUri).into(imageView);
-                imageChanged = true; // Set flag to true as image has changed
+            if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                isPressed = 1;
+                Log.d("MakePlantActivity", "Image capture successful");
+                Bundle extras = result.getData().getExtras();
+                Bitmap imageBitmap = (Bitmap) extras.get("data");
+                imageView.setImageBitmap(imageBitmap);
+                // Save the bitmap as a file and get the path
+                imageUri = saveImage(imageBitmap);
             } else {
-                // Image capture failed or was cancelled by the user
-                Log.e("EditPlantActivity", "No photo captured or operation cancelled.");
-                // Reset or handle as required
-                imageChanged = false;
+                isPressed = 0;
+                Log.d("MakePlantActivity", "Camera action cancelled or failed");
+                Toast.makeText(EditPlantActivity.this, "Cancelled taking picture", Toast.LENGTH_SHORT).show();
             }
         }
     };
@@ -403,6 +410,10 @@ public class EditPlantActivity extends AppCompatActivity {
         return byteBuffer.toByteArray();
     }
     private void editPlant(String plantId, String newName, String newHeight, String newStatus, String newLastWatered, String newAvatar, String userId) {
+        if (newName.trim().isEmpty() || newHeight.trim().isEmpty()) {
+            Toast.makeText(EditPlantActivity.this, "Name and Height cannot be empty!", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String authToken = AuthLoginActivity.getAuthToken(this);
         ApiInterface apiService = RetrofitClient.getClient().create(ApiInterface.class);
 
@@ -507,10 +518,11 @@ public class EditPlantActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
-                    Uri selectedImage = result.getData().getData();
+                    isPressed = 1;
+                    Uri selectedImageUri = result.getData().getData();
                     Toast.makeText(EditPlantActivity.this, "Processing image, please wait...", Toast.LENGTH_SHORT).show();
                     try {
-                        Bitmap bitmap = getCorrectlyOrientedBitmap(selectedImage);
+                        Bitmap bitmap = getCorrectlyOrientedBitmap(selectedImageUri);
                         imageView.setImageBitmap(bitmap);
                         imageUri = saveImage(bitmap); // Save the image and update the URI
                         imageChanged = true; // Set flag to true as image has changed
@@ -518,9 +530,14 @@ public class EditPlantActivity extends AppCompatActivity {
                         Log.e("EditPlantActivity", "Error selecting image from gallery", e);
                         imageChanged = false;
                     }
+                } else {
+                    isPressed = 0;
+                    Toast.makeText(EditPlantActivity.this, "Image selection cancelled", Toast.LENGTH_SHORT).show();
+                    imageChanged = false;
                 }
             }
     );
+
 
     private Bitmap getCorrectlyOrientedBitmap(Uri imageUri) throws IOException {
         InputStream inputStream = getContentResolver().openInputStream(imageUri);

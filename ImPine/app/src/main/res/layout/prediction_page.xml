@@ -55,7 +55,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/headerBar">
-
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Initial input values are filled with current weather data!\nYou can input your own weather data for prediction."
+            android:fontFamily="@font/short_stack"
+            android:textColor="@color/darkblue"
+            android:layout_gravity="center"
+            android:layout_marginBottom="18dp"
+            android:textSize="9dp" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

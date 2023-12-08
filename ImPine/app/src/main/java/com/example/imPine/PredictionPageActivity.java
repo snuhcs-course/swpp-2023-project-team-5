@@ -252,6 +252,14 @@ public class PredictionPageActivity extends AppCompatActivity {
         // Fetch and set weather data each time the activity resumes
         setDefaultWeatherValues();
     }
+
+    private boolean isInputValid() {
+        return isRainValid(rainValue) &&
+                isTemperatureValid(temperatureValue) &&
+                isHumidityValid(humidityValue) &&
+                isCloudinessValid(cloudValue) &&
+                isWindValid(windValue);
+    }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -308,18 +316,25 @@ public class PredictionPageActivity extends AppCompatActivity {
         btnPredict.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Prepare to send either user input or default values
-                Intent intent = new Intent(PredictionPageActivity.this, PredictionResultActivity.class);
-                intent.putExtra("temperatureValue", temperatureValue);
-                intent.putExtra("rainValue", rainValue);
-                intent.putExtra("humidityValue", humidityValue);
-                intent.putExtra("cloudValue", cloudValue);
-                intent.putExtra("windValue", windValue);
+                // Validate the input values
+                if (isInputValid()) {
+                    // If valid, continue to PredictionResultActivity
+                    Intent intent = new Intent(PredictionPageActivity.this, PredictionResultActivity.class);
+                    intent.putExtra("temperatureValue", temperatureValue);
+                    intent.putExtra("rainValue", rainValue);
+                    intent.putExtra("humidityValue", humidityValue);
+                    intent.putExtra("cloudValue", cloudValue);
+                    intent.putExtra("windValue", windValue);
 
-                intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                startActivity(intent);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    startActivity(intent);
+                } else {
+                    // If invalid, show a toast message
+                    showToast("Please enter valid data within the specified ranges.");
+                }
             }
         });
+
 
         // Diary button click
         ImageButton diaryButton = findViewById(R.id.diary);

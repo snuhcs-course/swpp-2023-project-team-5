@@ -93,15 +93,19 @@ public class DiaryDetailActivity extends AppCompatActivity {
     private void hideProgressBar() {
         loadingPanel.setVisibility(View.GONE);
     }
+    private int isPressed = 0;
 
     private ActivityResultCallback<ActivityResult> cameraResultCallback = new ActivityResultCallback<ActivityResult>() {
         @Override
         public void onActivityResult(ActivityResult result) {
             if (result.getResultCode() == RESULT_OK) {
+                isPressed = 1;
                 // Image captured successfully
                 Glide.with(DiaryDetailActivity.this).load(imageUri).into(imageView);
                 imageChanged = true; // Set the flag to true as the image has changed
             } else {
+                isPressed = 0;
+                Toast.makeText(DiaryDetailActivity.this, "Cancelled...Attach a new photo if you want a picture!", Toast.LENGTH_SHORT).show();
                 Log.e("DiaryDetailActivity", "Image capture failed or cancelled");
             }
         }
@@ -270,7 +274,7 @@ public class DiaryDetailActivity extends AppCompatActivity {
     private void setupEditButton() {
         editButton.setOnClickListener(v -> {
             if (hasChanges()) {
-                if (imageChanged) {
+                if (isPressed == 1) {
                     updateDiaryWithImage(imageUri);
                 }
                 else updateDiaryWithoutImage();
@@ -525,6 +529,7 @@ public class DiaryDetailActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    isPressed = 1;
                     Uri selectedImageUri = result.getData().getData();
                     Toast.makeText(DiaryDetailActivity.this, "Processing image, please wait...", Toast.LENGTH_SHORT).show();
                     try {
@@ -535,6 +540,9 @@ public class DiaryDetailActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         Log.e("DiaryNewActivity", "Error selecting image from gallery", e);
                     }
+                }
+                else {
+                    isPressed = 0;
                 }
             }
     );
