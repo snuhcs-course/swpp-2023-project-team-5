@@ -164,8 +164,6 @@ public class EditPlantActivity extends AppCompatActivity {
             }
         }
     };
-
-
     private ImageView lastSelectedAvatar = null;
     private int currentAvatar = 0; // Default value, update it based on the intent extra
 
