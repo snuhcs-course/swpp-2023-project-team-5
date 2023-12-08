@@ -91,28 +91,79 @@ public class EditPlantActivity extends AppCompatActivity {
     }
 
     private int isPressed = 1;
+    private Bitmap rotateImageIfRequired2(Bitmap img, int orientation) throws IOException {
+        switch (orientation) {
+            case androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_90:
+                return rotateImage2(img, 90);
+            case androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_180:
+                return rotateImage2(img, 180);
+            case androidx.exifinterface.media.ExifInterface.ORIENTATION_ROTATE_270:
+                return rotateImage2(img, 270);
+            default:
+                return img;
+        }
+    }
+
+    private static Bitmap rotateImage2(Bitmap img, int degree) {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(degree);
+        Bitmap rotatedImg = Bitmap.createBitmap(img, 0, 0, img.getWidth(), img.getHeight(), matrix, true);
+        img.recycle();
+        return rotatedImg;
+    }
+    private void setPic2() throws IOException {
+        // Get the dimensions of the View
+        int targetW = imageView.getWidth();
+        int targetH = imageView.getHeight();
+
+        // Get the dimensions of the bitmap
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+        bmOptions.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(currentPhotoPath, bmOptions);
+        int photoW = bmOptions.outWidth;
+        int photoH = bmOptions.outHeight;
+
+        // Determine how much to scale down the image
+        int scaleFactor = Math.max(1, Math.min(photoW / targetW, photoH / targetH));
+
+        // Decode the image file into a Bitmap sized to fill the View
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true;
+
+        Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath, bmOptions);
+
+        // Get the orientation of the image
+        androidx.exifinterface.media.ExifInterface ei = new androidx.exifinterface.media.ExifInterface(currentPhotoPath);
+        int orientation = ei.getAttributeInt(androidx.exifinterface.media.ExifInterface.TAG_ORIENTATION, androidx.exifinterface.media.ExifInterface.ORIENTATION_NORMAL);
+
+        bitmap = rotateImageIfRequired2(bitmap, orientation);
+
+        imageView.setImageBitmap(bitmap);
+    }
 
 
     private ActivityResultCallback<ActivityResult> cameraResultCallback = new ActivityResultCallback<ActivityResult>() {
         @Override
         public void onActivityResult(ActivityResult result) {
-            if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+            if (result.getResultCode() == RESULT_OK) {
+                try {
+                    setPic2();
+                    imageChanged = true; // Set flag to true as image has changed
+                } catch (IOException e) {
+                    Log.e("EditPlantActivity", "Error occurred while loading image from file", e);
+                    Toast.makeText(EditPlantActivity.this, "Failed to load image", Toast.LENGTH_SHORT).show();
+                }
+
                 isPressed = 1;
-                Log.d("MakePlantActivity", "Image capture successful");
-                Bundle extras = result.getData().getExtras();
-                Bitmap imageBitmap = (Bitmap) extras.get("data");
-                imageView.setImageBitmap(imageBitmap);
-                // Save the bitmap as a file and get the path
-                imageUri = saveImage(imageBitmap);
+                Log.d("EditPlantActivity", "Image capture successful");
             } else {
                 isPressed = 0;
-                Log.d("MakePlantActivity", "Camera action cancelled or failed");
+                Log.d("EditPlantActivity", "Camera action cancelled or failed");
                 Toast.makeText(EditPlantActivity.this, "Cancelled taking picture", Toast.LENGTH_SHORT).show();
             }
         }
     };
-
-
     private ImageView lastSelectedAvatar = null;
     private int currentAvatar = 0; // Default value, update it based on the intent extra
 
@@ -385,11 +436,15 @@ public class EditPlantActivity extends AppCompatActivity {
         boolean hasImageChanged = imageChanged; // Use the flag instead of comparing URIs
 
 
-        if (hasNameChanged || hasHeightChanged || hasStatusChanged || hasLastWateredChanged || hasAvatarChanged || hasImageChanged) {
+        if (hasNameChanged || hasHeightChanged || hasStatusChanged || hasLastWateredChanged || hasAvatarChanged || isPressed == 1) {
             Log.d("EditPlantActivity", "Changes detected. Updating plant information.");
             editPlant(Integer.toString(existingPlant.getPlant_id()), newName, newHeight, newStatus, newLastWatered, Integer.toString(currentAvatar), userId);
             HomePageActivity.avatarFromHome = currentAvatar;
         } else {
+            if (isPressed == 0) {
+                Toast.makeText(EditPlantActivity.this, "Attach photo again!", Toast.LENGTH_SHORT).show();
+                return;
+            }
             Toast.makeText(this, "No changes to update", Toast.LENGTH_SHORT).show();
             HomePageActivity.avatarFromHome = currentAvatar;
             navigateToHomePage();
@@ -524,6 +579,7 @@ public class EditPlantActivity extends AppCompatActivity {
                     try {
                         Bitmap bitmap = getCorrectlyOrientedBitmap(selectedImageUri);
                         imageView.setImageBitmap(bitmap);
+                        rotateImage(bitmap,90);
                         imageUri = saveImage(bitmap); // Save the image and update the URI
                         imageChanged = true; // Set flag to true as image has changed
                     } catch (IOException e) {
