@@ -75,6 +75,7 @@ public class DiaryNewActivity extends AppCompatActivity {
     private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
 
     private RelativeLayout loadingPanel;
+    private int isPressed = 0;
 
     private void showProgressBar() {
         loadingPanel.setVisibility(View.VISIBLE);
@@ -133,6 +134,7 @@ public class DiaryNewActivity extends AppCompatActivity {
                 result -> {
                     if (result.getResultCode() == RESULT_OK) {
                         // Proceed only if the result is OK
+                        isPressed = 1;
                         try {
                             setPic();
                         } catch (IOException e) {
@@ -140,9 +142,10 @@ public class DiaryNewActivity extends AppCompatActivity {
                             e.printStackTrace();
                         }
                     } else {
+                        isPressed = 0;
                         // Handle the case where the user cancels the camera action
                         Log.d("DiaryNewActivity", "Camera action was cancelled or failed.");
-                        Toast.makeText(DiaryNewActivity.this, "Picture taking cancelled", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(DiaryNewActivity.this, "Cancelled...Attach a new photo if you want a picture!", Toast.LENGTH_SHORT).show();
                         // Here, do not modify imageView or imageUri
                     }
                 });
@@ -221,7 +224,7 @@ public class DiaryNewActivity extends AppCompatActivity {
 
         String authToken = AuthLoginActivity.getAuthToken(this);
         Call<ResponseBody> call;
-        if (body != null) {
+        if (isPressed == 1) {
             // Show loading panel
             showProgressBar();
             call = apiService.createDiary(authToken, titlePart, contentPart, isPrivatePart, categoryPart, body);
@@ -365,6 +368,7 @@ public class DiaryNewActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    isPressed = 1;
                     Uri selectedImageUri = result.getData().getData();
                     Toast.makeText(DiaryNewActivity.this, "Processing image, please wait...", Toast.LENGTH_SHORT).show();
                     try {
@@ -374,6 +378,9 @@ public class DiaryNewActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         Log.e("DiaryNewActivity", "Error selecting image from gallery", e);
                     }
+                }
+                else {
+                    isPressed = 0;
                 }
             }
     );

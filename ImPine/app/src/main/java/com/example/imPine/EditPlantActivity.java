@@ -89,27 +89,15 @@ public class EditPlantActivity extends AppCompatActivity {
     private void hideProgressBar() {
         loadingPanel.setVisibility(View.GONE);
     }
-//    private ActivityResultCallback<ActivityResult> cameraResultCallback = new ActivityResultCallback<ActivityResult>() {
-//        @Override
-//        public void onActivityResult(ActivityResult result) {
-//            if (result.getResultCode() == RESULT_OK) {
-//                // Image captured successfully
-//                Glide.with(EditPlantActivity.this).load(imageUri).into(imageView);
-//                imageChanged = true; // Set flag to true as image has changed
-//            } else {
-//                // Image capture failed or was cancelled by the user
-//                Log.e("EditPlantActivity", "No photo captured or operation cancelled.");
-//                // Reset or handle as required
-//
-//                imageChanged = false;
-//            }
-//        }
-//    };
+
+    private int isPressed = 1;
+
 
     private ActivityResultCallback<ActivityResult> cameraResultCallback = new ActivityResultCallback<ActivityResult>() {
         @Override
         public void onActivityResult(ActivityResult result) {
             if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                isPressed = 1;
                 Log.d("MakePlantActivity", "Image capture successful");
                 Bundle extras = result.getData().getExtras();
                 Bitmap imageBitmap = (Bitmap) extras.get("data");
@@ -117,8 +105,8 @@ public class EditPlantActivity extends AppCompatActivity {
                 // Save the bitmap as a file and get the path
                 imageUri = saveImage(imageBitmap);
             } else {
+                isPressed = 0;
                 Log.d("MakePlantActivity", "Camera action cancelled or failed");
-//                imageUri = null; // Set imageUri to null if camera action is cancelled or fails
                 Toast.makeText(EditPlantActivity.this, "Cancelled taking picture", Toast.LENGTH_SHORT).show();
             }
         }
@@ -422,6 +410,10 @@ public class EditPlantActivity extends AppCompatActivity {
         return byteBuffer.toByteArray();
     }
     private void editPlant(String plantId, String newName, String newHeight, String newStatus, String newLastWatered, String newAvatar, String userId) {
+        if (newName.trim().isEmpty() || newHeight.trim().isEmpty()) {
+            Toast.makeText(EditPlantActivity.this, "Name and Height cannot be empty!", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String authToken = AuthLoginActivity.getAuthToken(this);
         ApiInterface apiService = RetrofitClient.getClient().create(ApiInterface.class);
 
@@ -526,6 +518,7 @@ public class EditPlantActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    isPressed = 1;
                     Uri selectedImageUri = result.getData().getData();
                     Toast.makeText(EditPlantActivity.this, "Processing image, please wait...", Toast.LENGTH_SHORT).show();
                     try {
@@ -538,6 +531,7 @@ public class EditPlantActivity extends AppCompatActivity {
                         imageChanged = false;
                     }
                 } else {
+                    isPressed = 0;
                     Toast.makeText(EditPlantActivity.this, "Image selection cancelled", Toast.LENGTH_SHORT).show();
                     imageChanged = false;
                 }

@@ -74,6 +74,7 @@ public class MakePlantActivity extends AppCompatActivity {
 
     private int avatar = 0;
     private ImageView lastSelectedAvatar = null;
+    private int isPressed = 0;
 
     private void handleAvatarClick(ImageView clickedAvatar, int avatarValue) {
         if (lastSelectedAvatar != null) {
@@ -88,25 +89,6 @@ public class MakePlantActivity extends AppCompatActivity {
         // Update the avatar variable
         this.avatar = avatarValue;
     }
-
-//    private ActivityResultCallback<ActivityResult> cameraResultCallback = new ActivityResultCallback<ActivityResult>() {
-//        @Override
-//        public void onActivityResult(ActivityResult result) {
-//            if (result.getResultCode() == RESULT_OK && currentPhotoPath != null) {
-//                try {
-//                    Bitmap bitmap = BitmapFactory.decodeFile(currentPhotoPath);
-//                    bitmap = rotateImageIfRequired(bitmap, currentPhotoPath);
-//
-//                    imageView.setImageBitmap(bitmap);
-//                    imageUri = saveImage(bitmap); // Save the rotated bitmap
-//                } catch (IOException e) {
-//                    Log.e("MakePlantActivity", "Error setting the image", e);
-//                }
-//            } else {
-//                Toast.makeText(MakePlantActivity.this, "Camera action cancelled", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//    };
 
     // Method to check and request permission
     private void requestCameraPermission() {
@@ -215,6 +197,7 @@ public class MakePlantActivity extends AppCompatActivity {
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == RESULT_OK) {
+                        isPressed = 1;
                         try {
                             setPic();
                         }  catch (IOException e) {
@@ -222,8 +205,10 @@ public class MakePlantActivity extends AppCompatActivity {
                         }
                     } else if (result.getResultCode() == RESULT_CANCELED) {
                         Toast.makeText(this, "Take a picture or choose from gallery to proceed!", Toast.LENGTH_SHORT).show();
+                        isPressed = 0;
                     } else {
                         Toast.makeText(this, "Image capture failed", Toast.LENGTH_SHORT).show();
+                        isPressed = 0;
                     }
                 });
 
@@ -239,13 +224,18 @@ public class MakePlantActivity extends AppCompatActivity {
             String heightString = heightEditText.getText().toString().trim();
 
             // Check if any of the fields are empty or if the imageUri is null
-            if (plantName.isEmpty() || heightString.isEmpty() || imageUri == null) {
-                String message = "Please fill in all fields and take a picture.";
-                if (plantName.isEmpty() || heightString.isEmpty()) {
-                    message = "Please fill in all fields!";
+            if (plantName.isEmpty() || heightString.isEmpty() || imageUri == null || isPressed == 0) {
+                String message;
+                if (isPressed == 0) {
+                    message = "Try attaching a picture again!";
                 }
-                else if(imageUri == null) {
-                    message = "Please attach a picture of your pineapple!";
+                else {
+                    message = "Please fill in all fields and attach a picture.";
+                    if (plantName.isEmpty() || heightString.isEmpty()) {
+                        message = "Please fill in all fields!";
+                    } else if (imageUri == null) {
+                        message = "Please attach a picture of your pineapple!";
+                    }
                 }
                 Toast.makeText(MakePlantActivity.this, message, Toast.LENGTH_SHORT).show();
             } else {
@@ -496,6 +486,7 @@ public class MakePlantActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
                 if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    isPressed = 1;
                     Uri selectedImage = result.getData().getData();
                     Toast.makeText(MakePlantActivity.this, "Processing image, please wait...", Toast.LENGTH_SHORT).show();
                     try {
@@ -507,6 +498,7 @@ public class MakePlantActivity extends AppCompatActivity {
                     }
                 }
                 else{
+                    isPressed = 0;
                     Toast.makeText(MakePlantActivity.this, "Take a picture or choose from gallery to proceed!", Toast.LENGTH_SHORT).show();
                     imageUri = null;
                 }
