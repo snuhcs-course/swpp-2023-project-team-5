@@ -12,7 +12,12 @@
           "package_name": "com.example.imPine"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "596133871955-rq85gg7nac5umgiihulaqp6u4fdnhh5u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCOQTsCS83HuPOaLjAXID-ODInKpoGyE48"
@@ -20,7 +25,41 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "596133871955-rq85gg7nac5umgiihulaqp6u4fdnhh5u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:596133871955:android:7f6831554438d07cb7a1a6",
+        "android_client_info": {
+          "package_name": "com.imPine.imPineThankYou"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "596133871955-rq85gg7nac5umgiihulaqp6u4fdnhh5u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCOQTsCS83HuPOaLjAXID-ODInKpoGyE48"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "596133871955-rq85gg7nac5umgiihulaqp6u4fdnhh5u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

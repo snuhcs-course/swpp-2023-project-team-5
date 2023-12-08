@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.imPine'
+    namespace 'com.imPine.imPineThankYou'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.imPine"
+        applicationId "com.imPine.imPineThankYou"
         minSdk 24
         targetSdk 33
         versionCode 1
