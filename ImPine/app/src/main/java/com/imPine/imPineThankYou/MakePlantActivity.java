@@ -360,7 +360,7 @@ public class MakePlantActivity extends AppCompatActivity {
                 Log.e("DiaryNewActivity", "Error occurred while creating the file", ex);
             }
             if (photoFile != null) {
-                imageUri = FileProvider.getUriForFile(this, "com.example.imPine.fileprovider", photoFile);
+                imageUri = FileProvider.getUriForFile(this, "com.imPine.imPineThankYou.fileprovider", photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                 cameraLauncher.launch(takePictureIntent);
             }
