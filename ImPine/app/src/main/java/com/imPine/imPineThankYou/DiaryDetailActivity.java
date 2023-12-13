@@ -457,7 +457,7 @@ public class DiaryDetailActivity extends AppCompatActivity {
             File photoFile = createImageFile();
             if (photoFile != null) {
                 imageUri = FileProvider.getUriForFile(this,
-                        "com.example.imPine.fileprovider", photoFile);
+                        "com.imPine.imPineThankYou.fileprovider", photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
                 cameraLauncher.launch(takePictureIntent);
             }
